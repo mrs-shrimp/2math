@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>三角形と四角形</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+:root{
+  --bg:#F2F8F5; --grid:#D3E7DF; --grid2:#C6DDD3;
+  --ink:#1F2F4A; --ink2:#4E5F7B; --card:#FFFFFF; --tile:#FFFFFF; --seltile:#E6F0FF;
+  --primary:#2468D8; --onprimary:#FFFFFF; --ok:#1B8F52; --ng:#D93A40; --warn:#D97A00;
+  --chk:rgba(255,204,51,.62); --chkline:#B77800; --gold:#F2B705;
+  --t1:#FFE28A; --t2:#BFE3FF; --t3:#FFC9D6; --t4:#C9F0D3; --t5:#FFD3A8; --t6:#D9CCFF; --t7:#BDEFEA; --t8:#E6F08A;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16213A; --grid:#22335A; --grid2:#33487A;
+    --ink:#F2F5FF; --ink2:#A9B6D3; --card:#1F2C4A; --tile:#1A2744; --seltile:#26365E;
+    --primary:#6AA5FF; --onprimary:#0F1A30; --ok:#4CD08A; --ng:#FF7A80; --warn:#FFB04D;
+    --chk:rgba(255,204,51,.55); --chkline:#FFD24D; --gold:#FFD24D;
+    --t1:#6B5A1F; --t2:#1F4A6B; --t3:#6B2F45; --t4:#1F5A3A; --t5:#6B4420; --t6:#45387A; --t7:#1F5A56; --t8:#56601F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16213A; --grid:#22335A; --grid2:#33487A;
+  --ink:#F2F5FF; --ink2:#A9B6D3; --card:#1F2C4A; --tile:#1A2744; --seltile:#26365E;
+  --primary:#6AA5FF; --onprimary:#0F1A30; --ok:#4CD08A; --ng:#FF7A80; --warn:#FFB04D;
+  --chk:rgba(255,204,51,.55); --chkline:#FFD24D; --gold:#FFD24D;
+  --t1:#6B5A1F; --t2:#1F4A6B; --t3:#6B2F45; --t4:#1F5A3A; --t5:#6B4420; --t6:#45387A; --t7:#1F5A56; --t8:#56601F;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; min-height:100vh;
+  font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+  font-size:18px; line-height:1.65; color:var(--ink);
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  -webkit-text-size-adjust:100%;
+}
+ruby{ruby-position:over}
+rt{font-size:.45em;font-weight:500;letter-spacing:.02em}
+h1,h2,p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:4px solid var(--warn);outline-offset:3px}
+.wrap{max-width:980px;margin:0 auto;padding:14px 16px 40px}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:52px;padding:.4em 1.3em;
+  border:3px solid var(--ink);border-radius:16px;background:var(--card);color:var(--ink);font-weight:900;font-size:1rem;line-height:1.3;
+  box-shadow:0 4px 0 var(--ink);transition:transform .06s,box-shadow .06s}
+.btn:active:not(:disabled){transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.primary{background:var(--primary);color:var(--onprimary)}
+.btn.small{min-height:44px;padding:.2em .9em;font-size:.9rem;border-radius:14px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn[aria-pressed="true"]{background:var(--t1);}
+.actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:14px 0}
+
+/* ---- top bar ---- */
+.top{display:flex;align-items:center;gap:12px;margin:2px 0 12px;flex-wrap:wrap}
+.ttl{font-size:clamp(20px,4.4vw,30px);font-weight:900;line-height:1.7;display:flex;align-items:center;gap:10px;flex:1;min-width:220px}
+.badge{flex:none;width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-size:1.05rem;font-weight:900}
+.prog{font-weight:700;color:var(--ink2);margin-bottom:6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.combo{display:inline-block;padding:0 12px;border-radius:999px;border:3px solid var(--ink);background:var(--t1);color:var(--ink);font-weight:900;line-height:1.6}
+.note{background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;margin:0 0 14px;line-height:1.9}
+.msg{min-height:3.4em;font-weight:700;padding:10px 14px;border-radius:14px;margin:12px 0 0;line-height:1.8}
+.msg.okm{background:var(--t4);border:3px solid var(--ok)}
+.msg.ngm{background:var(--t5);border:3px solid var(--warn)}
+.msg.inf{background:var(--card);border:3px dashed var(--ink2)}
+.msg:empty{border:0;background:none;padding:0}
+
+/* ---- home ---- */
+.hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin:8px 0 18px}
+.hero-svg{width:min(300px,100%);height:auto;flex:none}
+.hbg{fill:var(--tile);stroke:var(--ink);stroke-width:3}
+.gl2 line{stroke:var(--grid2);stroke-width:1}
+.shape2{stroke:var(--ink);stroke-width:3;stroke-linejoin:round}
+.grade{font-weight:700;color:var(--ink2)}
+.hero h1{font-size:clamp(34px,8vw,56px);font-weight:900;line-height:1.55}
+.lead{font-weight:700;margin-top:4px}
+.cards2{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:20px}
+@media (min-width:720px){.cards2{grid-template-columns:1.25fr 1fr}}
+.panel{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:12px 14px}
+.ph{font-size:1.05rem;font-weight:900;margin-bottom:6px;line-height:1.8}
+.mis{display:block;margin:6px 0}
+.mis .mt{display:flex;justify-content:space-between;gap:8px;font-weight:700;line-height:1.8}
+.mis .mt .st{white-space:nowrap}
+.bar{height:14px;border:2px solid var(--ink);border-radius:999px;background:var(--tile);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:999px}
+.mis.done .mt{color:var(--ok)}
+.mis.done .bar i{background:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.chip{border:3px solid var(--ink);border-radius:14px;padding:0 10px;background:var(--tile);font-weight:700;line-height:1.9}
+.chip b{font-size:1.1rem}
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media (min-width:720px){.menu{grid-template-columns:repeat(4,1fr)}}
+.mtile{display:flex;flex-direction:column;gap:8px;text-align:left;padding:12px;min-height:210px;
+  border:3px solid var(--ink);border-radius:20px;background:var(--c);color:var(--ink);box-shadow:5px 5px 0 var(--ink);transition:transform .06s,box-shadow .06s}
+.mtile:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+.mtop{display:flex;justify-content:space-between;align-items:center}
+.mtop .badge{width:34px;height:34px;font-size:1rem}
+.stars{font-size:1.15rem;letter-spacing:.06em}
+.mico{width:100%;height:84px;background:var(--tile);border-radius:12px;border:2px solid var(--ink)}
+.mtitle{font-weight:900;font-size:1.02rem;line-height:1.85}
+.gl line{stroke:var(--grid2);stroke-width:.05}
+.ic{stroke:var(--ink);stroke-width:.22;stroke-linejoin:round}
+.icl{stroke:var(--ink);stroke-width:.5;fill:none;stroke-linecap:round}
+.icm{stroke:var(--ink);stroke-width:.25;fill:none}
+
+/* ---- figures ---- */
+.shape{stroke:var(--ink);stroke-width:.16;stroke-linejoin:round;stroke-linecap:round}
+.chk{fill:var(--chk);stroke:var(--chkline);stroke-width:.1}
+.rmark{stroke:var(--ok);stroke-width:.14;fill:none;stroke-linejoin:miter}
+.chkicon{display:inline-block;width:1.05em;height:1.05em;background:var(--chk);border:2px solid var(--chkline);vertical-align:-.15em;margin:0 .15em}
+
+.fig1{max-width:460px;margin:0 auto;border:3px solid var(--ink);border-radius:20px;background:var(--tile);padding:6px;position:relative}
+.fig1 svg{display:block;width:100%;height:auto}
+.vring{fill:none;stroke:var(--ink2);stroke-width:.08;stroke-dasharray:.25 .2}
+.vdot{fill:var(--ink)}
+.vdot.okd{fill:var(--ok)} .vdot.ngd{fill:var(--ng)} .vdot.missd{fill:var(--warn)}
+.vring.okd{stroke:var(--ok);stroke-width:.16;stroke-dasharray:none}
+.vring.ngd{stroke:var(--ng);stroke-width:.16;stroke-dasharray:none}
+.vring.missd{stroke:var(--warn);stroke-width:.16}
+.vsel{fill:none;stroke:var(--primary);stroke-width:.2}
+.vhit{cursor:pointer}
+.xmark{stroke:var(--ng);stroke-width:.2;stroke-linecap:round}
+.spark{position:absolute;top:-8px;left:-6px;z-index:2;width:30px;height:30px;border-radius:50%;background:var(--gold);border:3px solid var(--ink);display:grid;place-items:center;font-size:.9rem;line-height:1;color:#1F2F4A}
+
+/* ---- pick screens ---- */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tile{position:relative;display:block;width:100%;padding:4px;text-align:center;
+  border:3px solid var(--ink);border-radius:16px;background:var(--tile);color:var(--ink)}
+.tile svg{display:block;width:100%;height:auto}
+.tile[aria-pressed="true"]{background:var(--seltile);box-shadow:0 0 0 4px var(--primary);border-color:var(--primary)}
+.tile:disabled{opacity:1;color:var(--ink);cursor:default}
+.tile.ok{border-color:var(--ok);box-shadow:0 0 0 4px var(--ok);background:var(--tile)}
+.tile.bad{border-color:var(--ng);box-shadow:0 0 0 4px var(--ng);background:var(--tile)}
+.tile.miss{border-color:var(--warn);border-style:dashed;box-shadow:0 0 0 4px var(--warn);background:var(--tile)}
+.tag{position:absolute;top:-10px;right:-6px;min-width:34px;padding:0 8px;border-radius:999px;border:3px solid var(--ink);font-weight:900;font-size:.95rem;line-height:1.5;color:#fff}
+.tok{background:var(--ok)} .tng{background:var(--ng)} .tms{background:var(--warn)}
+.trare{right:auto;left:-6px;background:var(--gold);color:#1F2F4A}
+:root[data-theme="dark"] .tag{color:#0F1A30}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag{color:#0F1A30}}
+.why{display:block;font-size:.78rem;font-weight:700;line-height:1.5;padding:2px 2px 4px}
+.why em{font-style:normal;color:var(--ok)}
+
+/* ---- result ---- */
+.result{text-align:center;padding:26px 16px;border:3px solid var(--ink);border-radius:24px;background:var(--card);margin-top:10px}
+.result h2{font-size:1.7rem;font-weight:900}
+.bigstars{font-size:3.2rem;letter-spacing:.08em;margin:6px 0}
+.result p{font-weight:700}
+.sum{list-style:none;margin:12px auto 0;padding:0;max-width:520px;text-align:left}
+.sum li{border:3px solid var(--ink);border-radius:14px;background:var(--tile);padding:2px 12px;margin:8px 0;font-weight:700;line-height:1.9}
+.sum li.hl{background:var(--t1)}
+
+/* ---- menu 7 ---- */
+.tray{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;padding:10px;min-height:96px;
+  border:3px dashed var(--ink2);border-radius:16px;background:var(--card)}
+.card7{position:relative;border:3px solid var(--ink);border-radius:12px;background:var(--tile);padding:2px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.card7 svg{display:block;width:100%;height:auto;pointer-events:none}
+.card7.sel{outline:4px solid var(--primary);outline-offset:2px;background:var(--seltile)}
+.card7.dragging{opacity:.3}
+.card7 .spark{width:22px;height:22px;font-size:.7rem;top:-8px;left:-8px}
+.ghost{position:fixed;z-index:60;width:76px;pointer-events:none;border:3px solid var(--ink);border-radius:12px;background:var(--tile);padding:2px;box-shadow:0 8px 18px rgba(0,0,0,.28);transform:rotate(-4deg)}
+.ghost svg{display:block;width:100%;height:auto}
+.buckets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.bucket{border:3px solid var(--ink);border-radius:16px;background:var(--bc);padding:8px 6px;min-height:200px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
+.bucket .bt{font-weight:900;text-align:center;line-height:1.8;font-size:.95rem}
+.bucket .bd{font-size:.74rem;line-height:1.55;text-align:center;font-weight:700}
+.placed{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-content:flex-start}
+.mini{width:calc(50% - 4px);max-width:64px;border:2px solid var(--ink);border-radius:8px;background:var(--tile);padding:1px}
+.mini svg{display:block;width:100%;height:auto}
+.left7{font-weight:700;color:var(--ink2);margin:8px 2px 6px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---- menu 8 ---- */
+.pal{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+@media (min-width:720px){.pal{grid-template-columns:repeat(8,1fr)}}
+.pbtn{padding:4px;border:3px solid var(--ink);border-radius:14px;background:var(--tile);color:var(--ink)}
+.pbtn:active{transform:translateY(2px)}
+.pbtn svg{display:block;width:100%;height:54px}
+.pbtn span{display:block;text-align:center;font-size:.72rem;font-weight:700;line-height:1.4}
+.pbtn.found{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
+.canvas{display:block;width:100%;height:auto;border:3px solid var(--ink);border-radius:18px;background:var(--tile);touch-action:none;user-select:none;-webkit-user-select:none}
+.gp{stroke:var(--grid2);stroke-width:1;fill:none}
+.piece{cursor:grab}
+.piece polygon{stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.piece.sel polygon{stroke:var(--warn);stroke-width:4.5;stroke-dasharray:9 5}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
+.tools .btn{min-height:46px;font-size:.88rem;padding:.2em .9em}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sw{width:36px;height:36px;border-radius:50%;border:3px solid var(--ink);padding:0}
+.sw:disabled{opacity:.35;cursor:not-allowed}
+.tally{margin-top:12px;font-weight:700;background:var(--card);border:3px solid var(--ink);border-radius:14px;padding:8px 14px;line-height:1.9}
+
+/* ---- zukan ---- */
+.zgroup{margin:0 0 6px;font-weight:900;font-size:1.05rem;line-height:1.9}
+.zgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+@media (min-width:720px){.zgrid{grid-template-columns:repeat(5,1fr)}}
+.zslot{border:3px solid var(--ink);border-radius:16px;background:var(--tile);padding:4px;text-align:center}
+.zslot.found{box-shadow:0 0 0 3px var(--gold);border-color:var(--ink)}
+.zfig svg{display:block;width:100%;height:auto}
+.zfig.q{aspect-ratio:1/1;display:grid;place-items:center;font-size:2.4rem;font-weight:900;color:var(--ink2)}
+.zname{font-size:.78rem;font-weight:700;line-height:1.7;padding:0 2px 4px}
+.zcnt{font-size:.75rem;color:var(--ink2);font-weight:700}
+
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:no-preference){
+  .shake{animation:shake .35s}
+  .bigstars{animation:pop .5s ease-out}
+  .combo.hot{animation:pulse .6s ease-in-out 2}
+}
+@media (max-width:420px){
+  body{font-size:17px}
+  .bucket .bt{font-size:.85rem}
+  .bucket .bd{font-size:.68rem}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+'use strict';
+var app=document.getElementById('app');
+
+/* ================= ことば（ふりがなつき） ================= */
+var R=function(k,y){return '<ruby>'+k+'<rt>'+y+'</rt></ruby>';};
+var W={
+  tri:R('三角形','さんかくけい'), quad:R('四角形','しかくけい'), right:R('直角','ちょっかく'),
+  rtri:R('直角三角形','ちょっかくさんかくけい'), rect:R('長方形','ちょうほうけい'), sq:R('正方形','せいほうけい'),
+  fig:R('図形','ずけい')
+};
+var NAME={tri:W.tri,quad:W.quad,right:W.right,rtri:W.rtri,rect:W.rect,sq:W.sq};
+var MENUS=[
+  {id:'m1',title:W.right+'をさがせ！'},
+  {id:'m2',title:W.tri+'をさがせ！'},
+  {id:'m3',title:W.quad+'をさがせ！'},
+  {id:'m4',title:W.rtri+'をさがせ！'},
+  {id:'m5',title:W.rect+'をさがせ！'},
+  {id:'m6',title:W.sq+'をさがせ！'},
+  {id:'m7',title:'ならった'+W.fig+'をわけろ！'},
+  {id:'m8',title:W.tri+'と'+W.quad+'でじゆうにもようづくり'}
+];
+
+/* ================= ユーティリティ ================= */
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function rint(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function pickR(a){return a[Math.floor(Math.random()*a.length)];}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+function sub(a,b){return [a[0]-b[0],a[1]-b[1]];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1];}
+function crs(a,b){return a[0]*b[1]-a[1]*b[0];}
+function len(a){return Math.hypot(a[0],a[1]);}
+function norm(a){var l=len(a)||1;return [a[0]/l,a[1]/l];}
+function fx(n){return (Math.round(n*1000)/1000).toString();}
+function starsTxt(n){n=n||0;return '★★★'.slice(0,n)+'☆☆☆'.slice(0,3-n);}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function wpick(list,wf){
+  var tot=0,i;
+  for(i=0;i<list.length;i++){list[i]._w=(list[i].w===undefined?1:list[i].w)*(wf?wf(list[i]):1);tot+=list[i]._w;}
+  if(tot<=0)return list[0];
+  var r=Math.random()*tot;
+  for(i=0;i<list.length;i++){r-=list[i]._w;if(r<=0&&list[i]._w>0)return list[i];}
+  return list[list.length-1];
+}
+
+/* ================= 保存データ ================= */
+var LSK='sankaku-shikaku-v2';
+function defStore(){
+  return {v:2,prog:{},found:{tri:0,quad:0,right:0,rtri:0,rect:0,sq:0},skill:{},weak:{},coll:{},recent:{},recentFound:[],daily:null,bestCombo:0,bonus:0,rare:0,plays:0};
+}
+function loadStore(){
+  var s=null;
+  try{var r=localStorage.getItem(LSK);if(r)s=JSON.parse(r);}catch(e){s=null;}
+  if(!s||typeof s!=='object'){
+    s=defStore();
+    try{var old=localStorage.getItem('sankaku-shikaku-prog');if(old){s.prog=JSON.parse(old)||{};}}catch(e){}
+  }
+  var d=defStore(),k;
+  for(k in d){if(s[k]===undefined||s[k]===null){if(k!=='daily')s[k]=d[k];}}
+  if(s.daily===undefined)s.daily=null;
+  for(k in d.found){if(typeof s.found[k]!=='number')s.found[k]=0;}
+  return s;
+}
+var store=loadStore();
+function save(){try{localStorage.setItem(LSK,JSON.stringify(store));}catch(e){}}
+function award(id,s){if(!store.prog[id]||s>store.prog[id]){store.prog[id]=s;}save();}
+
+/* ---- 内部のレベル（1〜5）と「まちがえ度」 ---- */
+function sk(mid){var s=store.skill[mid];if(!s){s=store.skill[mid]={lv:1,pts:0};}return s;}
+function bumpSkill(mid,good){
+  var s=sk(mid),up=false;
+  if(good===true){
+    s.pts=Math.max(s.pts,0)+1;
+    if(s.pts>=2&&s.lv<5){s.lv++;s.pts=0;up=true;}
+    else if(s.pts>2)s.pts=2;
+  }else if(good===false){
+    s.pts=Math.min(s.pts,0)-1;
+    if(s.pts<=-2&&s.lv>1){s.lv--;s.pts=0;}
+    else if(s.pts<-2)s.pts=-2;
+  }
+  save();return up;
+}
+function weakOf(t){return store.weak[t]||0;}
+function updWeak(t,ok){var w=weakOf(t);w=ok?Math.max(0,w-0.5):Math.min(6,w+1);store.weak[t]=w;}
+
+/* ================= 図形の分析（頂点から正確に判定） ================= */
+function polyArea(p){var a=0,n=p.length;for(var i=0;i<n;i++){var q=p[(i+1)%n];a+=p[i][0]*q[1]-q[0]*p[i][1];}return a/2;}
+function axisEdge(a){return a[0]===0||a[1]===0;}
+function analyze(f){
+  f.rights=[];f.angles=[];f.sides=[];f.edges=[];
+  if(f.kind){f.type='other';f.tk=f.kind;f.n=f.pts?f.pts.length-1:0;f.look=f.kind;return f;}
+  var p=f.pts,n=p.length,i;f.n=n;
+  for(i=0;i<n;i++)f.edges.push(sub(p[(i+1)%n],p[i]));
+  for(i=0;i<n;i++){
+    var a=sub(p[(i+n-1)%n],p[i]),b=f.edges[i],d=dot(a,b);
+    if(d===0)f.rights.push(i);
+    f.angles.push(Math.acos(clamp(d/(len(a)*len(b)),-1,1))*180/Math.PI);
+    f.sides.push(len(b));
+  }
+  var s0=f.sides[0];
+  f.equal=f.sides.every(function(s){return Math.abs(s-s0)<1e-9;});
+  f.axis=f.edges.every(axisEdge);
+  var xs=p.map(function(q){return q[0];}),ys=p.map(function(q){return q[1];});
+  f.bw=Math.max.apply(null,xs)-Math.min.apply(null,xs);
+  f.bh=Math.max.apply(null,ys)-Math.min.apply(null,ys);
+  if(n===3)f.type=f.rights.length?'rtri':'tri';
+  else if(n===4){
+    if(f.rights.length===4)f.type=f.equal?'sq':'rect';
+    else f.type=f.equal?'rhombus':'quad';
+  }else f.type='poly';
+  f.tk=f.type;
+  f.look=lookKey(f);
+  var ss=f.sides.map(function(s){return Math.round(s*10)/10;}).sort().join(',');
+  var aa=f.angles.map(function(s){return Math.round(s);}).sort().join(',');
+  f.shapeSig=f.type+'|'+ss+'|'+aa;
+  return f;
+}
+function lookKey(f){
+  var t=f.type;
+  if(t==='tri'){
+    var mn=Math.min.apply(null,f.angles),mx=Math.max.apply(null,f.angles);
+    return mn<30?'tri-thin':(mx>90?'tri-obtuse':'tri-acute');
+  }
+  if(t==='rtri'){
+    var ri=f.rights[0],a=sub(f.pts[(ri+2)%3],f.pts[ri]),b=sub(f.pts[(ri+1)%3],f.pts[ri]);
+    var l1=len(a),l2=len(b),ratio=Math.max(l1,l2)/Math.min(l1,l2);
+    if(ratio>=2.8)return 'rtri-thin';
+    return (axisEdge(a)&&axisEdge(b))?'rtri-axis':'rtri-tilt';
+  }
+  if(t==='rect'){
+    if(!f.axis)return 'rect-tilt';
+    var r=Math.max(f.bw,f.bh)/Math.min(f.bw,f.bh);
+    if(r>=2.8)return 'rect-thin';
+    return f.bw>f.bh?'rect-wide':'rect-tall';
+  }
+  if(t==='sq'){
+    if(!f.axis)return 'sq-tilt';
+    return f.bw>=5?'sq-big':'sq-small';
+  }
+  if(t==='rhombus')return 'quad-same';
+  if(t==='quad'){
+    if(f.rights.length===2)return 'quad-right2';
+    if(crs(f.edges[0],f.edges[2])===0||crs(f.edges[1],f.edges[3])===0)return 'quad-para';
+    return 'quad-free';
+  }
+  return 'poly'+f.n;
+}
+
+/* ================= 図形ジェネレータ ================= */
+var uid=0;
+var FILLS=['#FFD166','#7CC6FE','#95E1A3','#FFA8C5','#C3A6FF','#FFB88C'];
+var FBCOUNT=0;
+var VMAX={'1,0':9,'1,1':5,'1,2':3,'2,1':3,'3,4':1,'4,3':1};
+var VMIN={'1,0':2,'1,1':2,'1,2':1,'2,1':1,'3,4':1,'4,3':1};
+
+function dih(pts,t){
+  return pts.map(function(p){
+    var x=p[0],y=p[1];
+    switch(t){
+      case 0:return [x,y];case 1:return [-y,x];case 2:return [-x,-y];case 3:return [y,-x];
+      case 4:return [-x,y];case 5:return [y,x];case 6:return [x,-y];default:return [-y,-x];
+    }
+  });
+}
+function fit(pts){
+  var minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;
+  pts.forEach(function(p){minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1]);});
+  var w=maxx-minx,h=maxy-miny;
+  if(w>10||h>10)return null;
+  var ox=rint(0,10-w)-minx,oy=rint(0,10-h)-miny;
+  return pts.map(function(p){return [p[0]+ox,p[1]+oy];});
+}
+function sigOf(f){
+  if(f.kind==='circle')return 'C'+f.r+':'+f.cx+','+f.cy;
+  var p=f.pts,mx=1e9,my=1e9;
+  p.forEach(function(q){mx=Math.min(mx,q[0]);my=Math.min(my,q[1]);});
+  return (f.kind||'P')+f.n+':'+p.map(function(q){return fx(q[0]-mx)+','+fx(q[1]-my);}).join(';')+(f.ei!==undefined?'|'+f.ei:'');
+}
+function okFig(f,spec){
+  var p=f.pts,n=p.length,lv=spec.lv||1,i;
+  for(i=0;i<n;i++){if(p[i][0]<0||p[i][0]>10||p[i][1]<0||p[i][1]>10)return false;}
+  var sg=0;
+  for(i=0;i<n;i++){
+    var c=crs(f.edges[i],f.edges[(i+1)%n]);
+    if(c===0)return false;
+    var s=c>0?1:-1;
+    if(sg===0)sg=s;else if(s!==sg)return false;
+  }
+  var mnS=Math.min.apply(null,f.sides),mxS=Math.max.apply(null,f.sides);
+  if(mnS<2-1e-9)return false;
+  var maxR=spec.rare?6:(lv>=5?5.5:(lv>=3?4.6:3.3));
+  if(mxS/mnS>maxR)return false;
+  if(n<=4){
+    var minA=spec.rare?11:(lv>=5?12:(lv>=3?17:24));
+    var margin=(lv>=5||spec.rare)?6:8;
+    for(i=0;i<n;i++){
+      var a=f.angles[i];
+      if(a<minA||a>180-minA)return false;
+      if(f.rights.indexOf(i)<0&&Math.abs(a-90)<margin)return false;
+    }
+  }
+  var area=Math.abs(polyArea(p));
+  if(area<(n===3?(lv<=2&&!spec.rare?6:4):(spec.rare?4:8)))return false;
+  return true;
+}
+function finish(raw,spec){
+  var lv=spec.lv||1;
+  var t=lv<=1?pickR([0,4]):pickR([0,1,2,3,4,5,6,7]);
+  var pts=fit(dih(raw,t));
+  if(!pts)return null;
+  var f={id:'g'+(++uid),pts:pts,lv:lv,rare:!!spec.rare,fill:FILLS[rint(0,FILLS.length-1)]};
+  analyze(f);
+  if(!okFig(f,spec))return null;
+  f.sig=sigOf(f);
+  return f;
+}
+function pickVec(spec){
+  var lv=spec.lv;
+  if(spec.rare)return pickR([[3,4],[4,3],[2,1],[1,2],[1,1]]);
+  if(lv<=2)return [1,0];
+  if(Math.random()<0.5)return [1,0];
+  return pickR([[1,1],[2,1],[1,2]]);
+}
+function rawRtri(spec){
+  var v=pickVec(spec),key=v.join(),m=VMAX[key],mn=VMIN[key];
+  var s=rint(mn,m),k=rint(mn,m);
+  if(spec.lv<=2&&!spec.rare&&Math.max(s,k)/Math.min(s,k)>2.2)return null;
+  var w0=[-v[1],v[0]];
+  return [[0,0],[s*v[0],s*v[1]],[k*w0[0],k*w0[1]]];
+}
+function rawRect(spec){
+  var lv=spec.lv,v,s,k,key,m,mn;
+  if(spec.rare&&Math.random()<0.55){
+    if(Math.random()<0.5){v=[1,0];s=rint(8,10);k=2;}
+    else{v=[1,1];s=pickR([4,5]);k=pickR([2,3]);if(s===k)return null;}
+  }else{
+    v=pickVec(spec);key=v.join();m=VMAX[key];mn=VMIN[key];
+    var near=(lv>=4&&Math.random()<0.4),thin=(lv>=3&&Math.random()<0.3);
+    if(near){var pr=pickR([[5,4],[4,3],[6,5],[3,2]]);s=pr[0];k=pr[1];}
+    else if(thin&&key==='1,0'){s=rint(7,9);k=rint(2,3);}
+    else{s=rint(mn+1,m);k=rint(mn,Math.max(mn,Math.floor(s/1.5)));}
+  }
+  if(s===k)return null;
+  if(Math.random()<0.5){var tmp=s;s=k;k=tmp;}
+  var w0=[-v[1],v[0]];
+  return [[0,0],[s*v[0],s*v[1]],[s*v[0]+k*w0[0],s*v[1]+k*w0[1]],[k*w0[0],k*w0[1]]];
+}
+function rawSq(spec){
+  var lv=spec.lv,v,s;
+  if(spec.rare){
+    v=pickR([[3,4],[4,3],[2,1],[1,1]]);
+    s=(v.join()==='2,1')?3:((v.join()==='1,1')?5:1);
+  }else{
+    v=(lv>=3&&Math.random()<0.55)?pickR([[1,1],[2,1],[1,2]]):[1,0];
+    var key=v.join();
+    s=(key==='1,0')?rint(2,9):rint(VMIN[key],VMAX[key]);
+  }
+  var w0=[-v[1],v[0]];
+  return [[0,0],[s*v[0],s*v[1]],[s*v[0]+s*w0[0],s*v[1]+s*w0[1]],[s*w0[0],s*w0[1]]];
+}
+function rawTri(spec){
+  var lv=spec.lv;
+  if(lv<=1&&!spec.rare){
+    var b=rint(4,9),h=rint(3,8),ax=clamp(Math.round(b/2)+rint(-1,1),1,b-1);
+    return [[0,h],[b,h],[ax,0]];
+  }
+  var B=rint(5,10);
+  return [[rint(0,B),rint(0,B)],[rint(0,B),rint(0,B)],[rint(0,B),rint(0,B)]];
+}
+function buildVecs(){
+  var groups={},g=[[5,0],[3,4],[4,3]],out={};
+  function add(key,p,q){
+    var arr=out[key]||(out[key]=[]);
+    [[p,q],[q,p]].forEach(function(b){
+      [[1,1],[1,-1],[-1,1],[-1,-1]].forEach(function(sg){
+        var v=[b[0]*sg[0],b[1]*sg[1]];
+        if(!arr.some(function(u){return u[0]===v[0]&&u[1]===v[1];}))arr.push(v);
+      });
+    });
+  }
+  add('25',5,0);add('25',3,4);add('5',1,2);add('10',1,3);add('20',2,4);add('13',2,3);
+  return out;
+}
+var RHV=buildVecs();
+function rawRhombus(spec){
+  var key=pickR(['25','25','5','10','20']);
+  var g=RHV[key],a=pickR(g),b=pickR(g);
+  if(dot(a,b)===0||crs(a,b)===0)return null;
+  return [[0,0],a,[a[0]+b[0],a[1]+b[1]],b];
+}
+function rawQuad(spec){
+  var sub2=spec.sub||wpick([{t:'para',w:1},{t:'trap',w:1.2},{t:'rtrap',w:0.9},{t:'free',w:1}]).t;
+  if(sub2==='para'){
+    var w=rint(3,7),h=rint(2,6),sh=rint(1,3)*(Math.random()<0.5?-1:1);
+    return [[0,0],[w,0],[w+sh,h],[sh,h]];
+  }
+  if(sub2==='trap'||sub2==='rtrap'){
+    var W2=rint(5,9),t=rint(2,W2-2),h2=rint(3,7),x1;
+    if(sub2==='rtrap')x1=0;
+    else x1=spec.lv>=3?rint(-2,W2-t+2):rint(0,W2-t);
+    return [[0,0],[W2,0],[x1+t,h2],[x1,h2]];
+  }
+  return [[rint(0,3),rint(0,3)],[rint(6,10),rint(0,4)],[rint(6,10),rint(6,10)],[rint(0,4),rint(6,10)]];
+}
+function rawPoly(spec){
+  var kind=pickR(['cut','cut','house','hex']),W2,H,cx,cy;
+  if(kind==='house'){
+    W2=2*rint(3,4);H=rint(3,5);var r=rint(2,3);
+    return [[0,0],[W2,0],[W2,H],[W2/2,H+r],[0,H]];
+  }
+  W2=rint(6,9);H=rint(6,9);
+  if(kind==='cut'){
+    cx=rint(2,W2-2);cy=rint(2,H-2);
+    return [[0,0],[W2,0],[W2,H-cy],[W2-cx,H],[0,H]];
+  }
+  var cx1=rint(2,3),cy1=rint(2,3),cx2=rint(2,3),cy2=rint(2,3);
+  return [[cx1,0],[W2,0],[W2,H-cy2],[W2-cx2,H],[0,H],[0,cy1]];
+}
+function baseFor(nb,spec){
+  var t=nb===3?pickR(['tri','rtri','tri']):pickR(['rect','sq','quad','rhombus','quad']);
+  for(var i=0;i<40;i++){var b=genOnce({t:t,lv:Math.min(spec.lv,4)});if(b)return b;}
+  return null;
+}
+function genOpen(spec){
+  var nb=spec.base||pickR([3,4]);
+  for(var tr=0;tr<30;tr++){
+    var b=baseFor(nb,spec);if(!b)continue;
+    var pts=b.pts.map(function(p){return [p[0],p[1]];});
+    var r=rint(0,pts.length-1);pts=pts.slice(r).concat(pts.slice(0,r));
+    var last=pts[pts.length-1],first=pts[0],L=len(sub(first,last));
+    if(L<3.6)continue;
+    var t=spec.lv<=2?0.35+Math.random()*0.15:(spec.lv<=4?0.5+Math.random()*0.15:0.62+Math.random()*0.12);
+    if((1-t)*L<1.2)t=1-1.2/L;
+    var q=[last[0]+(first[0]-last[0])*t,last[1]+(first[1]-last[1])*t];
+    var f={id:'g'+(++uid),kind:'open',pts:pts.concat([q]),baseN:b.n,lv:spec.lv,rare:false,fill:FILLS[0]};
+    analyze(f);f.shapeSig='open|'+b.shapeSig;f.sig=sigOf(f);
+    return f;
+  }
+  return null;
+}
+function genCurve(spec){
+  var nb=spec.base||pickR([3,4]);
+  for(var tr=0;tr<30;tr++){
+    var b=baseFor(nb,spec);if(!b)continue;
+    var p=b.pts,n=p.length,cands=[],i;
+    for(i=0;i<n;i++){if(b.sides[i]>=4.2)cands.push(i);}
+    if(!cands.length)continue;
+    var e=pickR(cands),A=p[e],B=p[(e+1)%n],L=b.sides[e];
+    var mid=[(A[0]+B[0])/2,(A[1]+B[1])/2],d=norm(sub(B,A)),nr=[-d[1],d[0]];
+    var cen=[0,0];p.forEach(function(q){cen[0]+=q[0]/n;cen[1]+=q[1]/n;});
+    if(dot(sub(mid,cen),nr)<0)nr=[-nr[0],-nr[1]];
+    var bulge=Math.max(1.3,L*(spec.lv>=4?0.2:0.3));
+    var peak=[mid[0]+nr[0]*bulge,mid[1]+nr[1]*bulge];
+    if(peak[0]<-0.6||peak[0]>10.6||peak[1]<-0.6||peak[1]>10.6)continue;
+    var ctrl=[mid[0]+nr[0]*bulge*2,mid[1]+nr[1]*bulge*2];
+    var dStr='M'+fx(p[0][0])+' '+fx(p[0][1]);
+    for(i=0;i<n;i++){
+      var T=p[(i+1)%n];
+      if(i===e)dStr+=' Q'+fx(ctrl[0])+' '+fx(ctrl[1])+' '+fx(T[0])+' '+fx(T[1]);
+      else dStr+=' L'+fx(T[0])+' '+fx(T[1]);
+    }
+    dStr+=' Z';
+    var f={id:'g'+(++uid),kind:'curve',d:dStr,pts:p.map(function(q){return [q[0],q[1]];}),ei:e,baseN:n,lv:spec.lv,rare:false,fill:FILLS[rint(0,5)]};
+    analyze(f);f.n=n;f.shapeSig='curve|'+b.shapeSig;f.sig=sigOf(f);
+    return f;
+  }
+  return null;
+}
+function genCircle(spec){
+  var r=pickR([2.5,3,3.5,4,4.5]);
+  var cx=rint(Math.ceil(r),Math.floor(10-r)),cy=rint(Math.ceil(r),Math.floor(10-r));
+  var f={id:'g'+(++uid),kind:'circle',cx:cx,cy:cy,r:r,lv:spec.lv,rare:false,fill:FILLS[rint(0,5)]};
+  analyze(f);f.shapeSig='circle|'+r;f.sig=sigOf(f);
+  return f;
+}
+function genOnce(spec){
+  var t=spec.t,raw,f;
+  if(t==='open')return genOpen(spec);
+  if(t==='curve')return genCurve(spec);
+  if(t==='circle')return genCircle(spec);
+  if(t==='tri')raw=rawTri(spec);
+  else if(t==='rtri')raw=rawRtri(spec);
+  else if(t==='rect')raw=rawRect(spec);
+  else if(t==='sq')raw=rawSq(spec);
+  else if(t==='rhombus')raw=rawRhombus(spec);
+  else if(t==='quad')raw=rawQuad(spec);
+  else if(t==='poly')raw=rawPoly(spec);
+  if(!raw)return null;
+  f=finish(raw,spec);
+  if(!f)return null;
+  if(f.type!==t)return null;
+  if(t==='tri'&&spec.lv>=4&&spec.near){
+    if(!f.angles.some(function(a){var d=Math.abs(a-90);return d>=8&&d<=22;}))return null;
+  }
+  return f;
+}
+var FALLBACK={
+  tri:[[1,8],[9,8],[4,2]],rtri:[[1,1],[1,7],[7,7]],rect:[[1,2],[9,2],[9,7],[1,7]],sq:[[2,2],[7,2],[7,7],[2,7]],
+  rhombus:[[1,3],[6,3],[9,7],[4,7]],quad:[[3,2],[7,2],[9,8],[1,8]],poly:[[5,1],[9,4],[8,9],[2,9],[1,4]]
+};
+function fallback(t){
+  if(t==='circle'||t==='open'||t==='curve'||!FALLBACK[t])return genCircle({lv:1});
+  var f={id:'g'+(++uid),pts:FALLBACK[t].map(function(p){return [p[0],p[1]];}),lv:1,rare:false,fill:FILLS[rint(0,5)]};
+  analyze(f);f.sig=sigOf(f);
+  return f;
+}
+function gen(spec,ctx){
+  ctx=ctx||{avoid:{},shapes:{},looks:{}};
+  var i,f;
+  for(i=0;i<220;i++){
+    f=genOnce(spec);
+    if(!f)continue;
+    if(spec.check&&!spec.check(f))continue;
+    if(ctx.avoid[f.sig])continue;
+    if(i<140&&ctx.shapes[f.shapeSig])continue;
+    if(i<80&&spec.newLook&&ctx.looks[f.look])continue;
+    ctx.shapes[f.shapeSig]=1;ctx.looks[f.look]=1;ctx.avoid[f.sig]=1;
+    return f;
+  }
+  FBCOUNT++;
+  f=fallback(spec.t);
+  ctx.shapes[f.shapeSig]=1;ctx.avoid[f.sig]=1;
+  return f;
+}
+function itemLv(lv){var r=Math.random();return clamp(lv+(r<0.25?-1:(r<0.75?0:1)),1,5);}
+function recentCtx(mid){
+  var av={};(store.recent[mid]||[]).forEach(function(s){av[s]=1;});
+  return {avoid:av,shapes:{},looks:{}};
+}
+function rememberSigs(mid,figs){
+  var r=store.recent[mid]||[];
+  figs.forEach(function(f){if(f.sig)r.push(f.sig);});
+  store.recent[mid]=r.slice(-40);save();
+}
+
+/* ================= 図形の描画 ================= */
+function gridLines(a,b){
+  var s='';
+  for(var i=a;i<=b;i++){s+='<line x1="'+i+'" y1="'+a+'" x2="'+i+'" y2="'+b+'"/><line x1="'+a+'" y1="'+i+'" x2="'+b+'" y2="'+i+'"/>';}
+  return '<g class="gl">'+s+'</g>';
+}
+function ptsStr(pts){return pts.map(function(p){return fx(p[0])+','+fx(p[1]);}).join(' ');}
+function figBody(f){
+  if(f.kind==='open')return '<polyline class="shape" points="'+ptsStr(f.pts)+'" fill="none"/>';
+  if(f.kind==='curve')return '<path class="shape" d="'+f.d+'" fill="'+f.fill+'"/>';
+  if(f.kind==='circle')return '<circle class="shape" cx="'+f.cx+'" cy="'+f.cy+'" r="'+f.r+'" fill="'+f.fill+'"/>';
+  return '<polygon class="shape" points="'+ptsStr(f.pts)+'" fill="'+f.fill+'"/>';
+}
+function corner(pts,i){
+  var n=pts.length,V=pts[i],A=pts[(i+n-1)%n],B=pts[(i+1)%n];
+  return {V:V,u:norm(sub(A,V)),w:norm(sub(B,V))};
+}
+function checkerSVG(pts,i,L){
+  var c=corner(pts,i),V=c.V,u=c.u,w=c.w;
+  var cr=u[0]*w[1]-u[1]*w[0];
+  var p=cr>0?[-u[1],u[0]]:[u[1],-u[0]];
+  var a=[V[0]+u[0]*L,V[1]+u[1]*L],b=[a[0]+p[0]*L,a[1]+p[1]*L],d=[V[0]+p[0]*L,V[1]+p[1]*L];
+  return '<polygon class="chk" points="'+ptsStr([V,a,b,d])+'"/>';
+}
+function markSVG(pts,i,m){
+  var c=corner(pts,i),V=c.V,u=c.u,w=c.w;
+  var a=[V[0]+u[0]*m,V[1]+u[1]*m],b=[a[0]+w[0]*m,a[1]+w[1]*m],d=[V[0]+w[0]*m,V[1]+w[1]*m];
+  return '<polyline class="rmark" points="'+ptsStr([a,b,d])+'"/>';
+}
+function figSVG(f,o){
+  o=o||{};
+  var extra='';
+  if(f.pts&&!f.kind){
+    if(o.checker)f.pts.forEach(function(p,i){extra+=checkerSVG(f.pts,i,1.4);});
+    if(o.marks)f.rights.forEach(function(i){extra+=markSVG(f.pts,i,0.95);});
+  }
+  return '<svg viewBox="-1 -1 12 12" role="img" aria-label="'+(o.label||'図形')+'" focusable="false">'+gridLines(0,10)+figBody(f)+extra+'</svg>';
+}
+function slim(f){
+  var o={fill:f.fill,type:f.type};
+  if(f.kind)o.kind=f.kind;
+  if(f.pts)o.pts=f.pts;
+  if(f.d)o.d=f.d;
+  if(f.kind==='circle'){o.cx=f.cx;o.cy=f.cy;o.r=f.r;}
+  return o;
+}
+
+/* ================= ずかん・発見数・ミッション ================= */
+var COLL=[
+  {k:'tri-acute',n:'とがった '+W.tri,g:'tri'},
+  {k:'tri-obtuse',n:'ひらたい '+W.tri,g:'tri'},
+  {k:'tri-thin',n:'細長い '+W.tri,g:'tri'},
+  {k:'rtri-axis',n:'たて・よこの '+W.rtri,g:'rtri'},
+  {k:'rtri-tilt',n:'ななめの '+W.rtri,g:'rtri'},
+  {k:'rtri-thin',n:'細長い '+W.rtri,g:'rtri'},
+  {k:'rect-wide',n:'よこ長の '+W.rect,g:'rect'},
+  {k:'rect-tall',n:'たて長の '+W.rect,g:'rect'},
+  {k:'rect-thin',n:'細長い '+W.rect,g:'rect'},
+  {k:'rect-tilt',n:'ななめの '+W.rect,g:'rect'},
+  {k:'sq-small',n:'小さい '+W.sq,g:'sq'},
+  {k:'sq-big',n:'大きい '+W.sq,g:'sq'},
+  {k:'sq-tilt',n:'ななめの '+W.sq,g:'sq'},
+  {k:'quad-same',n:'へんが ぜんぶ 同じ長さで '+W.right+'の ない '+W.quad,g:'quad'},
+  {k:'quad-right2',n:W.right+'が 2つの '+W.quad,g:'quad'},
+  {k:'quad-para',n:'向かいあう へんが ならんだ '+W.quad,g:'quad'},
+  {k:'quad-free',n:'ふつうの '+W.quad,g:'quad'},
+  {k:'poly5',n:'かどが 5つの 形',g:'other'},
+  {k:'poly6',n:'かどが 6つの 形',g:'other'},
+  {k:'open',n:'とじていない 形',g:'other'},
+  {k:'curve',n:'まがった 線の ある 形',g:'other'},
+  {k:'circle',n:'まるい 形',g:'other'}
+];
+function collName(k){for(var i=0;i<COLL.length;i++){if(COLL[i].k===k)return COLL[i].n;}return k;}
+var SESSION=null;
+function newSession(id){SESSION={id:id,found:{},combo:0,maxCombo:0,bonus:0,rare:0,newColl:[],missions:[],notes:[]};}
+function takeNotes(){var n=SESSION.notes.slice();SESSION.notes=[];return n;}
+
+function ensureDaily(){
+  if(!store.daily||store.daily.date!==todayStr()){store.daily={date:todayStr(),missions:makeMissions(),round:0};save();}
+}
+var MPOOL=[{c:'tri',lo:4,hi:7},{c:'quad',lo:4,hi:7},{c:'right',lo:6,hi:10},{c:'rtri',lo:3,hi:5},{c:'rect',lo:3,hi:4},{c:'sq',lo:3,hi:4}];
+function makeMissions(){
+  return shuffle(MPOOL).slice(0,3).map(function(m){return {c:m.c,n:rint(m.lo,m.hi),got:0,done:false};});
+}
+function mtext(m){return NAME[m.c]+'を '+m.n+'こ 見つけよう';}
+function foundInc(c,n){
+  if(!n)return;
+  store.found[c]=(store.found[c]||0)+n;
+  SESSION.found[c]=(SESSION.found[c]||0)+n;
+  ensureDaily();
+  store.daily.missions.forEach(function(m){
+    if(m.c===c&&!m.done){
+      m.got=Math.min(m.n,m.got+n);
+      if(m.got>=m.n){m.done=true;SESSION.missions.push(m);SESSION.notes.push('ミッション クリア！ ✦ '+mtext(m));}
+    }
+  });
+}
+function collect(f){
+  var key=f.look;if(!key)return false;
+  var e=store.coll[key],isNew=!e;
+  if(!e){e=store.coll[key]={n:0,fig:slim(f)};SESSION.newColl.push(key);}
+  e.n++;
+  if(f.pts&&!f.kind&&f.type!=='poly'){
+    var r=store.recentFound.filter(function(x){return x.look!==key;});
+    var s=slim(f);s.look=key;
+    r.unshift(s);store.recentFound=r.slice(0,8);
+  }
+  return isNew;
+}
+function noteCombo(ok){
+  if(ok){SESSION.combo++;SESSION.maxCombo=Math.max(SESSION.maxCombo,SESSION.combo);store.bestCombo=Math.max(store.bestCombo||0,SESSION.combo);}
+  else SESSION.combo=0;
+}
+function comboPill(){
+  if(!SESSION||SESSION.combo<1)return '';
+  return '<span class="combo hot">COMBO '+SESSION.combo+'</span>';
+}
+
+/* ================= ホーム・共通画面 ================= */
+var state={screen:'home'};
+var ICON={
+  m1:'<path class="icl" d="M2 1.5 V8.5 H9"/><path class="icm" d="M2 6.5 H4 V8.5"/>',
+  m2:'<polygon class="ic" points="5,1.5 1.5,8.5 8.5,8.5" fill="#FFA8C5"/>',
+  m3:'<polygon class="ic" points="2,2 8.5,1.5 9,8 3,8.5" fill="#95E1A3"/>',
+  m4:'<polygon class="ic" points="2,1.5 2,8.5 8.5,8.5" fill="#FFB88C"/><path class="icm" d="M2 6.5 H4 V8.5"/>',
+  m5:'<polygon class="ic" points="1,2.5 9,2.5 9,7.5 1,7.5" fill="#7CC6FE"/>',
+  m6:'<polygon class="ic" points="2,2 8,2 8,8 2,8" fill="#C3A6FF"/>',
+  m7:'<polygon class="ic" points="0.8,4.6 0.8,0.8 4.4,4.6" fill="#FFB88C"/><polygon class="ic" points="5.4,1.2 9.2,1.2 9.2,4.4 5.4,4.4" fill="#7CC6FE"/><polygon class="ic" points="3.6,5.8 6.4,5.8 6.4,8.6 3.6,8.6" fill="#C3A6FF"/>',
+  m8:'<polygon class="ic" points="2,5 8,5 8,9 2,9" fill="#FFD166"/><polygon class="ic" points="1.2,5 5,1.2 8.8,5" fill="#FFA8C5"/><polygon class="ic" points="4.2,9 4.2,6.6 5.8,6.6 5.8,9" fill="#7CC6FE"/>'
+};
+function heroSVG(){
+  var g='';
+  for(var x=13;x<260;x+=13){g+='<line x1="'+x+'" y1="3" x2="'+x+'" y2="127"/>';}
+  for(var y=13;y<130;y+=13){g+='<line x1="3" y1="'+y+'" x2="257" y2="'+y+'"/>';}
+  return '<svg class="hero-svg" viewBox="0 0 260 130" role="img" aria-label="三角形と四角形と直角チェッカーの絵">'
+    +'<rect class="hbg" x="1.5" y="1.5" width="257" height="127" rx="14"/><g class="gl2">'+g+'</g>'
+    +'<polygon class="shape2" points="18,104 18,34 78,104" fill="#FFA8C5"/>'
+    +'<polygon class="shape2" points="100,52 192,52 192,104 100,104" fill="#7CC6FE"/>'
+    +'<polygon class="shape2" points="208,62 244,62 244,98 208,98" fill="#95E1A3"/>'
+    +'<polygon class="chk" points="100,104 132,104 132,72 100,72" style="stroke-width:2.5"/>'
+    +'</svg>';
+}
+function missionPanel(){
+  ensureDaily();
+  var ms=store.daily.missions,all=ms.every(function(m){return m.done;});
+  var rows=ms.map(function(m){
+    var pc=Math.round(m.got/m.n*100);
+    return '<div class="mis'+(m.done?' done':'')+'"><div class="mt"><span>'+mtext(m)+'</span><span class="st">'+(m.done?'✓ クリア！':m.got+' / '+m.n)+'</span></div>'
+      +'<div class="bar" aria-hidden="true"><i style="width:'+pc+'%"></i></div></div>';
+  }).join('');
+  return '<section class="panel"><h2 class="ph">きょうの ミッション</h2>'+rows
+    +(all?'<p style="font-weight:900;margin-top:6px">ミッションクリア！ ぜんぶ できたね ✦</p><div class="actions" style="margin:8px 0 0"><button class="btn small" data-act="newmis">あたらしい ミッション</button></div>':'')
+    +'</section>';
+}
+function recordPanel(){
+  var chips=['tri','quad','right','rtri','rect','sq'].map(function(c){
+    return '<span class="chip">'+NAME[c]+' <b>'+(store.found[c]||0)+'</b>こ</span>';
+  }).join('');
+  var got=COLL.filter(function(c){return store.coll[c.k];}).length;
+  return '<section class="panel"><h2 class="ph">これまでに 見つけた 図形</h2><div class="chips">'+chips+'</div>'
+    +'<button class="btn small" data-act="zukan">'+W.fig+'ずかん　'+got+' / '+COLL.length+'</button></section>';
+}
+function renderHome(){
+  var tiles=MENUS.map(function(m,i){
+    var s=store.prog[m.id]||0;
+    return '<button class="mtile" data-act="open" data-id="'+m.id+'" style="--c:var(--t'+(i+1)+')">'
+      +'<span class="mtop"><span class="badge">'+(i+1)+'</span><span class="stars" aria-label="ほし '+s+'こ">'+starsTxt(s)+'</span></span>'
+      +'<svg class="mico" viewBox="0 0 10 10" aria-hidden="true">'+gridLines(0,10)+ICON[m.id]+'</svg>'
+      +'<span class="mtitle">'+m.title+'</span></button>';
+  }).join('');
+  app.innerHTML='<main class="wrap">'
+    +'<header class="hero">'+heroSVG()
+    +'<div><p class="grade">2年 算数</p><h1>'+W.tri+'と'+W.quad+'</h1><p class="lead">図形を さがして、わけて、つくろう！</p></div></header>'
+    +'<div class="cards2">'+missionPanel()+recordPanel()+'</div>'
+    +'<nav class="menu" aria-label="メニュー">'+tiles+'</nav></main>';
+}
+function topbar(id){
+  var idx=0;MENUS.forEach(function(m,i){if(m.id===id)idx=i;});
+  return '<div class="top"><button class="btn small" data-act="home">‹ メニュー</button>'
+    +'<h1 class="ttl"><span class="badge">'+(idx+1)+'</span><span>'+MENUS[idx].title+'</span></h1></div>';
+}
+
+/* ---- ずかん ---- */
+function renderZukan(){
+  var got=COLL.filter(function(c){return store.coll[c.k];}).length;
+  var groups=[{g:'tri',t:W.tri},{g:'rtri',t:W.rtri},{g:'rect',t:W.rect},{g:'sq',t:W.sq},{g:'quad',t:W.quad+'いろいろ'},{g:'other',t:'そのほかの 形'}];
+  var body=groups.map(function(gr){
+    var slots=COLL.filter(function(c){return c.g===gr.g;}).map(function(c){
+      var e=store.coll[c.k];
+      if(e){
+        var fig=e.fig;fig.rights=fig.rights||[];
+        return '<div class="zslot found"><div class="zfig">'+figSVG(fig,{label:'見つけた 図形'})+'</div><div class="zname">'+c.n+'</div><div class="zcnt">'+e.n+'かい であった</div></div>';
+      }
+      return '<div class="zslot"><div class="zfig q" aria-hidden="true">？</div><div class="zname">まだ あえていない</div></div>';
+    }).join('');
+    return '<h2 class="zgroup">'+gr.t+'</h2><div class="zgrid">'+slots+'</div>';
+  }).join('');
+  app.innerHTML='<main class="wrap"><div class="top"><button class="btn small" data-act="home">‹ メニュー</button>'
+    +'<h1 class="ttl"><span>'+W.fig+'ずかん　'+got+' / '+COLL.length+'</span></h1></div>'
+    +'<p class="note">ゲームで 見つけた 形が ここに ふえるよ。いろんな 形に であおう！</p>'+body+'</main>';
+}
+
+/* ---- けっか ---- */
+var RES=null;
+function summaryHTML(){
+  var li=[];
+  ['tri','quad','right','rtri','rect','sq'].forEach(function(c){
+    var n=SESSION.found[c];
+    if(n)li.push('<li>'+NAME[c]+'を '+n+'こ 見つけた！（ぜんぶで '+store.found[c]+'こ）</li>');
+  });
+  if(SESSION.maxCombo>=1)li.push('<li class="hl">さいこう COMBO '+SESSION.maxCombo+'（ベスト '+store.bestCombo+'）</li>');
+  if(SESSION.bonus)li.push('<li class="hl">✦ じぶんで できた ボーナス × '+SESSION.bonus+'</li>');
+  if(SESSION.rare)li.push('<li class="hl">✦ レア図形 ゲット × '+SESSION.rare+'</li>');
+  if(SESSION.newColl.length)li.push('<li class="hl">✦ '+W.fig+'ずかんに あたらしい 形 × '+SESSION.newColl.length+'</li>');
+  SESSION.missions.forEach(function(m){li.push('<li class="hl">ミッション クリア！ '+mtext(m)+'</li>');});
+  return li.length?'<ul class="sum">'+li.join('')+'</ul>':'';
+}
+function showResult(o){
+  RES=o;store.plays=(store.plays||0)+1;award(o.id,o.stars);
+  state.screen='result';renderResult();window.scrollTo(0,0);
+}
+function renderResult(){
+  app.innerHTML='<main class="wrap">'+topbar(RES.id)
+    +'<section class="result"><h2>ぜんぶ おわったよ！</h2><div class="bigstars" aria-label="ほし '+RES.stars+'こ">'+starsTxt(RES.stars)+'</div>'
+    +'<p>'+RES.line+'</p>'+summaryHTML()
+    +'<div class="actions"><button class="btn primary" data-act="again">もういちど</button><button class="btn" data-act="zukan">'+W.fig+'ずかん</button><button class="btn" data-act="home">メニューへ</button></div></section></main>';
+}
+
+/* ================= メニュー1：直角をさがせ ================= */
+var M1=null;
+function buildM1(){
+  var lv=sk('m1').lv,ctx=recentCtx('m1');
+  var pool=[
+    {t:'rect',w:2},{t:'rtri',w:2.2},{t:'tri',w:1.4},{t:'sq',w:1},
+    {t:'quad',sub:'rtrap',w:1.6},{t:'quad',sub:'para',w:lv>=2?1:0},{t:'rhombus',w:lv>=2?0.8:0},{t:'poly',w:lv>=3?1:0}
+  ];
+  var wf=function(x){return 1+weakOf(x.t);};
+  for(var attempt=0;attempt<20;attempt++){
+    var chosen=[],left=pool.slice();
+    while(chosen.length<3&&left.length){
+      var x=wpick(left,wf);
+      chosen.push(x);
+      left=left.filter(function(y){return y!==x;});
+    }
+    var hasRight=chosen.some(function(x){return x.t==='rect'||x.t==='rtri'||x.t==='sq'||x.sub==='rtrap'||x.t==='poly';});
+    if(!hasRight)continue;
+    var figs=chosen.map(function(x){
+      var l=itemLv(lv);
+      return gen({t:x.t,sub:x.sub,lv:l,newLook:true,near:l>=4&&Math.random()<0.5},ctx);
+    });
+    if(Math.random()<0.1+0.02*lv){
+      var cand=figs.filter(function(f){return f.type==='rect'||f.type==='rtri'||f.type==='sq';});
+      if(cand.length){
+        var ix=figs.indexOf(pickR(cand));
+        var f2=gen({t:figs[ix].type,lv:Math.max(3,lv),rare:true},ctx);
+        if(f2.rare)figs[ix]=f2;
+      }
+    }
+    return shuffle(figs);
+  }
+  return [gen({t:'rect',lv:1},ctx),gen({t:'rtri',lv:1},ctx),gen({t:'tri',lv:1},ctx)];
+}
+function startM1(){
+  newSession('m1');
+  M1={list:buildM1(),i:0,sel:{},checked:false,score:0,msg:'',ok:false,chkOn:false,usedChk:false};
+  rememberSigs('m1',M1.list);
+  state.screen='m1';renderM1();window.scrollTo(0,0);
+}
+function m1Count(){var n=0;for(var k in M1.sel){if(M1.sel[k])n++;}return n;}
+function m1SVG(){
+  var f=M1.list[M1.i],chk=M1.checked,s=gridLines(0,10)+figBody(f);
+  f.pts.forEach(function(p,i){
+    var sel=!!M1.sel[i],isR=f.rights.indexOf(i)>=0,cls='';
+    if(sel&&M1.chkOn)s+=checkerSVG(f.pts,i,1.7);
+    if(chk&&isR)s+=markSVG(f.pts,i,1.0);
+    if(chk){if(sel&&isR)cls=' okd';else if(sel&&!isR)cls=' ngd';else if(!sel&&isR)cls=' missd';}
+    s+='<circle class="vring'+cls+'" cx="'+p[0]+'" cy="'+p[1]+'" r="0.6"/>';
+    if(sel&&!chk)s+='<circle class="vsel" cx="'+p[0]+'" cy="'+p[1]+'" r="0.85"/>';
+    s+='<circle class="vdot'+cls+'" cx="'+p[0]+'" cy="'+p[1]+'" r="0.26"/>';
+    if(chk&&sel&&!isR){
+      var x=p[0],y=p[1],d=0.42;
+      s+='<path class="xmark" d="M'+(x-d)+' '+(y-d)+' L'+(x+d)+' '+(y+d)+' M'+(x+d)+' '+(y-d)+' L'+(x-d)+' '+(y+d)+'"/>';
+    }
+    if(!chk)s+='<circle class="vhit" data-act="vtx" data-v="'+i+'" cx="'+p[0]+'" cy="'+p[1]+'" r="1.15" fill="none" pointer-events="all"/>';
+  });
+  return '<svg viewBox="-1 -1 12 12" role="img" aria-label="かどを タップする 図形" focusable="false">'+s+'</svg>';
+}
+function m1Actions(){
+  if(!M1.checked){
+    return '<button class="btn small" data-act="m1chk" aria-pressed="'+M1.chkOn+'">'+W.right+'チェッカー：'+(M1.chkOn?'ON':'OFF')+'</button>'
+      +'<button class="btn primary" data-act="m1check">こたえあわせ</button><button class="btn" data-act="m1none">'+W.right+'は ないよ</button>';
+  }
+  var last=M1.i>=M1.list.length-1;
+  return '<button class="btn primary" data-act="m1next">'+(last?'けっかを 見る':'つぎへ')+'</button>';
+}
+function renderM1(){
+  var n=M1.list.length,f=M1.list[M1.i];
+  app.innerHTML='<main class="wrap">'+topbar('m1')
+    +'<p class="prog"><span>もんだい '+(M1.i+1)+' / '+n+'</span>'+comboPill()+'</p>'
+    +'<div class="note">'+W.right+'の かどを ぜんぶ タップしよう。むずかしい ときは 「'+W.right+'チェッカー」を ONに すると、タップした かどに <span class="chkicon"></span>きいろい チェッカーが でるよ。ぴったり かさなれば '+W.right+'！<br>チェッカーを つかわずに せいかいすると ボーナス ✦</div>'
+    +'<div class="fig1" id="fig1">'+(f.rare&&!M1.checked?'<span class="spark" aria-label="レア図形">✦</span>':'')+m1SVG()+'</div>'
+    +'<div class="msg'+(M1.checked?(M1.ok?' okm':' ngm'):'')+'" id="msg" role="status" aria-live="polite">'+(M1.msg||'')+'</div>'
+    +'<div class="actions" id="acts">'+m1Actions()+'</div></main>';
+}
+function m1Eval(){
+  var f=M1.list[M1.i],rs=f.rights,k=rs.length,ok=true,i,good=0;
+  for(i=0;i<f.pts.length;i++){
+    var want=rs.indexOf(i)>=0,sel=!!M1.sel[i];
+    if(want!==sel)ok=false;
+    if(want&&sel)good++;
+  }
+  M1.checked=true;M1.ok=ok;if(ok)M1.score++;
+  foundInc('right',good);
+  updWeak(f.tk,ok);
+  var lines=[],isNew=false;
+  if(ok||m1Count()>0){isNew=collect(f);}
+  noteCombo(ok);
+  if(ok){
+    lines.push(k?'せいかい！ '+W.right+'は '+k+'こ あったね。':'せいかい！ この形に '+W.right+'は ないよ。');
+    if(SESSION.combo>=2)lines.push('COMBO '+SESSION.combo+'！');
+    if(!M1.usedChk){SESSION.bonus++;store.bonus=(store.bonus||0)+1;lines.push('✦ チェッカーなしで できた！ ボーナス！');}
+  }else{
+    lines.push(k?'おしい！ '+W.right+'は ぜんぶで '+k+'こ だよ。みどりの しるしを 見てね。':'おしい！ この形には '+W.right+'が ないんだ。');
+    lines.push('もういちど やって COMBO を のばそう！');
+  }
+  if(f.rare){SESSION.rare++;store.rare=(store.rare||0)+1;lines.push('レア図形 ゲット！ ✦');}
+  if(isNew)lines.push('✦ '+W.fig+'ずかんに あたらしい 形： '+collName(f.look));
+  takeNotes().forEach(function(t){lines.push(t);});
+  M1.msg=lines.join('<br>');
+  save();renderM1();
+}
+
+/* ================= メニュー2〜6：ぜんぶえらぼう ================= */
+var PSPEC={
+  m2:{concept:'tri',test:function(f){return f.type==='tri'||f.type==='rtri';},tMin:3,tMax:4,checker:false,
+      T:[{t:'tri',w:2},{t:'rtri',w:1}],
+      F:function(lv){return [{t:'rect',w:1},{t:'sq',w:0.7},{t:'rhombus',w:0.7},{t:'quad',w:1},{t:'poly',w:1},
+        {t:'open',base:3,w:lv>=2?1.2:0.3},{t:'open',base:4,w:lv>=3?0.8:0},{t:'curve',base:3,w:lv>=2?1.2:0.6},{t:'circle',w:lv<=2?1:0.4}];},
+      note:W.tri+'は、3本の まっすぐな 線で かこまれた 形 だよ。'},
+  m3:{concept:'quad',test:function(f){return f.type==='rect'||f.type==='sq'||f.type==='rhombus'||f.type==='quad';},tMin:3,tMax:4,checker:false,
+      T:[{t:'rect',w:1},{t:'sq',w:0.8},{t:'rhombus',w:0.8},{t:'quad',w:1.4}],
+      F:function(lv){return [{t:'tri',w:1.3},{t:'rtri',w:0.6},{t:'poly',w:1},
+        {t:'open',base:4,w:lv>=2?1.2:0.3},{t:'open',base:3,w:lv>=3?0.6:0},{t:'curve',base:4,w:lv>=2?1.2:0.6},{t:'circle',w:lv<=2?1:0.4}];},
+      note:W.quad+'は、4本の まっすぐな 線で かこまれた 形 だよ。'},
+  m4:{concept:'rtri',test:function(f){return f.type==='rtri';},tMin:2,tMax:3,checker:true,
+      T:[{t:'rtri',w:1}],
+      F:function(lv){return [{t:'tri',w:3},{t:'rect',w:0.5},{t:'rhombus',w:0.3},{t:'quad',w:0.6},{t:'open',base:3,w:lv>=3?0.5:0}];},
+      note:W.rtri+'は、'+W.right+'の かどが ある '+W.tri+' だよ。'},
+  m5:{concept:'rect',test:function(f){return f.type==='rect';},tMin:3,tMax:4,checker:true,
+      T:[{t:'rect',w:1}],
+      F:function(lv){return [{t:'rhombus',w:1},{t:'quad',w:2},{t:'tri',w:0.8},{t:'rtri',w:0.6},{t:'poly',w:0.3}];},
+      note:W.rect+'は、4つの かどが ぜんぶ '+W.right+'の '+W.quad+' だよ。'},
+  m6:{concept:'sq',test:function(f){return f.type==='sq';},tMin:2,tMax:3,checker:true,
+      T:[{t:'sq',w:1}],
+      F:function(lv){return [{t:'rect',w:1.6},{t:'rhombus',w:1.2},{t:'quad',w:0.9},{t:'tri',w:0.3}];},
+      note:W.sq+'は、4つの かどが ぜんぶ '+W.right+'で、4本の へんの 長さが ぜんぶ 同じ '+W.quad+' だよ。'}
+};
+var ASK={m2:W.tri,m3:W.quad,m4:W.rtri,m5:W.rect,m6:W.sq};
+var RARE_OK={tri:1,rtri:1,rect:1,sq:1,rhombus:1};
+var P=null;
+function buildRound(mid,ctx){
+  var cfg=PSPEC[mid],lv=sk(mid).lv,specs=[],i,x;
+  var nT=rint(cfg.tMin,cfg.tMax);
+  var tWeak=0;cfg.T.forEach(function(t){tWeak=Math.max(tWeak,weakOf(t.t));});
+  if(tWeak>=2)nT=Math.min(cfg.tMax+1,nT+1);
+  var wf=function(o){return 1+weakOf(o.t);};
+  for(i=0;i<nT;i++){
+    x=wpick(cfg.T,wf);
+    specs.push({t:x.t,lv:itemLv(lv),newLook:true,near:false,check:function(f){return cfg.test(f);}});
+  }
+  var F=cfg.F(lv),cnt={};
+  for(i=0;i<9-nT;i++){
+    var cand=F.filter(function(o){
+      if(o.t==='circle'&&(cnt.circle||0)>=1)return false;
+      if((o.t==='open'||o.t==='curve')&&(cnt[o.t]||0)>=2)return false;
+      return true;
+    });
+    x=wpick(cand,wf);
+    cnt[x.t]=(cnt[x.t]||0)+1;
+    var l=itemLv(lv);
+    specs.push({t:x.t,base:x.base,lv:l,newLook:true,near:l>=4&&Math.random()<0.5,check:function(f){return !cfg.test(f);}});
+  }
+  if(Math.random()<0.12+0.02*lv){
+    var rc=specs.filter(function(s){return RARE_OK[s.t];});
+    if(rc.length){var rs=pickR(rc);rs.rare=true;rs.lv=Math.max(rs.lv,3);}
+  }
+  return shuffle(specs.map(function(s){return gen(s,ctx);}));
+}
+function startPick(id){
+  newSession(id);
+  P={id:id,cfg:PSPEC[id],round:0,rounds:3,ctx:recentCtx(id),items:[],sel:{},checked:false,chk:false,usedChk:false,msg:'',ok:false,perfect:0};
+  newRound();state.screen='pick';renderPick();window.scrollTo(0,0);
+}
+function newRound(){
+  P.items=buildRound(P.id,P.ctx);
+  rememberSigs(P.id,P.items);
+  P.sel={};P.checked=false;P.msg='';P.ok=false;P.usedChk=false;
+}
+function reasonFor(id,f){
+  var n=f.n;
+  if(f.kind==='open')return 'とじていない';
+  if(f.kind==='circle')return 'まがった 線だけ';
+  if(f.kind==='curve')return 'まがった 線が ある';
+  var k=f.rights.length;
+  if(id==='m2'||id==='m3'){return n+'本の 線'+(n===3?'（三角形）':(n===4?'（四角形）':''));}
+  if(id==='m4'){if(n!==3)return n+'本の 線';return k?'直角が ある':'直角が ない';}
+  if(id==='m5'){
+    if(n!==4)return n+'本の 線';
+    if(f.type==='rect')return 'かどが ぜんぶ 直角';
+    return k?'直角は '+k+'こ だけ':'直角が ない';
+  }
+  if(id==='m6'){
+    if(n!==4)return n+'本の 線';
+    if(f.type==='sq')return 'ぜんぶ 直角で へんも 同じ長さ';
+    if(f.type==='rect')return 'へんの 長さが ちがう';
+    return '直角が ない';
+  }
+  return '';
+}
+function renderPick(){
+  var c=P.cfg,tiles=P.items.map(function(f,i){
+    var cls='tile',tag='',why='',sel=!!P.sel[i],spark='';
+    if(P.checked){
+      var want=c.test(f);
+      if(sel&&want){cls+=' ok';tag='<span class="tag tok">○</span>';}
+      else if(sel&&!want){cls+=' bad';tag='<span class="tag tng">×</span>';}
+      else if(!sel&&want){cls+=' miss';tag='<span class="tag tms">ここも！</span>';}
+      if(f.rare)tag+='<span class="tag trare">レア！</span>';
+      why='<span class="why">'+reasonFor(P.id,f)+(f._new?'<br><em>✦ ずかんに ふえた！</em>':'')+'</span>';
+    }else if(f.rare){
+      spark='<span class="spark" aria-hidden="true">✦</span>';
+    }
+    return '<button class="'+cls+'" data-act="tile" data-i="'+i+'" aria-pressed="'+sel+'"'+(P.checked?' disabled':'')+' aria-label="図形 '+(i+1)+'">'
+      +spark+figSVG(f,{checker:P.chk,marks:P.checked&&c.checker,label:'図形 '+(i+1)})+tag+why+'</button>';
+  }).join('');
+  var tool='';
+  if(c.checker){
+    tool='<div class="actions" style="margin:0 0 12px"><button class="btn small" data-act="chk" aria-pressed="'+P.chk+'">'+W.right+'チェッカーを つかう：'+(P.chk?'ON':'OFF')+'</button></div>';
+  }
+  var acts;
+  if(!P.checked)acts='<button class="btn primary" data-act="pcheck">こたえあわせ</button>';
+  else acts='<button class="btn primary" data-act="pnext">'+(P.round>=P.rounds-1?'けっかを 見る':'つぎの もんだい')+'</button>';
+  app.innerHTML='<main class="wrap">'+topbar(P.id)
+    +'<p class="prog"><span>もんだい '+(P.round+1)+' / '+P.rounds+'</span>'+comboPill()+'</p>'
+    +'<div class="note">'+c.note+'<br>'+ASK[P.id]+'を ぜんぶ えらんで、「こたえあわせ」を おそう。'
+    +(P.id==='m6'||P.id==='m5'?'<br>ますめを かぞえて、へんの 長さを くらべよう。':'')
+    +(c.checker?'<br>チェッカーを つかわずに ぜんぶ せいかいすると ボーナス ✦':'')+'</div>'
+    +tool+'<div class="grid3">'+tiles+'</div>'
+    +'<div class="msg'+(P.checked?(P.ok?' okm':' ngm'):'')+'" id="msg" role="status" aria-live="polite">'+(P.msg||'')+'</div>'
+    +'<div class="actions">'+acts+'</div></main>';
+}
+function pickEval(){
+  var c=P.cfg,T=0,F=0,Wr=0,anySel=false,k;
+  for(k in P.sel){if(P.sel[k])anySel=true;}
+  var newNames=[],rareGot=0;
+  P.items.forEach(function(f,i){
+    var want=c.test(f),sel=!!P.sel[i],good=(want===sel);
+    if(want)T++;
+    if(want&&sel)F++;
+    if(!want&&sel)Wr++;
+    updWeak(f.tk,good);
+    f._new=false;
+    if(good&&anySel){
+      f._new=collect(f);
+      if(f._new)newNames.push(collName(f.look));
+      if(f.rare)rareGot++;
+    }
+  });
+  foundInc(c.concept,F);
+  P.checked=true;
+  P.ok=(F===T&&Wr===0);
+  if(P.ok)P.perfect++;
+  noteCombo(P.ok);
+  var up=bumpSkill(P.id,P.ok);
+  var lines=[];
+  if(P.ok){
+    lines.push('ぜんぶ せいかい！ '+T+'こ ぜんぶ 見つけたね。すごい！');
+    if(SESSION.combo>=2)lines.push('COMBO '+SESSION.combo+'！');
+    if(c.checker&&!P.usedChk){SESSION.bonus++;store.bonus=(store.bonus||0)+1;lines.push('✦ チェッカーなしで できた！ ボーナス！');}
+  }else{
+    lines.push('おしい！ '+T+'こ のうち '+F+'こ 見つけたよ。'+(Wr?'ちがう ものが '+Wr+'こ まざっていたよ。':'')+(T-F?'「ここも！」の 形も なかまだよ。':'')+'下の せつめいを 見てね。');
+    lines.push('もういちど やって COMBO を のばそう！');
+  }
+  if(rareGot){SESSION.rare+=rareGot;store.rare=(store.rare||0)+rareGot;lines.push('レア図形 ゲット！ ✦');}
+  if(newNames.length)lines.push('✦ '+W.fig+'ずかんに あたらしい 形： '+newNames.slice(0,2).join('、')+(newNames.length>2?' ほか':''));
+  if(up)lines.push('その ちょうし！ つぎは ちょっと ちがう 形も 出てくるよ。');
+  takeNotes().forEach(function(t){lines.push(t);});
+  P.msg=lines.join('<br>');
+  save();renderPick();
+}
+
+/* ================= メニュー7：わけろ ================= */
+var S7=null;
+function buildM7(){
+  var lv=sk('m7').lv,ctx=recentCtx('m7');
+  var counts={rtri:3,rect:3,sq:3},types=['rtri','rect','sq'];
+  var order=types.slice().sort(function(a,b){return weakOf(b)-weakOf(a);});
+  if(weakOf(order[0])>=2){counts[order[0]]=4;counts[order[2]]=2;}
+  var specs=[];
+  types.forEach(function(t){
+    for(var i=0;i<counts[t];i++)specs.push({t:t,lv:itemLv(lv),newLook:true,check:(function(tt){return function(f){return f.type===tt;};})(t)});
+  });
+  if(Math.random()<0.1+0.02*lv){var rs=pickR(specs);rs.rare=true;rs.lv=Math.max(rs.lv,3);}
+  var figs=specs.map(function(s){return gen(s,ctx);});
+  return figs;
+}
+function startM7(){
+  newSession('m7');
+  var figs=buildM7(),map={};
+  figs.forEach(function(f){map[f.id]=f;});
+  rememberSigs('m7',figs);
+  S7={figs:map,tray:shuffle(figs.map(function(f){return f.id;})),placed:{rtri:[],rect:[],sq:[]},sel:null,mistakes:0,msg:'',msgc:'',shake:null,done:false};
+  state.screen='m7';render7();window.scrollTo(0,0);
+}
+function hint7(f,b){
+  if(f.type==='rtri')return 'この形は '+W.tri+'だよ。かどは いくつ あるかな？';
+  if(b==='rtri')return 'この形は かどが 4つ あるよ。'+W.tri+'の かどは 3つ だね。';
+  if(f.type==='sq')return '4本の へんが ぜんぶ 同じ 長さ なら、もっと ぴったりの 名前が あるよ。';
+  return '4本の へんの 長さを くらべてみよう。ぜんぶ 同じ かな？';
+}
+function render7(){
+  var tray=S7.tray.map(function(id){
+    var f=S7.figs[id],on=S7.sel===id;
+    return '<div class="card7'+(on?' sel':'')+'" data-id="'+id+'" role="button" tabindex="0" aria-pressed="'+on+'" aria-label="図形。えらんで、下の はこを おす">'
+      +(f.rare?'<span class="spark" aria-hidden="true">✦</span>':'')+figSVG(f)+'</div>';
+  }).join('');
+  var bucket=function(key,title,desc,col){
+    return '<section class="bucket'+(S7.shake===key?' shake':'')+'" data-bucket="'+key+'" data-act="bucket" role="button" tabindex="0" style="--bc:var('+col+')" aria-label="'+key+'の はこ">'
+      +'<div class="bt">'+title+'</div><div class="bd">'+desc+'</div>'
+      +'<div class="placed">'+S7.placed[key].map(function(id){return '<div class="mini">'+figSVG(S7.figs[id])+'</div>';}).join('')+'</div></section>';
+  };
+  S7.shake=null;
+  var body=S7.done?'':'<div class="left7"><span>のこり '+S7.tray.length+'こ</span>'+comboPill()+'<span>図形を ドラッグ（または タップして えらんで、はこを タップ）</span></div><div class="tray" id="tray">'+tray+'</div>';
+  app.innerHTML='<main class="wrap">'+topbar('m7')
+    +'<div class="note">'+W.fig+'を 3つの はこに わけよう。</div>'+body
+    +'<div class="buckets">'
+    +bucket('rtri',W.rtri,W.right+'の かどが ある '+W.tri,'--t5')
+    +bucket('rect',W.rect,'かどが ぜんぶ '+W.right,'--t2')
+    +bucket('sq',W.sq,'かどが ぜんぶ '+W.right+'で、へんの 長さが 同じ','--t4')
+    +'</div>'
+    +'<div class="msg'+(S7.msgc?' '+S7.msgc:'')+'" role="status" aria-live="polite">'+(S7.msg||'')+'</div>'
+    +(S7.done?'<div class="actions"><button class="btn primary" data-act="m7end">けっかを 見る</button></div>':'')
+    +'</main>';
+}
+function sync7(){
+  var els=app.querySelectorAll('.card7');
+  for(var i=0;i<els.length;i++){var on=els[i].getAttribute('data-id')===S7.sel;els[i].classList.toggle('sel',on);els[i].setAttribute('aria-pressed',on?'true':'false');}
+}
+function place7(id,b){
+  var f=S7.figs[id];
+  if(f.type===b){
+    S7.tray=S7.tray.filter(function(x){return x!==id;});
+    S7.placed[b].push(id);S7.sel=null;
+    foundInc(b,1);updWeak(f.tk,true);
+    var isNew=collect(f);
+    noteCombo(true);
+    var ok=['せいかい！','そのとおり！','いいね！','ぴったり！'],lines=[pickR(ok)];
+    if(SESSION.combo>=2)lines[0]+=' COMBO '+SESSION.combo+'！';
+    if(f.rare){SESSION.rare++;store.rare=(store.rare||0)+1;lines.push('レア図形 ゲット！ ✦');}
+    if(isNew)lines.push('✦ '+W.fig+'ずかんに あたらしい 形： '+collName(f.look));
+    takeNotes().forEach(function(t){lines.push(t);});
+    S7.msg=lines.join('<br>');S7.msgc='okm';
+    if(!S7.tray.length){S7.done=true;S7.msg+='<br>ぜんぶ わけられたよ！ まちがいは '+S7.mistakes+'かい だったね。';}
+    save();
+  }else{
+    S7.mistakes++;S7.shake=b;updWeak(f.tk,false);noteCombo(false);
+    S7.msg='ざんねん。'+hint7(f,b)+'<br>もういちど やって COMBO を のばそう！';S7.msgc='ngm';
+  }
+  render7();
+}
+
+/* ================= メニュー8：もようづくり ================= */
+var U=24;
+var SHAPES8=[
+  {k:'sq2',label:'正方形（小）',cls:'sq',ic:'#C3A6FF',pts:[[-1,-1],[1,-1],[1,1],[-1,1]]},
+  {k:'sq4',label:'正方形（大）',cls:'sq',ic:'#C3A6FF',pts:[[-2,-2],[2,-2],[2,2],[-2,2]]},
+  {k:'rc4',label:'長方形',cls:'rect',ic:'#7CC6FE',pts:[[-2,-1],[2,-1],[2,1],[-2,1]]},
+  {k:'rc6',label:'ほそ長い 長方形',cls:'rect',ic:'#7CC6FE',pts:[[-3,-0.5],[3,-0.5],[3,0.5],[-3,0.5]]},
+  {k:'rt2',label:'直角三角形（小）',cls:'rtri',ic:'#FFB88C',pts:[[-1,-1],[-1,1],[1,1]]},
+  {k:'rt4',label:'直角三角形（大）',cls:'rtri',ic:'#FFB88C',pts:[[-2,-2],[-2,2],[2,2]]},
+  {k:'tr',label:'三角形',cls:'tri',ic:'#FFA8C5',pts:[[0,-2],[-2,2],[2,2]]},
+  {k:'qd',label:'四角形',cls:'quad',ic:'#95E1A3',pts:[[-1,-1.5],[1,-1.5],[3,1.5],[-3,1.5]]}
+];
+var COLORS8=['#FFD166','#7CC6FE','#95E1A3','#FFA8C5','#C3A6FF','#FFB88C','#5EDBD0','#E6F27A'];
+var M8=null;
+function shape8(k){for(var i=0;i<SHAPES8.length;i++){if(SHAPES8[i].k===k)return SHAPES8[i];}return null;}
+function shapeOf(p){return p.k==='c'?{pts:p.pts,cls:p.cls}:shape8(p.k);}
+function clsOfType(t){return t==='rtri'?'rtri':(t==='tri'?'tri':(t==='rect'?'rect':(t==='sq'?'sq':'quad')));}
+function startM8(){
+  newSession('m8');
+  M8={pieces:[],sel:null,hist:[],nextId:1,clearArm:false,msg:'',msgc:''};
+  state.screen='m8';renderM8();window.scrollTo(0,0);
+}
+function snap8(){M8.hist.push(JSON.stringify(M8.pieces));if(M8.hist.length>50)M8.hist.shift();}
+function tf8(p){return 'translate('+p.x+' '+p.y+') rotate('+p.rot+') scale('+(p.flip?-1:1)+' 1)';}
+function pieceSVG(p){
+  var s=shapeOf(p);
+  var pts=s.pts.map(function(q){return [q[0]*U,q[1]*U];});
+  return '<g class="piece'+(M8.sel===p.id?' sel':'')+'" data-id="'+p.id+'" transform="'+tf8(p)+'"><polygon points="'+ptsStr(pts)+'" fill="'+p.color+'"/></g>';
+}
+function shapeIcon(pts,fill){
+  var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];});
+  var minx=Math.min.apply(null,xs),maxx=Math.max.apply(null,xs),miny=Math.min.apply(null,ys),maxy=Math.max.apply(null,ys);
+  var w=maxx-minx+0.8,h=maxy-miny+0.8,size=Math.max(w,h);
+  var vx=minx-0.4-(size-w)/2,vy=miny-0.4-(size-h)/2;
+  return '<svg viewBox="'+fx(vx)+' '+fx(vy)+' '+fx(size)+' '+fx(size)+'" aria-hidden="true"><polygon class="ic" points="'+ptsStr(pts)+'" fill="'+fill+'"/></svg>';
+}
+function customPts(fig){
+  var xs=fig.pts.map(function(p){return p[0];}),ys=fig.pts.map(function(p){return p[1];});
+  var cx=(Math.min.apply(null,xs)+Math.max.apply(null,xs))/2,cy=(Math.min.apply(null,ys)+Math.max.apply(null,ys))/2;
+  return fig.pts.map(function(q){return [Math.round((q[0]-cx)*0.55*100)/100,Math.round((q[1]-cy)*0.55*100)/100];});
+}
+function tally8(){
+  var t=0,q=0,rt=0,rc=0,sq=0;
+  M8.pieces.forEach(function(p){
+    var c=shapeOf(p).cls;
+    if(c==='rtri'){t++;rt++;}else if(c==='tri'){t++;}
+    else{q++;if(c==='rect')rc++;else if(c==='sq')sq++;}
+  });
+  return W.tri+' '+t+'こ（'+W.rtri+' '+rt+'こ） ／ '+W.quad+' '+q+'こ（'+W.rect+' '+rc+'こ・'+W.sq+' '+sq+'こ）';
+}
+function renderM8(){
+  var pal=SHAPES8.map(function(s){
+    return '<button class="pbtn" data-act="add" data-k="'+s.k+'" aria-label="'+s.label+'を ふやす">'+shapeIcon(s.pts,s.ic)+'<span>'+s.label+'</span></button>';
+  }).join('');
+  var found=(store.recentFound||[]).map(function(fg,i){
+    return '<button class="pbtn found" data-act="addc" data-i="'+i+'" aria-label="見つけた 図形を ふやす">'+shapeIcon(fg.pts,fg.fill)+'<span>見つけた ✦</span></button>';
+  }).join('');
+  var sw=COLORS8.map(function(c,i){
+    return '<button class="sw needs" data-act="color" data-c="'+c+'" style="background:'+c+'" aria-label="いろ '+(i+1)+'"></button>';
+  }).join('');
+  var ps=M8.pieces.map(pieceSVG).join('');
+  app.innerHTML='<main class="wrap">'+topbar('m8')
+    +'<div class="note">下の 図形を タップして ふやそう。ドラッグで うごかして、ならべて もようを つくろう。'
+    +(found?'<br>✦ さいきん ゲームで 見つけた 図形も つかえるよ。':'')+'</div>'
+    +'<div class="pal">'+pal+'</div>'
+    +(found?'<div class="pal">'+found+'</div>':'')
+    +'<svg class="canvas" id="cv" viewBox="0 0 576 384" role="application" aria-label="もようを つくる ばしょ">'
+    +'<defs><pattern id="g8" width="24" height="24" patternUnits="userSpaceOnUse"><path class="gp" d="M24 0 H0 V24"/></pattern></defs>'
+    +'<rect id="cvbg" x="0" y="0" width="576" height="384" fill="url(#g8)"/>'+ps+'</svg>'
+    +'<div class="tools">'
+    +'<button class="btn needs" data-act="rot">まわす ↻</button>'
+    +'<button class="btn needs" data-act="rot45">ななめに まわす</button>'
+    +'<button class="btn needs" data-act="flip">ひっくりかえす</button>'
+    +'<button class="btn needs" data-act="del">この図形を けす</button>'
+    +'<button class="btn" data-act="undo"'+(M8.hist.length?'':' disabled')+'>もどす</button>'
+    +'<button class="btn" data-act="clear">'+(M8.clearArm?'ほんとうに ぜんぶ けす？':'ぜんぶ けす')+'</button>'
+    +'</div>'
+    +'<div class="tools"><span style="font-weight:700">いろ：</span><span class="swatches">'+sw+'</span></div>'
+    +'<div class="tally">'+tally8()+'</div>'
+    +'<div class="msg'+(M8.msgc?' '+M8.msgc:'')+'" role="status" aria-live="polite">'+(M8.msg||'')+'</div>'
+    +'<div class="actions"><button class="btn primary" data-act="m8done">できた！</button></div></main>';
+  updateTools();
+}
+function updateTools(){
+  var els=app.querySelectorAll('.needs');
+  for(var i=0;i<els.length;i++){els[i].disabled=(M8.sel===null);}
+}
+function selPiece(){for(var i=0;i<M8.pieces.length;i++){if(M8.pieces[i].id===M8.sel)return M8.pieces[i];}return null;}
+
+/* ================= ドラッグ（7・8） ================= */
+var DR=null;
+function svgPt(svg,e){
+  var pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
+  var m=svg.getScreenCTM();
+  return m?pt.matrixTransform(m.inverse()):{x:0,y:0};
+}
+app.addEventListener('pointerdown',function(e){
+  if(e.button!==undefined&&e.button!==0&&e.pointerType==='mouse')return;
+  var t=e.target;if(!t.closest)return;
+  if(state.screen==='m7'){
+    var c=t.closest('.card7');
+    if(c){DR={type:'c7',pid:e.pointerId,id:c.getAttribute('data-id'),el:c,sx:e.clientX,sy:e.clientY,moved:false,ghost:null};}
+  }else if(state.screen==='m8'){
+    var pc=t.closest('.piece');
+    if(pc){
+      var id=parseInt(pc.getAttribute('data-id'),10),svg=document.getElementById('cv'),pp=svgPt(svg,e),pi=null;
+      M8.pieces.forEach(function(p){if(p.id===id)pi=p;});
+      if(!pi)return;
+      M8.sel=id;
+      var all=app.querySelectorAll('.piece');
+      for(var i=0;i<all.length;i++){all[i].classList.toggle('sel',parseInt(all[i].getAttribute('data-id'),10)===id);}
+      updateTools();
+      DR={type:'p8',pid:e.pointerId,id:id,el:pc,svg:svg,p:pi,ox:pp.x-pi.x,oy:pp.y-pi.y,moved:false,sx:e.clientX,sy:e.clientY,before:JSON.stringify(M8.pieces)};
+      e.preventDefault();
+    }else if(t.closest('#cv')){
+      M8.sel=null;
+      var all2=app.querySelectorAll('.piece');
+      for(var j=0;j<all2.length;j++)all2[j].classList.remove('sel');
+      updateTools();
+    }
+  }
+});
+window.addEventListener('pointermove',function(e){
+  if(!DR||e.pointerId!==DR.pid)return;
+  if(DR.type==='c7'){
+    if(!DR.moved&&Math.hypot(e.clientX-DR.sx,e.clientY-DR.sy)>8){
+      DR.moved=true;
+      var g=document.createElement('div');g.className='ghost';g.innerHTML=DR.el.innerHTML;document.body.appendChild(g);DR.ghost=g;
+      DR.el.classList.add('dragging');
+    }
+    if(DR.moved&&DR.ghost){DR.ghost.style.left=(e.clientX-38)+'px';DR.ghost.style.top=(e.clientY-38)+'px';}
+  }else if(DR.type==='p8'){
+    if(!DR.moved&&Math.hypot(e.clientX-DR.sx,e.clientY-DR.sy)>4)DR.moved=true;
+    if(DR.moved){
+      var pp=svgPt(DR.svg,e);
+      DR.p.x=Math.max(0,Math.min(576,Math.round(pp.x-DR.ox)));
+      DR.p.y=Math.max(0,Math.min(384,Math.round(pp.y-DR.oy)));
+      DR.el.setAttribute('transform',tf8(DR.p));
+    }
+  }
+});
+function endDrag(e,cancel){
+  if(!DR||e.pointerId!==DR.pid)return;
+  var d=DR;DR=null;
+  if(d.type==='c7'){
+    if(d.ghost)d.ghost.parentNode.removeChild(d.ghost);
+    d.el.classList.remove('dragging');
+    if(cancel)return;
+    if(d.moved){
+      var under=document.elementFromPoint(e.clientX,e.clientY);
+      var b=under&&under.closest?under.closest('[data-bucket]'):null;
+      if(b)place7(d.id,b.getAttribute('data-bucket'));
+    }else{
+      S7.sel=(S7.sel===d.id)?null:d.id;sync7();
+    }
+  }else if(d.type==='p8'){
+    if(d.moved&&!cancel){
+      d.p.x=Math.round(d.p.x/12)*12;d.p.y=Math.round(d.p.y/12)*12;
+      M8.hist.push(d.before);if(M8.hist.length>50)M8.hist.shift();
+    }
+    if(cancel){M8.pieces=JSON.parse(d.before);}
+    var idx=-1;M8.pieces.forEach(function(p,i){if(p.id===d.id)idx=i;});
+    if(idx>=0){var pc=M8.pieces.splice(idx,1)[0];M8.pieces.push(pc);}
+    M8.clearArm=false;
+    renderM8();
+  }
+}
+window.addEventListener('pointerup',function(e){endDrag(e,false);});
+window.addEventListener('pointercancel',function(e){endDrag(e,true);});
+
+app.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ')return;
+  if(state.screen!=='m7'||!e.target.closest)return;
+  var c=e.target.closest('.card7');
+  if(c){e.preventDefault();var id=c.getAttribute('data-id');S7.sel=(S7.sel===id)?null:id;sync7();return;}
+  var b=e.target.closest('.bucket');
+  if(b){e.preventDefault();if(S7.sel)place7(S7.sel,b.getAttribute('data-bucket'));}
+});
+
+/* ================= クリック処理 ================= */
+function startMenu(id){
+  if(id==='m1')startM1();
+  else if(id==='m7')startM7();
+  else if(id==='m8')startM8();
+  else startPick(id);
+}
+function goHome(){state.screen='home';renderHome();window.scrollTo(0,0);}
+app.addEventListener('click',function(e){
+  var t=e.target.closest?e.target.closest('[data-act]'):null;
+  if(!t)return;
+  var a=t.getAttribute('data-act');
+  switch(a){
+    case 'open':startMenu(t.getAttribute('data-id'));break;
+    case 'home':goHome();break;
+    case 'again':startMenu(RES.id);break;
+    case 'zukan':state.screen='zukan';renderZukan();window.scrollTo(0,0);break;
+    case 'newmis':ensureDaily();store.daily.round=(store.daily.round||0)+1;store.daily.missions=makeMissions();save();renderHome();break;
+
+    case 'vtx':
+      if(M1.checked)break;
+      var v=parseInt(t.getAttribute('data-v'),10);
+      M1.sel[v]=!M1.sel[v];M1.msg='';
+      if(M1.sel[v]&&M1.chkOn)M1.usedChk=true;
+      document.getElementById('fig1').innerHTML=(M1.list[M1.i].rare?'<span class="spark" aria-label="レア図形">✦</span>':'')+m1SVG();
+      var mg=document.getElementById('msg');mg.textContent='';mg.className='msg';
+      break;
+    case 'm1chk':
+      M1.chkOn=!M1.chkOn;
+      if(M1.chkOn)M1.usedChk=true;
+      renderM1();
+      break;
+    case 'm1check':
+      if(m1Count()===0){
+        var mm=document.getElementById('msg');mm.className='msg inf';
+        mm.innerHTML='かどを タップしてね。'+W.right+'が ないと おもったら「'+W.right+'は ないよ」を おしてね。';
+      }else m1Eval();
+      break;
+    case 'm1none':M1.sel={};m1Eval();break;
+    case 'm1next':
+      if(M1.i<M1.list.length-1){M1.i++;M1.sel={};M1.checked=false;M1.msg='';M1.usedChk=false;renderM1();window.scrollTo(0,0);}
+      else{
+        var n=M1.list.length,sc=M1.score;
+        bumpSkill('m1',sc>=n?true:(sc<=1?false:null));
+        showResult({id:'m1',stars:sc>=n?3:(sc>=n-1?2:1),line:n+'もん中 '+sc+'もん せいかい！'});
+      }
+      break;
+
+    case 'tile':
+      if(P.checked)break;
+      var i=parseInt(t.getAttribute('data-i'),10);
+      P.sel[i]=!P.sel[i];
+      t.setAttribute('aria-pressed',P.sel[i]?'true':'false');
+      break;
+    case 'chk':P.chk=!P.chk;if(P.chk)P.usedChk=true;renderPick();break;
+    case 'pcheck':
+      var any=false,kk;for(kk in P.sel){if(P.sel[kk])any=true;}
+      if(!any){var m2=document.getElementById('msg');m2.className='msg inf';m2.textContent='図形を タップして えらんでから、「こたえあわせ」を おしてね。';}
+      else pickEval();
+      break;
+    case 'pnext':
+      if(P.round<P.rounds-1){P.round++;newRound();renderPick();window.scrollTo(0,0);}
+      else showResult({id:P.id,stars:P.perfect>=3?3:(P.perfect===2?2:1),line:P.rounds+'かい中 '+P.perfect+'かい、ぜんぶ せいかい！'});
+      break;
+
+    case 'bucket':
+      if(S7.sel)place7(S7.sel,t.getAttribute('data-bucket'));
+      else{S7.msg='先に 図形を えらんでね。（ドラッグでも いいよ）';S7.msgc='inf';render7();}
+      break;
+    case 'm7end':
+      bumpSkill('m7',S7.mistakes<=1?true:(S7.mistakes>=4?false:null));
+      showResult({id:'m7',stars:S7.mistakes<=1?3:(S7.mistakes<=4?2:1),line:'まちがいは '+S7.mistakes+'かい だったよ。'});
+      break;
+
+    case 'add':
+      if(M8.pieces.length>=60){M8.msg='図形が いっぱいだよ。いらない 図形を けしてね。';M8.msgc='inf';renderM8();break;}
+      snap8();
+      var jit=(M8.pieces.length%6)*12;
+      var np={id:M8.nextId++,k:t.getAttribute('data-k'),x:252+jit,y:156+jit,rot:0,flip:false,color:COLORS8[M8.pieces.length%COLORS8.length]};
+      M8.pieces.push(np);M8.sel=np.id;M8.msg='';M8.msgc='';M8.clearArm=false;renderM8();
+      break;
+    case 'addc':
+      var fg=store.recentFound[parseInt(t.getAttribute('data-i'),10)];
+      if(!fg)break;
+      if(M8.pieces.length>=60){M8.msg='図形が いっぱいだよ。いらない 図形を けしてね。';M8.msgc='inf';renderM8();break;}
+      snap8();
+      var jit2=(M8.pieces.length%6)*12;
+      var np2={id:M8.nextId++,k:'c',pts:customPts(fg),cls:clsOfType(fg.type),x:252+jit2,y:156+jit2,rot:0,flip:false,color:fg.fill};
+      M8.pieces.push(np2);M8.sel=np2.id;M8.msg='';M8.msgc='';M8.clearArm=false;renderM8();
+      break;
+    case 'rot':case 'rot45':case 'flip':case 'color':case 'del':
+      var sp=selPiece();if(!sp)break;
+      snap8();
+      if(a==='rot')sp.rot=(sp.rot+90)%360;
+      else if(a==='rot45')sp.rot=(sp.rot+45)%360;
+      else if(a==='flip')sp.flip=!sp.flip;
+      else if(a==='color')sp.color=t.getAttribute('data-c');
+      else if(a==='del'){M8.pieces=M8.pieces.filter(function(p){return p.id!==sp.id;});M8.sel=null;}
+      M8.clearArm=false;renderM8();
+      break;
+    case 'undo':
+      if(M8.hist.length){M8.pieces=JSON.parse(M8.hist.pop());if(!selPiece())M8.sel=null;M8.clearArm=false;renderM8();}
+      break;
+    case 'clear':
+      if(!M8.pieces.length)break;
+      if(!M8.clearArm){M8.clearArm=true;M8.msg='もういちど おすと ぜんぶ きえるよ。';M8.msgc='inf';renderM8();}
+      else{snap8();M8.pieces=[];M8.sel=null;M8.clearArm=false;M8.msg='';M8.msgc='';renderM8();}
+      break;
+    case 'm8done':
+      var np8=M8.pieces.length;
+      if(np8<5){M8.msg='あと '+(5-np8)+'こ ならべると できあがり！ 図形を ふやしてみよう。';M8.msgc='inf';renderM8();}
+      else{
+        var tr=0,qd=0;
+        M8.pieces.forEach(function(p){var c=shapeOf(p).cls;if(c==='rtri'||c==='tri')tr++;else qd++;});
+        award('m8',3);
+        M8.msg='すてきな もようが できたね！ '+W.tri+'を '+tr+'こ、'+W.quad+'を '+qd+'こ つかったよ。先生や おうちの人に 見せよう！';
+        M8.msgc='okm';renderM8();
+      }
+      break;
+  }
+});
+
+function render(){
+  if(state.screen==='home')renderHome();
+  else if(state.screen==='m1')renderM1();
+  else if(state.screen==='pick')renderPick();
+  else if(state.screen==='m7')render7();
+  else if(state.screen==='m8')renderM8();
+  else if(state.screen==='zukan')renderZukan();
+  else if(state.screen==='result')renderResult();
+}
+render();
+
+if(typeof window!=='undefined'&&window.__SK_TEST){
+  var T=window.__SK_TEST;
+  T.gen=gen;T.genOnce=genOnce;T.buildRound=buildRound;T.buildM1=buildM1;T.buildM7=buildM7;T.PSPEC=PSPEC;
+  T.recentCtx=recentCtx;T.analyze=analyze;T.startMenu=startMenu;T.store=store;T.fb=function(){return FBCOUNT;};
+  T.renderers={home:renderHome,zukan:renderZukan};T.click=function(el){return el;};
+  T.state=state;T.sk=sk;T.getP=function(){return P;};T.getM1=function(){return M1;};T.getS7=function(){return S7;};
+  T.pickEval=pickEval;T.m1Eval=m1Eval;T.place7=place7;T.setSel=function(s){P.sel=s;};T.getSession=function(){return SESSION;};
+}
+})();
+</script>
+</body>
+</html>
