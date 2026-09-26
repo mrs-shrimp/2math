@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>図形を動かそう</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dff3fc;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif}
+#toolbar{position:fixed;top:10px;right:10px;z-index:5000;background:rgba(255,255,255,.96);border:1px solid #aaa;border-radius:9px;padding:7px 9px;box-shadow:0 2px 8px rgba(0,0,0,.12);user-select:none}
+#toolbar button{font-size:14px;padding:5px 9px;margin-left:4px;border:1px solid #999;border-radius:6px;background:#fff;cursor:pointer}
+#hint{margin-right:4px;font-size:12px;color:#555}
+#board{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden}
+.shape{position:absolute;cursor:grab;touch-action:none;transform-origin:center center;user-select:none}
+.shape:active{cursor:grabbing}
+.shape svg{display:block;overflow:visible}
+.shape polygon{fill:#f8dfa0;stroke:#222;stroke-width:2.2;stroke-linejoin:miter;vector-effect:non-scaling-stroke}
+.label{position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.97);border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif;pointer-events:none}
+.selected{outline:2px dashed #3787c8;outline-offset:4px}
+.rotate-btn{position:absolute;left:50%;top:-46px;width:36px;height:36px;transform:translateX(-50%);border-radius:50%;border:2px solid #3787c8;background:#fff;color:#246a9e;font-size:22px;line-height:30px;padding:0;cursor:pointer;display:none;z-index:100;box-shadow:0 2px 7px rgba(0,0,0,.18);touch-action:none}
+.selected .rotate-btn{display:block}
+
+/* 仕分け画面 */
+#sortModal{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.28);align-items:center;justify-content:center;padding:18px}
+#sortPanel{width:min(1100px,96vw);height:min(720px,92vh);background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+#sortHeader{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;border-bottom:1px solid #ddd;background:#f7f7f7}
+#sortHeader h2{margin:0;font-size:22px}
+#sortClose{width:36px;height:36px;border:1px solid #aaa;border-radius:50%;background:#fff;font-size:22px;cursor:pointer}
+#sortHelp{padding:9px 17px;font-size:14px;color:#555;border-bottom:1px solid #eee}
+#sortTableWrap{flex:1;overflow:auto;padding:14px}
+#sortTable{width:100%;min-width:700px;border-collapse:collapse;table-layout:fixed}
+#sortTable th,#sortTable td{border:2px solid #777;vertical-align:top}
+#sortTable th{height:52px;background:#fffdf0;padding:6px}
+.group-name{width:100%;height:38px;border:0;outline:0;background:transparent;text-align:center;font-size:20px;font-weight:bold;font-family:inherit}
+#sortTable td{height:330px;background:#fff;padding:10px}
+.drop-cell{display:flex;flex-wrap:wrap;align-content:flex-start;gap:18px;min-height:290px}
+.sort-bank{margin-top:14px;padding:12px;border:2px dashed #aaa;border-radius:10px;background:#fafafa;min-height:155px}
+.sort-bank-title{font-weight:bold;margin-bottom:8px}
+#sortPieces{display:flex;flex-wrap:wrap;gap:12px}
+.sort-shape{position:relative;display:inline-flex;align-items:center;justify-content:center;width:92px;height:130px;cursor:grab;touch-action:none;user-select:none}
+.sort-shape:active{cursor:grabbing}
+.sort-shape svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.sort-shape polygon{fill:#f8dfa0;stroke:#222;stroke-width:2.2;stroke-linejoin:miter;vector-effect:non-scaling-stroke}
+.sort-label{position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.97);border:1px solid #555;display:flex;align-items:center;justify-content:center;font-size:14px;pointer-events:none}
+.sort-shape.dragging{opacity:.45}
+.sort-cell-over{background:#eef8ff!important}
+#sortFooter{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid #ddd}
+#sortReset{border:1px solid #aaa;background:#fff;border-radius:7px;padding:7px 12px;cursor:pointer}
+
+/* 自由に形作り */
+#freeModal{display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.28);align-items:center;justify-content:center;padding:14px}
+#freePanel{width:min(1180px,97vw);height:min(780px,94vh);background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden}
+#freeHeader{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid #ddd;background:#f7f7f7}
+#freeHeader h2{margin:0;font-size:22px}
+#freeClose{width:36px;height:36px;border:1px solid #aaa;border-radius:50%;background:#fff;font-size:22px;cursor:pointer}
+#freeHelp{padding:8px 15px;color:#555;font-size:14px;border-bottom:1px solid #eee}
+#freeWorkspace{position:relative;flex:1;overflow:hidden;background:#dff3fc}
+#freeControls{position:absolute;left:12px;top:12px;z-index:20;display:flex;gap:7px;align-items:center;background:rgba(255,255,255,.96);padding:8px;border:1px solid #aaa;border-radius:9px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#freeControls button{font-size:14px;padding:6px 10px;border:1px solid #999;border-radius:6px;background:#fff;cursor:pointer}
+#freeControls button:disabled{opacity:.45;cursor:default}
+#freeColor{width:38px;height:32px;padding:2px;border:1px solid #999;border-radius:6px;background:#fff;cursor:pointer}
+.free-shape{position:absolute;cursor:grab;touch-action:none;user-select:none;transform-origin:center center}
+.free-shape:active{cursor:grabbing}
+.free-shape svg{display:block;overflow:visible}
+.free-shape polygon{stroke:#222;stroke-width:2.2;stroke-linejoin:miter;vector-effect:non-scaling-stroke}
+.free-shape .label{position:absolute}
+.free-selected{outline:2px dashed #3787c8;outline-offset:4px}
+.free-rotate{position:absolute;left:50%;top:-46px;width:36px;height:36px;transform:translateX(-50%);border-radius:50%;border:2px solid #3787c8;background:#fff;color:#246a9e;font-size:22px;line-height:30px;padding:0;display:none;z-index:50;box-shadow:0 2px 7px rgba(0,0,0,.18);touch-action:none}
+.free-selected .free-rotate{display:block}
+
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <span id="hint">図形をドラッグ＝移動 ／ ↻をドラッグ＝回転</span>
+  <button id="reset">初期位置</button>
+  <button id="openSort">なかまに分ける</button>
+  <button id="openFree">自由に形作り</button>
+</div>
+
+<div id="board"></div>
+
+<div id="sortModal">
+  <div id="sortPanel">
+    <div id="sortHeader">
+      <h2>なかまに分ける</h2>
+      <button id="sortClose" aria-label="閉じる">×</button>
+    </div>
+    <div id="sortHelp">表題を自分で入力して、下の「あ～く」の形をドラッグして仲間ごとに分けましょう。</div>
+    <div id="sortTableWrap">
+      <table id="sortTable">
+        <thead>
+          <tr>
+            <th><input class="group-name" value="なかま①"></th>
+            <th><input class="group-name" value="なかま②"></th>
+            <th><input class="group-name" value="なかま③"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="drop-cell"></div></td>
+            <td><div class="drop-cell"></div></td>
+            <td><div class="drop-cell"></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="sort-bank" id="sortBank">
+        <div class="sort-bank-title">形</div>
+        <div id="sortPieces"></div>
+      </div>
+    </div>
+    <div id="sortFooter">
+      <button id="sortReset">仕分けをリセット</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="freeModal">
+  <div id="freePanel">
+    <div id="freeHeader">
+      <h2>自由に形作り</h2>
+      <button id="freeClose" aria-label="閉じる">×</button>
+    </div>
+    <div id="freeHelp">図形をタップして選びます。「コピーする」で複製し、「色をえらぶ」で色を変えられます。図形はドラッグで移動、↻で回転できます。</div>
+    <div id="freeWorkspace">
+      <div id="freeControls">
+        <button id="freeCopy" disabled>コピーする</button>
+        <button id="freeColorBtn" disabled>色をえらぶ</button>
+        <input id="freeColor" type="color" value="#f8dfa0" aria-label="図形の色" style="display:none">
+        <button id="freeDelete" disabled>けす</button>
+        <button id="freeReset">はじめにもどす</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ★図形の形状データ：この8個は変更しない★ */
+const initial = [
+  {name:"あ", x:24,  y:16,  w:51,  h:103, points:"0,0 51,0 0,103"},
+  {name:"い", x:84,  y:16,  w:154, h:103, points:"50,0 154,0 102,103 0,103"},
+  {name:"う", x:241, y:68,  w:50,  h:51, points:"25,0 50,51 0,51"},
+  {name:"え", x:326, y:16,  w:24,  h:103, points:"24,0 24,103 0,51.5"},
+  {name:"お", x:404, y:16,  w:51,  h:103, points:"0,0 51,0 51,103 0,103"},
+  {name:"か", x:24,  y:147, w:50,  h:101, points:"0,0 0,101 50,101"},
+  {name:"き", x:84,  y:146, w:101, h:102, points:"0,0 101,0 101,102 51,102"},
+  {name:"く", x:240, y:146, w:104, h:102, points:"0,0 104,0 104,102 0,102"}
+];
+
+const board = document.getElementById("board");
+let zCounter = 10;
+
+function polygonCentroid(pointsString){
+  const pts=pointsString.trim().split(/\s+/).map(p=>{const [x,y]=p.split(",").map(Number);return{x,y}});
+  let crossSum=0,cx=0,cy=0;
+  for(let i=0;i<pts.length;i++){
+    const a=pts[i],b=pts[(i+1)%pts.length];
+    const cross=a.x*b.y-b.x*a.y;
+    crossSum+=cross; cx+=(a.x+b.x)*cross; cy+=(a.y+b.y)*cross;
+  }
+  if(Math.abs(crossSum)<1e-8){
+    return{x:pts.reduce((s,p)=>s+p.x,0)/pts.length,y:pts.reduce((s,p)=>s+p.y,0)/pts.length};
+  }
+  return{x:cx/(3*crossSum),y:cy/(3*crossSum)};
+}
+
+function makeShape(data,index){
+  const el=document.createElement("div");
+  el.className="shape";
+  el.dataset.index=index;
+  el.dataset.angle="0";
+  el.style.left=data.x+"px";
+  el.style.top=data.y+"px";
+  el.style.width=data.w+"px";
+  el.style.height=data.h+"px";
+  el.style.zIndex=index+1;
+
+  const c=polygonCentroid(data.points);
+  el.innerHTML=
+    '<svg width="'+data.w+'" height="'+data.h+'" viewBox="0 0 '+data.w+' '+data.h+'"><polygon points="'+data.points+'"></polygon></svg>'+
+    '<div class="label" style="left:'+c.x+'px;top:'+c.y+'px;transform:translate(-50%,-50%)">'+data.name+'</div>'+
+    '<button class="rotate-btn" title="回転" aria-label="'+data.name+'を回転">↻</button>';
+
+  board.appendChild(el);
+  const rotateBtn=el.querySelector(".rotate-btn");
+
+  function select(){
+    document.querySelectorAll(".shape").forEach(s=>s.classList.remove("selected"));
+    el.classList.add("selected");
+    el.style.zIndex=++zCounter;
+  }
+
+  let moveGesture=null;
+  el.addEventListener("pointerdown",e=>{
+    if(e.target===rotateBtn)return;
+    e.preventDefault();e.stopPropagation();select();
+    el.setPointerCapture(e.pointerId);
+    const r=el.getBoundingClientRect();
+    moveGesture={id:e.pointerId,dx:e.clientX-r.left,dy:e.clientY-r.top};
+  });
+  el.addEventListener("pointermove",e=>{
+    if(!moveGesture||e.pointerId!==moveGesture.id)return;
+    const br=board.getBoundingClientRect();
+    let nx=e.clientX-br.left-moveGesture.dx;
+    let ny=e.clientY-br.top-moveGesture.dy;
+    nx=Math.max(-40,Math.min(nx,board.clientWidth-el.offsetWidth+40));
+    ny=Math.max(-40,Math.min(ny,board.clientHeight-el.offsetHeight+40));
+    el.style.left=nx+"px";el.style.top=ny+"px";
+  });
+  el.addEventListener("pointerup",e=>{
+    if(moveGesture&&e.pointerId===moveGesture.id){moveGesture=null;try{el.releasePointerCapture(e.pointerId)}catch(_){}}
+  });
+  el.addEventListener("pointercancel",()=>moveGesture=null);
+
+  let rotateGesture=null;
+  function angleFromCenter(x,y){
+    const r=el.getBoundingClientRect();
+    return Math.atan2(y-(r.top+r.height/2),x-(r.left+r.width/2))*180/Math.PI;
+  }
+  function normalizeDelta(d){while(d>180)d-=360;while(d<-180)d+=360;return d}
+
+  rotateBtn.addEventListener("pointerdown",e=>{
+    e.preventDefault();e.stopPropagation();select();rotateBtn.setPointerCapture(e.pointerId);
+    rotateGesture={id:e.pointerId,lastAngle:angleFromCenter(e.clientX,e.clientY),moved:false};
+  });
+  rotateBtn.addEventListener("pointermove",e=>{
+    if(!rotateGesture||e.pointerId!==rotateGesture.id)return;
+    const a=angleFromCenter(e.clientX,e.clientY),d=normalizeDelta(a-rotateGesture.lastAngle);
+    if(Math.abs(d)>0.01){
+      rotateGesture.moved=true;
+      const next=Number(el.dataset.angle)+d;
+      el.dataset.angle=String(next);el.style.transform="rotate("+next+"deg)";
+      rotateGesture.lastAngle=a;
+    }
+  });
+  rotateBtn.addEventListener("pointerup",e=>{
+    if(rotateGesture&&e.pointerId===rotateGesture.id){
+      const moved=rotateGesture.moved;rotateGesture=null;
+      try{rotateBtn.releasePointerCapture(e.pointerId)}catch(_){}
+      if(!moved){
+        const next=Number(el.dataset.angle)+15;
+        el.dataset.angle=String(next);el.style.transform="rotate("+next+"deg)";
+      }
+    }
+  });
+  rotateBtn.addEventListener("pointercancel",()=>rotateGesture=null);
+
+  return el;
+}
+
+function build(){
+  board.innerHTML="";
+  zCounter=10;
+  initial.forEach((d,i)=>makeShape(d,i));
+}
+
+board.addEventListener("pointerdown",e=>{
+  if(e.target===board)document.querySelectorAll(".shape").forEach(s=>s.classList.remove("selected"));
+});
+
+document.getElementById("reset").addEventListener("click",build);
+
+/* 仕分け画面 */
+const sortModal=document.getElementById("sortModal");
+const sortPieces=document.getElementById("sortPieces");
+const sortBank=document.getElementById("sortBank");
+const dropCells=document.querySelectorAll(".drop-cell");
+
+function createSortPiece(data,index){
+  const piece=document.createElement("div");
+  piece.className="sort-shape";
+  piece.draggable=true;
+  piece.dataset.index=index;
+  piece.innerHTML=
+    '<svg viewBox="0 0 '+data.w+' '+data.h+'" preserveAspectRatio="xMidYMid meet"><polygon points="'+data.points+'"></polygon></svg>'+
+    '<div class="sort-label">'+data.name+'</div>';
+
+  const c=polygonCentroid(data.points);
+  const label=piece.querySelector(".sort-label");
+  label.style.left=(c.x/data.w*100)+"%";
+  label.style.top=(c.y/data.h*100)+"%";
+  label.style.transform="translate(-50%,-50%)";
+
+  piece.addEventListener("dragstart",e=>{
+    e.dataTransfer.setData("text/plain",String(index));
+    e.dataTransfer.effectAllowed="move";
+    piece.classList.add("dragging");
+  });
+  piece.addEventListener("dragend",()=>piece.classList.remove("dragging"));
+  return piece;
+}
+
+function resetSortPieces(){
+  sortPieces.innerHTML="";
+  initial.forEach((d,i)=>sortPieces.appendChild(createSortPiece(d,i)));
+  bindTouchSorting();
+}
+
+function getSortPiece(index){return document.querySelector('.sort-shape[data-index="'+index+'"]')}
+
+dropCells.forEach(cell=>{
+  cell.addEventListener("dragover",e=>{e.preventDefault();cell.classList.add("sort-cell-over")});
+  cell.addEventListener("dragleave",()=>cell.classList.remove("sort-cell-over"));
+  cell.addEventListener("drop",e=>{
+    e.preventDefault();cell.classList.remove("sort-cell-over");
+    const p=getSortPiece(Number(e.dataTransfer.getData("text/plain")));
+    if(p)cell.appendChild(p);
+  });
+});
+sortBank.addEventListener("dragover",e=>e.preventDefault());
+sortBank.addEventListener("drop",e=>{
+  e.preventDefault();
+  const p=getSortPiece(Number(e.dataTransfer.getData("text/plain")));
+  if(p)sortPieces.appendChild(p);
+});
+
+/* タッチ・ペン */
+let touchDrag=null;
+function bindTouchSorting(){
+  document.querySelectorAll(".sort-shape").forEach(piece=>{
+    piece.addEventListener("pointerdown",e=>{
+      if(e.pointerType==="mouse")return;
+      e.preventDefault();
+      piece.setPointerCapture(e.pointerId);
+      touchDrag={piece,id:e.pointerId};
+      piece.classList.add("dragging");
+    });
+    piece.addEventListener("pointerup",e=>{
+      if(!touchDrag||e.pointerId!==touchDrag.id)return;
+      const p=touchDrag.piece;
+      p.classList.remove("dragging");
+      const target=document.elementFromPoint(e.clientX,e.clientY);
+      const cell=target&&target.closest(".drop-cell");
+      if(cell)cell.appendChild(p);
+      else if(target&&(target.closest("#sortBank")||target.closest("#sortPieces")))sortPieces.appendChild(p);
+      touchDrag=null;
+    });
+    piece.addEventListener("pointercancel",()=>{if(touchDrag){touchDrag.piece.classList.remove("dragging");touchDrag=null}});
+  });
+}
+
+document.getElementById("openSort").addEventListener("click",()=>{
+  sortModal.style.display="flex";
+  resetSortPieces();
+});
+document.getElementById("sortClose").addEventListener("click",()=>sortModal.style.display="none");
+sortModal.addEventListener("pointerdown",e=>{if(e.target===sortModal)sortModal.style.display="none"});
+document.getElementById("sortReset").addEventListener("click",resetSortPieces);
+
+/* 最初に必ずメイン画面を構築 */
+
+/* ===============================
+   自由に形作り
+   図形データは initial をそのまま使用。
+   =============================== */
+const freeModal = document.getElementById("freeModal");
+const freeWorkspace = document.getElementById("freeWorkspace");
+const freeCopy = document.getElementById("freeCopy");
+const freeColorBtn = document.getElementById("freeColorBtn");
+const freeColor = document.getElementById("freeColor");
+const freeDelete = document.getElementById("freeDelete");
+const freeReset = document.getElementById("freeReset");
+
+let freeItems = [];
+let freeSelected = null;
+let freeId = 0;
+
+function freeSetSelected(el){
+  document.querySelectorAll(".free-shape").forEach(s=>s.classList.remove("free-selected"));
+  freeSelected = el;
+  if(el){
+    el.classList.add("free-selected");
+    el.style.zIndex = ++zCounter;
+  }
+  freeCopy.disabled = !el;
+  freeColorBtn.disabled = !el;
+  freeDelete.disabled = !el;
+}
+
+function freeMakeShape(data, x, y, color, angle, id){
+  const el = document.createElement("div");
+  el.className = "free-shape";
+  el.dataset.id = id;
+  el.dataset.angle = String(angle || 0);
+  el.dataset.color = color || "#f8dfa0";
+  el.style.left = x + "px";
+  el.style.top = y + "px";
+  el.style.width = data.w + "px";
+  el.style.height = data.h + "px";
+  el.style.zIndex = ++zCounter;
+
+  const c = polygonCentroid(data.points);
+  el.innerHTML =
+    '<svg width="'+data.w+'" height="'+data.h+'" viewBox="0 0 '+data.w+' '+data.h+'">'+
+      '<polygon points="'+data.points+'"></polygon>'+
+    '</svg>'+
+    '<div class="label" style="left:'+c.x+'px;top:'+c.y+'px;transform:translate(-50%,-50%)">'+data.name+'</div>'+
+    '<button class="free-rotate" title="回転" aria-label="回転">↻</button>';
+
+  const polygon = el.querySelector("polygon");
+  polygon.style.fill = el.dataset.color;
+
+  const rotateBtn = el.querySelector(".free-rotate");
+
+  el.addEventListener("pointerdown", e=>{
+    if(e.target === rotateBtn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    freeSetSelected(el);
+    el.setPointerCapture(e.pointerId);
+    const r=el.getBoundingClientRect();
+    el._move={id:e.pointerId,dx:e.clientX-r.left,dy:e.clientY-r.top};
+  });
+
+  el.addEventListener("pointermove", e=>{
+    if(!el._move || e.pointerId!==el._move.id) return;
+    const r=freeWorkspace.getBoundingClientRect();
+    let nx=e.clientX-r.left-el._move.dx;
+    let ny=e.clientY-r.top-el._move.dy;
+    nx=Math.max(-30,Math.min(nx,freeWorkspace.clientWidth-el.offsetWidth+30));
+    ny=Math.max(-30,Math.min(ny,freeWorkspace.clientHeight-el.offsetHeight+30));
+    el.style.left=nx+"px";
+    el.style.top=ny+"px";
+  });
+
+  el.addEventListener("pointerup",e=>{
+    if(el._move && e.pointerId===el._move.id){
+      el._move=null;
+      try{el.releasePointerCapture(e.pointerId)}catch(_){}
+    }
+  });
+  el.addEventListener("pointercancel",()=>el._move=null);
+
+  let rg=null;
+  function angleAt(x,y){
+    const r=el.getBoundingClientRect();
+    return Math.atan2(y-(r.top+r.height/2),x-(r.left+r.width/2))*180/Math.PI;
+  }
+  function nd(d){while(d>180)d-=360;while(d<-180)d+=360;return d}
+
+  rotateBtn.addEventListener("pointerdown",e=>{
+    e.preventDefault();e.stopPropagation();freeSetSelected(el);
+    rotateBtn.setPointerCapture(e.pointerId);
+    rg={id:e.pointerId,last:angleAt(e.clientX,e.clientY),moved:false};
+  });
+  rotateBtn.addEventListener("pointermove",e=>{
+    if(!rg||e.pointerId!==rg.id)return;
+    const a=angleAt(e.clientX,e.clientY),d=nd(a-rg.last);
+    if(Math.abs(d)>0.01){
+      rg.moved=true;
+      const next=Number(el.dataset.angle)+d;
+      el.dataset.angle=String(next);
+      el.style.transform="rotate("+next+"deg)";
+      rg.last=a;
+    }
+  });
+  rotateBtn.addEventListener("pointerup",e=>{
+    if(rg&&e.pointerId===rg.id){
+      const moved=rg.moved;rg=null;
+      try{rotateBtn.releasePointerCapture(e.pointerId)}catch(_){}
+      if(!moved){
+        const next=Number(el.dataset.angle)+15;
+        el.dataset.angle=String(next);
+        el.style.transform="rotate("+next+"deg)";
+      }
+    }
+  });
+  rotateBtn.addEventListener("pointercancel",()=>rg=null);
+
+  return el;
+}
+
+function freeCreateInitial(){
+  freeWorkspace.querySelectorAll(".free-shape").forEach(e=>e.remove());
+  freeItems=[];
+  freeSelected=null;
+  freeId=0;
+  initial.forEach((d,i)=>{
+    const el=freeMakeShape(d,d.x,d.y,"#f8dfa0",0,freeId++);
+    freeItems.push({data:d,el});
+    freeWorkspace.appendChild(el);
+  });
+  freeSetSelected(null);
+}
+
+document.getElementById("openFree").addEventListener("click",()=>{
+  freeModal.style.display="flex";
+  freeCreateInitial();
+});
+
+document.getElementById("freeClose").addEventListener("click",()=>{
+  freeModal.style.display="none";
+});
+
+freeModal.addEventListener("pointerdown",e=>{
+  if(e.target===freeModal)freeModal.style.display="none";
+});
+
+freeWorkspace.addEventListener("pointerdown",e=>{
+  if(e.target===freeWorkspace)freeSetSelected(null);
+});
+
+freeCopy.addEventListener("click",()=>{
+  if(!freeSelected)return;
+  const src=freeItems.find(o=>o.el===freeSelected);
+  if(!src)return;
+  const x=Number.parseFloat(src.el.style.left)+28;
+  const y=Number.parseFloat(src.el.style.top)+28;
+  const copy=freeMakeShape(
+    src.data,
+    Math.min(x,freeWorkspace.clientWidth-src.data.w),
+    Math.min(y,freeWorkspace.clientHeight-src.data.h),
+    src.el.dataset.color,
+    Number(src.el.dataset.angle),
+    freeId++
+  );
+  freeItems.push({data:src.data,el:copy});
+  freeWorkspace.appendChild(copy);
+  freeSetSelected(copy);
+});
+
+freeColorBtn.addEventListener("click",()=>{
+  if(!freeSelected)return;
+  freeColor.value=freeSelected.dataset.color || "#f8dfa0";
+  freeColor.click();
+});
+
+freeColor.addEventListener("input",()=>{
+  if(!freeSelected)return;
+  freeSelected.dataset.color=freeColor.value;
+  freeSelected.querySelector("polygon").style.fill=freeColor.value;
+});
+
+freeDelete.addEventListener("click",()=>{
+  if(!freeSelected)return;
+  const target=freeSelected;
+  freeItems=freeItems.filter(o=>o.el!==target);
+  target.remove();
+  freeSetSelected(null);
+});
+
+freeReset.addEventListener("click",freeCreateInitial);
+
+build();
+</script>
+</body>
+</html>
