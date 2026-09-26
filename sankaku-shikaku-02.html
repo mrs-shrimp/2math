@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>これは三角形？四角形？ フラッシュカード</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:"Yu Gothic","Meiryo",sans-serif;background:#f4f7fb;color:#24324a}
+.wrap{max-width:1120px;margin:auto;padding:20px}
+h1{margin:0 0 5px;font-size:28px}
+.sub{margin:0 0 15px;color:#5d6879}
+.tabs,.tools,.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+button{border:0;border-radius:10px;padding:11px 16px;font-size:16px;font-weight:700;cursor:pointer;background:#e1e8f1;color:#24324a}
+button:hover{filter:brightness(.97)}
+button.active{background:#24324a;color:white}
+.card{background:white;border-radius:20px;box-shadow:0 6px 24px rgba(30,50,80,.12);padding:20px;min-height:650px}
+.progress{display:flex;justify-content:space-between;color:#667286;font-size:14px}
+.question{text-align:center;font-size:30px;font-weight:800;margin:10px}
+.stage{height:355px;border:2px dashed #d7e0ea;border-radius:16px;background:#fbfcfe;display:flex;align-items:center;justify-content:center}
+svg{width:100%;height:100%}
+.answer{width:min(820px,100%);margin:14px auto 0;min-height:66px;padding:12px;border-radius:12px;background:#f0f4f9;text-align:center;font-size:20px;font-weight:800}
+.hidden{visibility:hidden}
+.controls{margin-top:12px}
+.primary{background:#3f719f;color:white}
+.analysisbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.analysisbar button{background:#edf1f5}
+.analysisbar button.on{background:#d7e7df;color:#184b3a}
+.note{max-width:820px;margin:15px auto 0;background:#f7f8fa;border-left:5px solid #8192a5;padding:12px 15px;line-height:1.65;color:#536173}
+.score{text-align:center;margin-top:10px;color:#596579}
+.small{font-size:13px;color:#667286}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>これは三角形？ 四角形？</h1>
+<p class="sub">見た目ではなく、辺・頂点・「とじているか」に目をつけよう。</p>
+
+<div class="tabs">
+<button id="triTab" class="active" onclick="setMode('triangle')">三角形カード</button>
+<button id="quadTab" onclick="setMode('quadrilateral')">四角形カード</button>
+</div>
+
+<div class="card">
+<div class="progress"><span id="modeLabel">三角形</span><span id="count">1 / 20</span></div>
+<div class="question" id="question">これは三角形かな？</div>
+
+<div class="stage"><svg id="shape" viewBox="0 0 800 350"></svg></div>
+
+<div class="analysisbar">
+<button id="vertexBtn" onclick="toggleVertices()">● ちょう点を見る</button>
+<button id="edgeBtn" onclick="toggleEdges()">━ 辺を見る</button>
+<button onclick="resetHighlights()">元にもどす</button>
+</div>
+
+<div id="answer" class="answer hidden"></div>
+
+<div class="controls">
+<button class="primary" onclick="showAnswer()">答えを見る</button>
+<button onclick="judge(true)">○ そう思う</button>
+<button onclick="judge(false)">× ちがうと思う</button>
+<button onclick="nextCard()">次のカード →</button>
+<button onclick="randomCard()">ランダム</button>
+</div>
+
+<div class="score" id="score">正解 0 / 0</div>
+<div class="note">
+「なぜそう思った？」まで話しましょう。<br>
+<strong>ちょう点を見る</strong>と、辺と辺が切り替わるところが赤くなります。
+<strong>辺を見る</strong>と、1本ずつ色が変わります。
+</div>
+</div>
+</div>
+
+<script>
+const P=(points,valid,reason)=>({type:"poly",points,valid,reason});
+const L=(x1,y1,x2,y2,valid,reason)=>({type:"open",points:`${x1},${y1} ${x2},${y2}`,valid,reason});
+const PATH=(d,valid,reason)=>({type:"path",d,valid,reason});
+
+const triangleCards=[
+  P("400,35 125,285 675,285",true,"3本の直線で囲まれています。"),
+  P("90,260 690,105 560,300",true,"向きが変わっていても、3本の直線で囲まれています。"),
+  P("400,25 315,305 455,305",true,"とても細長くても、3本の直線で囲まれています。"),
+  P("100,275 390,265 690,95",true,"ほとんど平らに見えても、3本の直線で囲まれています。"),
+  P("150,270 400,45 640,275",true,"角の大きさが違っても、3本の直線で囲まれています。"),
+  P("115,270 400,55 685,270 400,170",false,"4本の直線で囲まれています。3本ではありません。"),
+  P("100,80 680,80 680,270 100,270 390,175",false,"5本の直線で囲まれています。3本ではありません。"),
+  PATH("M120 270 Q400 35 680 270 L120 270 Z",false,"曲線が含まれていて、3本の直線で囲まれていません。"),
+  L(130,270,400,55,false,"辺がとじていないので、囲まれた形になっていません。"),
+  L(130,270,400,55,false,"3本目の辺があと少しでつながるところですが、とじていないので三角形ではありません。")
+];
+
+const quadCards=[
+  P("125,80 675,80 675,280 125,280",true,"4本の直線で囲まれています。"),
+  P("120,105 630,65 690,260 150,285",true,"斜めでも、4本の直線で囲まれています。"),
+  P("130,80 660,80 535,285 95,285",true,"台形のような形でも、4本の直線で囲まれています。"),
+  P("400,45 600,205 400,300 200,205",true,"三角形のように見えても、4本の直線で囲まれています。"),
+  P("120,250 350,70 620,250 350,245",true,"4つ目の辺が細くても、4本の直線で囲まれています。"),
+  P("400,55 125,285 675,285",false,"3本の直線で囲まれています。4本ではありません。"),
+  P("100,80 680,80 680,270 100,270 390,175",false,"5本の直線で囲まれています。4本ではありません。"),
+  PATH("M120 270 Q400 45 680 270 L120 270 Z",false,"曲線が含まれていて、4本の直線で囲まれていません。"),
+  L(120,80,650,80,false,"辺がとじていないので、囲まれた形になっていません。"),
+  P("120,80 650,80 650,270 120.8,270",false,"4本目の辺がほんの少しだけ始点につながっていません。閉じた形ではありません。")
+];
+
+let mode="triangle",cards=triangleCards,index=0,correct=0,attempts=0;
+let verticesOn=false,edgesOn=false;
+
+function setMode(m){
+ mode=m; cards=m==="triangle"?triangleCards:quadCards; index=0;
+ document.getElementById("triTab").classList.toggle("active",m==="triangle");
+ document.getElementById("quadTab").classList.toggle("active",m==="quadrilateral");
+ render();
+}
+function render(){
+ const c=cards[index];
+ document.getElementById("modeLabel").textContent=mode==="triangle"?"三角形":"四角形";
+ document.getElementById("count").textContent=`${index+1} / ${cards.length}`;
+ document.getElementById("question").textContent=mode==="triangle"?"これは三角形かな？":"これは四角形かな？";
+ const a=document.getElementById("answer");
+ a.textContent=`答え：${c.valid?"はい":"いいえ"}　${c.reason}`;
+ a.classList.add("hidden");
+ verticesOn=false;edgesOn=false;
+ document.getElementById("vertexBtn").classList.remove("on");
+ document.getElementById("edgeBtn").classList.remove("on");
+ draw(c);
+}
+function svgEl(name,attrs={}){
+ const e=document.createElementNS("http://www.w3.org/2000/svg",name);
+ Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+ return e;
+}
+function draw(c){
+ const svg=document.getElementById("shape"); svg.innerHTML="";
+ if(c.type==="poly"){
+   const p=svgEl("polygon",{points:c.points,fill:"#eaf2fb",stroke:"#24324a","stroke-width":7,"stroke-linejoin":"round"});
+   svg.appendChild(p);
+ }else if(c.type==="open"){
+   const p=svgEl("polyline",{points:c.points,fill:"none",stroke:"#24324a","stroke-width":7,"stroke-linecap":"round","stroke-linejoin":"round"});
+   svg.appendChild(p);
+ }else{
+   const p=svgEl("path",{d:c.d,fill:"#eaf2fb",stroke:"#24324a","stroke-width":7,"stroke-linejoin":"round"});
+   svg.appendChild(p);
+ }
+}
+function getVertices(c){
+ if(c.type==="poly") return c.points.trim().split(/\s+/).map(s=>s.split(",").map(Number));
+ if(c.type==="open") return c.points.trim().split(/\s+/).map(s=>s.split(",").map(Number));
+ return [];
+}
+function toggleVertices(){verticesOn=!verticesOn;document.getElementById("vertexBtn").classList.toggle("on",verticesOn);updateOverlay();}
+function toggleEdges(){edgesOn=!edgesOn;document.getElementById("edgeBtn").classList.toggle("on",edgesOn);updateOverlay();}
+function resetHighlights(){verticesOn=false;edgesOn=false;document.getElementById("vertexBtn").classList.remove("on");document.getElementById("edgeBtn").classList.remove("on");updateOverlay();}
+function updateOverlay(){
+ const svg=document.getElementById("shape");
+ [...svg.querySelectorAll(".overlay")].forEach(e=>e.remove());
+ const c=cards[index], pts=getVertices(c);
+ if(edgesOn && pts.length>1){
+   const colors=["#168f83","#3f78b5","#8b5fbf","#c28b2c","#5a9a55","#b45a7a"];
+   for(let i=0;i<pts.length-1;i++){
+     const [x1,y1]=pts[i],[x2,y2]=pts[i+1];
+     svg.appendChild(svgEl("line",{x1,y1,x2,y2,stroke:colors[i%colors.length],"stroke-width":12,"stroke-linecap":"round",class:"overlay"}));
+   }
+   if(c.type==="poly"){
+     const [x1,y1]=pts[pts.length-1],[x2,y2]=pts[0];
+     svg.appendChild(svgEl("line",{x1,y1,x2,y2,stroke:colors[(pts.length-1)%colors.length],"stroke-width":12,"stroke-linecap":"round",class:"overlay"}));
+   }
+ }
+ if(verticesOn && pts.length){
+   pts.forEach(([x,y])=>{
+     svg.appendChild(svgEl("circle",{cx:x,cy:y,r:13,fill:"#e54848",stroke:"white","stroke-width":4,class:"overlay"}));
+   });
+ }
+}
+function showAnswer(){document.getElementById("answer").classList.remove("hidden");}
+function judge(v){attempts++;if(v===cards[index].valid)correct++;document.getElementById("score").textContent=`正解 ${correct} / ${attempts}`;showAnswer();}
+function nextCard(){index=(index+1)%cards.length;render();}
+function randomCard(){index=Math.floor(Math.random()*cards.length);render();}
+render();
+</script>
+</body>
+</html>
