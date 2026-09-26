@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>かたち けんもん タイムアタック</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            user-select: none;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(1.5deg); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 min-h-screen text-white flex flex-col items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl bg-slate-900/90 backdrop-blur-md rounded-3xl custom-shadow border-4 border-indigo-500/40 overflow-hidden flex flex-col min-h-[640px] relative">
+
+        <!-- Header Bar -->
+        <header class="bg-slate-950/80 px-6 py-4 flex items-center justify-between border-b-2 border-indigo-500/30">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">📐</span>
+                <h1 class="font-black text-lg md:text-xl bg-gradient-to-r from-amber-300 to-pink-400 bg-clip-text text-transparent">かたち けんもん タイムアタック</h1>
+            </div>
+            <div id="header-stats" class="hidden flex items-center space-x-3 text-xs md:text-sm font-bold">
+                <div class="bg-rose-950/80 px-3 py-1 rounded-full border border-rose-500/50 flex items-center space-x-1">
+                    <span>⏱️</span>
+                    <span id="timer-val" class="text-rose-300 text-base">60</span><span class="text-xs">びょう</span>
+                </div>
+                <div class="bg-indigo-950/80 px-3 py-1 rounded-full border border-indigo-500/50">
+                    てん数: <span id="score-val" class="text-amber-300">0</span>
+                </div>
+                <div class="bg-purple-950/80 px-3 py-1 rounded-full border border-purple-500/50">
+                    れんさ: <span id="combo-val" class="text-pink-400">0</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="screen-title" class="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6">
+            <div class="relative">
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-pink-500 to-indigo-500 blur opacity-70 animate-pulse"></div>
+                <div class="relative bg-slate-900 px-8 py-6 rounded-3xl border-2 border-indigo-400">
+                    <span class="text-6xl md:text-7xl block mb-2 animate-float">🔺🔷🔴</span>
+                    <h2 class="text-2xl md:text-3xl font-black text-white tracking-wider">60びょうで たくさん仕分けよう！</h2>
+                    <p class="text-sm text-indigo-300 mt-2">もん番になって、ルールに合うかたちを通そう！</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 w-full max-w-md pt-4">
+                <button onclick="startGame(1)" class="w-full py-4 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black rounded-2xl shadow-lg transform active:scale-95 transition-all flex items-center justify-between border-2 border-cyan-300/50">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🔺</span>
+                        <div class="text-left">
+                            <div class="text-lg">モード1：さんかくけい のみ</div>
+                            <div class="text-xs text-cyan-200 font-normal">3本の直線、ちょう点、かこまれた形</div>
+                        </div>
+                    </div>
+                    <span class="text-xl">▶</span>
+                </button>
+
+                <button onclick="startGame(2)" class="w-full py-4 px-6 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-400 hover:to-rose-500 text-white font-black rounded-2xl shadow-lg transform active:scale-95 transition-all flex items-center justify-between border-2 border-pink-300/50">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🟨</span>
+                        <div class="text-left">
+                            <div class="text-lg">モード2：しかくけい のみ</div>
+                            <div class="text-xs text-pink-200 font-normal">4本の直線、ちょう点、かこまれた形</div>
+                        </div>
+                    </div>
+                    <span class="text-xl">▶</span>
+                </button>
+
+                <button onclick="openZukan()" class="w-full py-3 px-6 bg-slate-800 hover:bg-slate-700 text-indigo-200 font-bold rounded-xl border border-indigo-400/30 transition-all flex items-center justify-center space-x-2">
+                    <span>📖 かたち ずかん を みる</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-game" class="flex-1 flex flex-col justify-between p-6 hidden relative">
+            <div class="flex justify-between items-center px-4 py-2 bg-slate-950/50 rounded-2xl border border-indigo-500/20 text-xs md:text-sm text-indigo-300">
+                <span id="gate-mission-text" class="font-bold text-amber-300">もくてき：さんかくけい だけを 通そう！</span>
+                <span id="shape-counter">仕分け数: <span class="text-white font-bold">0</span>かい</span>
+            </div>
+
+            <!-- Character Stage -->
+            <div class="flex-1 flex flex-col items-center justify-center my-4 relative">
+                <div id="dialogue-box" class="bg-white text-slate-900 px-6 py-3 rounded-3xl max-w-md w-full relative mb-4 shadow-xl border-4 border-indigo-200 animate-pop">
+                    <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[14px] border-t-white"></div>
+                    <div id="char-name" class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-0.5">たびびと</div>
+                    <div id="char-dialogue" class="text-base md:text-lg font-black">「こんにちは！ゲートを 通して いいですか？」</div>
+                </div>
+
+                <div id="character-container" class="relative flex items-center justify-center transition-transform duration-300">
+                    <!-- SVG shape injected via JS -->
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="grid grid-cols-2 gap-4 pt-2">
+                <button onclick="handlePass()" class="py-4 px-6 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-black text-lg rounded-2xl shadow-lg transform active:scale-95 transition-all border-2 border-emerald-300 flex flex-col items-center justify-center">
+                    <span class="text-2xl mb-1">🚪✨</span>
+                    <span>とおす</span>
+                </button>
+                <button onclick="handleRejectPrompt()" class="py-4 px-6 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-black text-lg rounded-2xl shadow-lg transform active:scale-95 transition-all border-2 border-rose-300 flex flex-col items-center justify-center">
+                    <span class="text-2xl mb-1">🛑❌</span>
+                    <span>だめ！</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="modal-reasons" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-900 border-2 border-indigo-500 rounded-3xl max-w-md w-full p-6 shadow-2xl animate-pop flex flex-col space-y-3">
+                <div class="text-center">
+                    <span class="text-2xl">⚠️</span>
+                    <h3 class="text-base md:text-lg font-black text-rose-400 mt-1">どうして 入れては だめなの？</h3>
+                    <p class="text-xs text-indigo-200 mt-0.5">下にある<span class="text-amber-300 font-bold">元の形</span>をよく見ながら、あてはまる理由をすべて選ぼう！</p>
+                </div>
+
+                <div class="flex items-center justify-center bg-slate-950/60 p-3 rounded-2xl border border-indigo-500/30 space-x-4">
+                    <div id="modal-shape-preview" class="w-20 h-20 flex items-center justify-center">
+                        <!-- Preview SVG -->
+                    </div>
+                    <div class="text-left flex-1">
+                        <div id="modal-shape-name" class="text-xs font-bold text-amber-300">形の名前</div>
+                        <div id="modal-shape-hint" class="text-xs text-slate-300 mt-1 leading-relaxed">形を見ながら考えてね</div>
+                    </div>
+                </div>
+
+                <div id="reasons-list" class="space-y-2 py-1 max-h-48 overflow-y-auto pr-1">
+                    <!-- Checkboxes injected via JS -->
+                </div>
+
+                <div id="reason-error-msg" class="text-xs text-rose-400 font-bold text-center hidden">
+                    「そうだね！でも、ほかにも残りの理由があるよ！」
+                </div>
+
+                <button onclick="submitReasons()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 font-black text-white rounded-xl shadow-md transition-all">
+                    これで こたえる！
+                </button>
+            </div>
+        </div>
+
+        <div id="modal-feedback" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-900 border-2 border-rose-500 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl animate-pop flex flex-col space-y-4">
+                <div class="text-5xl animate-bounce" id="feedback-emoji">💥</div>
+                <h3 id="feedback-title" class="text-xl font-black text-rose-400">ミスしちゃった！</h3>
+                <p id="feedback-text" class="text-sm text-slate-200 bg-slate-800 p-4 rounded-2xl border border-slate-700"></p>
+                <button onclick="closeFeedback()" class="py-3 px-6 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 font-black text-white rounded-xl shadow-md transition-all">
+                    つぎへ すすむ (-3びょう)
+                </button>
+            </div>
+        </div>
+
+        <div id="modal-result" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-slate-900 border-2 border-amber-500 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl animate-pop flex flex-col space-y-5">
+                <div class="text-6xl animate-bounce">⏰✨</div>
+                <h3 class="text-2xl font-black text-amber-300">タイムアップ！ おつかれさま！</h3>
+                <p class="text-sm text-slate-300">60びょう間でどれだけ仕分けられたかな？</p>
+                <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 space-y-2">
+                    <div class="flex justify-between text-xs text-indigo-300 px-4">
+                        <span>正解数: <strong id="res-correct" class="text-white text-sm">0</strong>かい</span>
+                        <span>最高れんさ: <strong id="res-combo" class="text-pink-400 text-sm">0</strong></span>
+                    </div>
+                    <div class="border-t border-slate-700 pt-2">
+                        <div class="text-xs text-indigo-300">きみの とくてきスコア</div>
+                        <div id="final-score" class="text-4xl font-black text-amber-300 mt-1">0</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="returnToTitle()" class="py-3 bg-slate-700 hover:bg-slate-600 font-bold text-white rounded-xl transition-all">
+                        タイトルへ
+                    </button>
+                    <button onclick="restartGame()" class="py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-black text-white rounded-xl transition-all">
+                        もういちど！
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-zukan" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex flex-col p-6 hidden">
+            <div class="flex justify-between items-center mb-4 border-b border-indigo-500/30 pb-3">
+                <h3 class="text-xl font-black text-amber-300 flex items-center space-x-2">
+                    <span>📖</span>
+                    <span>かたち ずかん（イラスト付き）</span>
+                </h3>
+                <button onclick="closeZukan()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-sm font-bold text-slate-300">とじる</button>
+            </div>
+            <div id="zukan-grid" class="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3 pr-2">
+                <!-- Zukan items injected via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            if (type === 'pass') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.setValueAtTime(600, now + 0.1);
+                osc.frequency.setValueAtTime(800, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        }
+
+        let currentMode = 1; // 1: Triangle, 2: Quadrilateral
+        let timeLeft = 60;
+        let timerInterval = null;
+        let score = 0;
+        let combo = 0;
+        let maxCombo = 0;
+        let correctCount = 0;
+        let shapeCount = 0;
+        let currentShape = null;
+        let lastTypeKey = null;
+        let unlockedZukan = JSON.parse(localStorage.getItem('zukan_unlocked_ja_v5') || '[]');
+
+        const triValidDialogues = [
+            "こんにちは！ぼく、3本の直線でできているよ！",
+            "ちゃんとしたさんかくけいだよ。通して！",
+            "3つのちょう点があるよ。合ってるかな？",
+            "こんにちは！ルールにぴったりの形だよ！",
+            "3つのへんと角があるよ！どうかな？",
+            "さんかくけいの旅人だよ。よろしくね！"
+        ];
+
+        const quadValidDialogues = [
+            "こんにちは！しかくけいのルールにぴったりだよ！",
+            "4つのへんとちょう点があるよ！通して！",
+            "まっすぐな4本の直線で囲まれているよ！",
+            "こんにちは！まぎれもない四角形さ！",
+            "4つの角があるよ。通してくれる？",
+            "しかくけいの旅人だよ。ルールはバッチリさ！"
+        ];
+
+        const allReasons = {
+            sides_tri: { id: 'sides_tri', text: 'へんの数が 3こ ではない', modes: [1] },
+            vertices_tri: { id: 'vertices_tri', text: 'ちょう点の数が 3つではない', modes: [1] },
+            sides_quad: { id: 'sides_quad', text: 'へんの数が 4こ ではない', modes: [2] },
+            vertices_quad: { id: 'vertices_quad', text: 'ちょう点の数が 4つではない', modes: [2] },
+            closed: { id: 'closed', text: '辺がとぎれていて、かこまれた形になっていない', modes: [1, 2] },
+            straight: { id: 'straight', text: 'まっすぐな直線だけでできていない（まるみがある）', modes: [1, 2] }
+        };
+
+        const shapeCatalog = [
+            { key: 'tri_std', name: '正三角形', mode: 'モード1', desc: '3本の直線と3つのちょう点で、きれいに囲まれた三角形。', svg: '<polygon points="50,15 15,85 85,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_right', name: '直角三角形', mode: 'モード1', desc: '一か所が直角になっており、3本の直線で囲まれた三角形。', svg: '<polygon points="15,15 15,85 85,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_slender', name: '細長い三角形', mode: 'モード1', desc: 'たて長ですが、しっかり3つのへんとちょう点を持つ三角形。', svg: '<polygon points="50,10 32,85 68,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_wide', name: '平べったい三角形', mode: 'モード1', desc: '横にひろがった平べったい形ですが、立派な三角形。', svg: '<polygon points="50,55 10,85 90,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_tilted', name: '傾いた三角形', mode: 'モード1', desc: '斜めに大きく傾いていますが、3本の直線とちょう点で囲まれています。', svg: '<polygon points="30,12 12,85 88,78" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_obtuse', name: 'どん角三角形', mode: 'モード1', desc: 'ひとつの角が大きく広がっている三角形。', svg: '<polygon points="85,25 15,75 85,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'tri_asym', name: '非対称の三角形', mode: 'モード1', desc: '左右のバランスがちがう、ユニークな形の三角形。', svg: '<polygon points="70,20 18,80 92,85" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_square', name: '正方形', mode: 'モード2', desc: '4つのへんがすべて等しく、4つの直線で囲まれた四角形。', svg: '<rect x="20" y="20" width="60" height="60" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_rect_hori', name: '横長長方形', mode: 'モード2', desc: 'むかい合うへんが同じ長さの横長な四角形。', svg: '<rect x="15" y="25" width="70" height="50" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_rect_vert', name: 'たて長長方形', mode: 'モード2', desc: 'たてに長い直線とちょう点で囲まれた四角形。', svg: '<rect x="28" y="15" width="44" height="70" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_trapezoid', name: '台形', mode: 'モード2', desc: '上下のへんの長さがちがうが、4本の直線で囲まれた四角形。', svg: '<polygon points="25,20 85,20 95,80 10,80" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_rhombus', name: 'ひし形', mode: 'モード2', desc: '斜めにきれいに傾いた4つのへんを持つ四角形。', svg: '<polygon points="50,15 85,50 50,85 15,50" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_parallelogram', name: '平行四辺形', mode: 'モード2', desc: 'むかい合う2組のへんが平行な四角形。', svg: '<polygon points="30,20 90,20 70,80 10,80" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'quad_skew', name: 'ゆがんだ四角形', mode: 'モード2', desc: '少し形が曲がっていますが、4本の直線でできた四角形。', svg: '<polygon points="18,20 88,15 82,85 22,80" fill="#38bdf8" stroke="#0284c7" stroke-width="4"/>' },
+            { key: 'inv_circle', name: 'まぁるい形（円）', mode: '共通', desc: '曲線でできていて、直線やちょう点がありません。', svg: '<circle cx="50" cy="50" r="35" fill="#f43f5e" stroke="#be123c" stroke-width="4"/>' },
+            { key: 'inv_oval', name: 'だ円の形', mode: '共通', desc: '上下にのびたような曲線でできた丸い形。', svg: '<ellipse cx="50" cy="50" rx="25" ry="38" fill="#f43f5e" stroke="#be123c" stroke-width="4"/>' },
+            { key: 'inv_square', name: '四角いお邪魔キャラ', mode: '共通', desc: '三角形モードで登場する四角い旅人。', svg: '<rect x="22" y="22" width="56" height="56" fill="#fbbf24" stroke="#d97706" stroke-width="4"/>' },
+            { key: 'inv_tri', name: '三角形のお邪魔キャラ', mode: '共通', desc: '四角形モードで登場する三角の旅人。', svg: '<polygon points="50,18 18,82 82,82" fill="#f43f5e" stroke="#be123c" stroke-width="4"/>' },
+            { key: 'inv_pentagon', name: '五角形', mode: '共通', desc: '角が5つ、へんも5つある多角形。', svg: '<polygon points="50,12 88,38 74,82 26,82 12,38" fill="#a855f7" stroke="#7e22ce" stroke-width="4"/>' },
+            { key: 'inv_hexagon', name: '六角形', mode: '共通', desc: '角が6つあるハニカムのような多角形。', svg: '<polygon points="35,15 65,15 85,50 65,85 35,85 15,50" fill="#a855f7" stroke="#7e22ce" stroke-width="4"/>' },
+            { key: 'inv_near_tri', name: '途中までの三角形風', mode: '共通', desc: '最後のへんが途中までしか描かれておらず囲まれていない。', svg: '<path d="M 15 85 L 50 15 L 85 85 L 50 85" fill="none" stroke="#ec4899" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' },
+            { key: 'inv_near_quad', name: '途中までの四角形風', mode: '共通', desc: '最後のへんがつながっておらず、完全に閉じられていない。', svg: '<path d="M 20 80 L 20 20 L 80 20 L 80 80 L 50 80" fill="none" stroke="#ec4899" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' },
+            { key: 'inv_open_line', name: '開いた折れ線', mode: '共通', desc: '線が途中で途切れていて、輪になっていない。', svg: '<polyline points="15,80 50,25 85,75" fill="none" stroke="#ec4899" stroke-width="6" stroke-linecap="round"/>' },
+            { key: 'inv_curved_tri', name: 'まるみのある三角形風', mode: '共通', desc: '直線ではなく、曲線（まるみ）で囲まれている。', svg: '<path d="M 50 15 Q 85 50 85 85 Q 50 70 15 85 Q 15 50 50 15 Z" fill="#f43f5e" stroke="#be123c" stroke-width="4"/>' },
+            { key: 'inv_star', name: 'ほし型', mode: '共通', desc: 'たくさんの角とへこみがある星の形の旅人。', svg: '<polygon points="50,10 61,35 88,38 68,57 74,85 50,71 26,85 32,57 12,38 39,35" fill="#eab308" stroke="#ca8a04" stroke-width="3"/>' }
+        ];
+
+        function generateRandomShape() {
+            let shapeData = null;
+            let attempts = 0;
+
+            while (attempts < 20) {
+                attempts++;
+                const isTargetMode1 = currentMode === 1;
+                const shouldBeValid = Math.random() < 0.48;
+
+                if (isTargetMode1) {
+                    if (shouldBeValid) {
+                        const validKeys = ['tri_std', 'tri_right', 'tri_slender', 'tri_wide', 'tri_tilted', 'tri_obtuse', 'tri_asym'];
+                        const chosenKey = validKeys[Math.floor(Math.random() * validKeys.length)];
+                        const catalogItem = shapeCatalog.find(s => s.key === chosenKey);
+                        const randomDialogue = triValidDialogues[Math.floor(Math.random() * triValidDialogues.length)];
+
+                        shapeData = {
+                            isValid: true,
+                            name: 'さんかくけいのたびびと',
+                            typeKey: catalogItem.key,
+                            svg: catalogItem.svg,
+                            dialogue: randomDialogue,
+                            desc: catalogItem.desc,
+                            correctReasons: []
+                        };
+                    } else {
+                        const invalidKeys = ['inv_circle', 'inv_oval', 'inv_square', 'inv_pentagon', 'inv_hexagon', 'inv_near_tri', 'inv_open_line', 'inv_curved_tri', 'inv_star'];
+                        const chosenKey = invalidKeys[Math.floor(Math.random() * invalidKeys.length)];
+                        const catalogItem = shapeCatalog.find(s => s.key === chosenKey);
+                        
+                        let correctReasons = [];
+                        if (chosenKey === 'inv_circle' || chosenKey === 'inv_oval') {
+                            correctReasons = ['sides_tri', 'vertices_tri', 'straight'];
+                        } else if (chosenKey === 'inv_curved_tri') {
+                            correctReasons = ['straight']; // Curved triangle has 3 sides/vertices, so only 'straight' is invalid
+                        } else if (chosenKey === 'inv_near_tri' || chosenKey === 'inv_open_line') {
+                            correctReasons = ['closed'];
+                        } else {
+                            correctReasons = ['sides_tri', 'vertices_tri'];
+                        }
+
+                        shapeData = {
+                            isValid: false,
+                            name: catalogItem.name,
+                            typeKey: catalogItem.key,
+                            svg: catalogItem.svg,
+                            dialogue: 'このかたちもとおしてほしいな！',
+                            desc: catalogItem.desc,
+                            correctReasons: correctReasons
+                        };
+                    }
+                } else {
+                    // Mode 2: Quadrilaterals
+                    if (shouldBeValid) {
+                        const validKeys = ['quad_square', 'quad_rect_hori', 'quad_rect_vert', 'quad_trapezoid', 'quad_rhombus', 'quad_parallelogram', 'quad_skew'];
+                        const chosenKey = validKeys[Math.floor(Math.random() * validKeys.length)];
+                        const catalogItem = shapeCatalog.find(s => s.key === chosenKey);
+                        const randomDialogue = quadValidDialogues[Math.floor(Math.random() * quadValidDialogues.length)];
+
+                        shapeData = {
+                            isValid: true,
+                            name: 'しかくけいのたびびと',
+                            typeKey: catalogItem.key,
+                            svg: catalogItem.svg,
+                            dialogue: randomDialogue,
+                            desc: catalogItem.desc,
+                            correctReasons: []
+                        };
+                    } else {
+                        const invalidKeys = ['inv_tri', 'inv_circle', 'inv_oval', 'inv_pentagon', 'inv_hexagon', 'inv_near_quad', 'inv_star', 'inv_curved_tri'];
+                        const chosenKey = invalidKeys[Math.floor(Math.random() * invalidKeys.length)];
+                        const catalogItem = shapeCatalog.find(s => s.key === chosenKey);
+                        
+                        let correctReasons = [];
+                        if (chosenKey === 'inv_circle' || chosenKey === 'inv_oval' || chosenKey === 'inv_curved_tri') {
+                            correctReasons = ['sides_quad', 'vertices_quad', 'straight'];
+                        } else if (chosenKey === 'inv_near_quad') {
+                            correctReasons = ['closed'];
+                        } else {
+                            correctReasons = ['sides_quad', 'vertices_quad'];
+                        }
+
+                        shapeData = {
+                            isValid: false,
+                            name: catalogItem.name,
+                            typeKey: catalogItem.key,
+                            svg: catalogItem.svg,
+                            dialogue: 'すきとおる四角形……ではないけれど！',
+                            desc: catalogItem.desc,
+                            correctReasons: correctReasons
+                        };
+                    }
+                }
+
+                if (shapeData.typeKey !== lastTypeKey) {
+                    lastTypeKey = shapeData.typeKey;
+                    break;
+                }
+            }
+
+            const faceSvg = `
+                <g class="animate-float">
+                    ${shapeData.svg}
+                    <circle cx="43" cy="46" r="4" fill="#1e293b"/>
+                    <circle cx="57" cy="46" r="4" fill="#1e293b"/>
+                    <circle cx="41" cy="44" r="1.5" fill="#ffffff"/>
+                    <circle cx="55" cy="44" r="1.5" fill="#ffffff"/>
+                    <path d="M 44 58 Q 50 63 56 58" stroke="#1e293b" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </g>
+            `;
+            shapeData.svgWithFace = `<svg viewBox="0 0 100 100" class="w-36 h-36 md:w-40 md:h-40 drop-shadow-lg">${faceSvg}</svg>`;
+            return shapeData;
+        }
+
+        window.startGame = function(mode) {
+            playSound('click');
+            currentMode = mode;
+            timeLeft = 60;
+            score = 0;
+            combo = 0;
+            maxCombo = 0;
+            correctCount = 0;
+            shapeCount = 0;
+            lastTypeKey = null;
+
+            document.getElementById('screen-title').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('header-stats').classList.remove('hidden');
+
+            const missionText = mode === 1 
+                ? 'もくてき：【さんかくけい】だけを通そう！' 
+                : 'もくてき：【しかくけい】だけを通そう！';
+            document.getElementById('gate-mission-text').textContent = missionText;
+
+            loadNextShape();
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-val').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    triggerTimeUp();
+                }
+            }, 1000);
+        };
+
+        window.loadNextShape = function() {
+            shapeCount++;
+            document.getElementById('shape-counter').innerHTML = `仕分け数: <span class="text-white font-bold">${shapeCount}</span>かい`;
+            currentShape = generateRandomShape();
+
+            document.getElementById('char-name').textContent = "たびびと";
+            document.getElementById('char-dialogue').textContent = `“${currentShape.dialogue}”`;
+            document.getElementById('character-container').innerHTML = currentShape.svgWithFace;
+
+            if (!unlockedZukan.includes(currentShape.typeKey)) {
+                unlockedZukan.push(currentShape.typeKey);
+                localStorage.setItem('zukan_unlocked_ja_v5', JSON.stringify(unlockedZukan));
+            }
+        };
+
+        function updateStatsUI() {
+            document.getElementById('score-val').textContent = score;
+            document.getElementById('combo-val').textContent = combo;
+            if (combo > maxCombo) maxCombo = combo;
+        }
+
+        window.handlePass = function() {
+            playSound('click');
+            if (currentShape.isValid) {
+                playSound('success');
+                score += 100 + (combo * 15);
+                combo++;
+                correctCount++;
+                updateStatsUI();
+                showMiniPopup('✨ せいかい！正しいかたちを通したよ！', 'emerald');
+                window.loadNextShape();
+            } else {
+                playSound('error');
+                combo = 0;
+                timeLeft = Math.max(0, timeLeft - 3);
+                updateStatsUI();
+                showFeedbackModal(
+                    '💥 まちがった形を通しちゃった！',
+                    `“実はちがう形だったよ！ ${currentShape.desc}” (-3びょうペナルティ)`,
+                    '🚨'
+                );
+            }
+        };
+
+        window.handleRejectPrompt = function() {
+            playSound('click');
+            if (currentShape.isValid) {
+                playSound('error');
+                combo = 0;
+                timeLeft = Math.max(0, timeLeft - 3);
+                updateStatsUI();
+                showFeedbackModal(
+                    '💢 正しい形をことわっちゃった！',
+                    `“ちょっと！これこそ正しいかたちだよ！ ${currentShape.desc}” (-3びょうペナルティ)`,
+                    '😤'
+                );
+            } else {
+                renderReasonsModal();
+            }
+        };
+
+        function renderReasonsModal() {
+            document.getElementById('modal-shape-preview').innerHTML = currentShape.svgWithFace;
+            document.getElementById('modal-shape-name').textContent = currentShape.name;
+            document.getElementById('modal-shape-hint').textContent = currentShape.desc;
+
+            const listEl = document.getElementById('reasons-list');
+            listEl.innerHTML = '';
+            document.getElementById('reason-error-msg').classList.add('hidden');
+
+            const validReasonsForMode = Object.values(allReasons).filter(r => r.modes.includes(currentMode) || r.modes.length === 2);
+
+            validReasonsForMode.forEach(reason => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center space-x-3 bg-slate-800/90 p-3 rounded-xl border border-slate-700 hover:bg-slate-750 cursor-pointer transition-all';
+                label.innerHTML = `
+                    <input type="checkbox" name="reason-chk" value="${reason.id}" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 bg-slate-900 border-slate-700">
+                    <span class="text-xs md:text-sm text-white font-medium">${reason.text}</span>
+                `;
+                listEl.appendChild(label);
+            });
+
+            document.getElementById('modal-reasons').classList.remove('hidden');
+        }
+
+        window.submitReasons = function() {
+            playSound('click');
+            const checkboxes = document.querySelectorAll('input[name="reason-chk"]:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+
+            const requiredReasons = currentShape.correctReasons;
+
+            const hasAllRequired = requiredReasons.every(req => selectedIds.includes(req));
+            const hasNoMissing = selectedIds.every(sel => requiredReasons.includes(sel));
+
+            if (hasAllRequired && hasNoMissing) {
+                document.getElementById('modal-reasons').classList.add('hidden');
+                playSound('success');
+                score += 150 + (combo * 20);
+                combo++;
+                correctCount++;
+                updateStatsUI();
+                showMiniPopup('🎉 理由も大正解！あやしい形を追い返した！', 'indigo');
+                window.loadNextShape();
+            } else {
+                playSound('error');
+                document.getElementById('reason-error-msg').classList.remove('hidden');
+                document.getElementById('reason-error-msg').textContent = "「そうだね！でも、ほかにも残りの理由があるよ！」";
+            }
+        };
+
+        function showMiniPopup(text, colorTheme) {
+            const popup = document.createElement('div');
+            popup.className = `fixed top-20 left-1/2 transform -translate-x-1/2 bg-${colorTheme === 'emerald' ? 'emerald' : 'indigo'}-600 text-white px-6 py-3 rounded-2xl shadow-2xl font-black text-xs md:text-sm z-50 animate-pop border-2 border-white/30`;
+            popup.textContent = text;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1200);
+        }
+
+        function showFeedbackModal(title, text, emoji) {
+            document.getElementById('feedback-title').textContent = title;
+            document.getElementById('feedback-text').textContent = text;
+            document.getElementById('feedback-emoji').textContent = emoji;
+            document.getElementById('modal-feedback').classList.remove('hidden');
+        }
+
+        window.closeFeedback = function() {
+            playSound('click');
+            document.getElementById('modal-feedback').classList.add('hidden');
+            window.loadNextShape();
+        };
+
+        function triggerTimeUp() {
+            document.getElementById('res-correct').textContent = correctCount;
+            document.getElementById('res-combo').textContent = maxCombo;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('modal-result').classList.remove('hidden');
+        }
+
+        window.restartGame = function() {
+            playSound('click');
+            document.getElementById('modal-result').classList.add('hidden');
+            window.startGame(currentMode);
+        };
+
+        window.returnToTitle = function() {
+            playSound('click');
+            document.getElementById('modal-result').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('header-stats').classList.add('hidden');
+            document.getElementById('screen-title').classList.remove('hidden');
+        };
+
+        window.openZukan = function() {
+            playSound('click');
+            const grid = document.getElementById('zukan-grid');
+            grid.innerHTML = '';
+
+            shapeCatalog.forEach(item => {
+                const isUnlocked = unlockedZukan.includes(item.key);
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border ${isUnlocked ? 'bg-slate-800/90 border-indigo-500/50' : 'bg-slate-950/50 border-slate-800 text-slate-500'} flex items-center space-x-4`;
+                
+                const svgDisplay = isUnlocked 
+                    ? `<svg viewBox="0 0 100 100" class="w-20 h-20 bg-slate-900 rounded-xl p-1 border border-indigo-500/30">${item.svg}</svg>`
+                    : `<div class="w-20 h-20 bg-slate-900/80 rounded-xl flex items-center justify-center text-2xl border border-slate-800">🔒</div>`;
+
+                card.innerHTML = `
+                    <div>${svgDisplay}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isUnlocked ? 'bg-indigo-900 text-indigo-200' : 'bg-slate-800 text-slate-600'}">${item.mode}</span>
+                            <span class="text-xs">${isUnlocked ? '発見！ ✅' : '未発見'}</span>
+                        </div>
+                        <h4 class="font-black text-sm md:text-base ${isUnlocked ? 'text-white' : 'text-slate-600'}">${isUnlocked ? item.name : '？？？？？'}</h4>
+                        <p class="text-xs mt-1 ${isUnlocked ? 'text-indigo-200' : 'text-slate-600'}">${isUnlocked ? item.desc : 'ゲームを遊んでこの形に出会おう！'}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('modal-zukan').classList.remove('hidden');
+        };
+
+        window.closeZukan = function() {
+            playSound('click');
+            document.getElementById('modal-zukan').classList.add('hidden');
+        };
+    </script>
+</body>
+</html>
