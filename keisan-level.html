@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>けいさんレベルチャレンジ</title>
+<style>
+:root{--blue:#3b82f6;--purple:#7654d8;--green:#20a56b;--red:#df5050;--ink:#25324a;--gold:#c99524}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#eef7ff,#fff8ed);font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;color:var(--ink)}
+button,input{font:inherit}.app{max-width:980px;margin:auto;padding:16px}.hidden{display:none!important}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.logo{font-size:28px;font-weight:900}.timer{background:#17233a;color:#fff;border-radius:15px;padding:9px 18px;min-width:145px;text-align:center;font-size:25px;font-weight:900}.timer.warning{background:#d83d3d;animation:pulse .6s infinite alternate}@keyframes pulse{to{transform:scale(1.05)}}
+.panel{background:#fff;border-radius:24px;padding:23px;box-shadow:0 8px 30px #21324a18;margin-bottom:15px}h1,h2,h3{margin:0 0 12px}h1{font-size:31px}h2{font-size:23px}.sub,.mini{color:#68758a}
+.mode-grid,.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.mode-card{border:3px solid #dbe7f7;border-radius:22px;padding:23px;background:#fbfdff}.mode-card.sub{border-color:#e2d9fa}.formula{font-size:35px;font-weight:900;margin:12px 0}.primary,.mode-card button{border:0;border-radius:15px;background:var(--blue);color:#fff;font-weight:900;padding:13px 22px;cursor:pointer}.mode-card.sub button{background:var(--purple)}.secondary{border:2px solid #cbd7e8;background:#fff;color:var(--ink);border-radius:13px;padding:11px 16px;font-weight:800;cursor:pointer}
+.name-input{padding:11px 13px;border:2px solid #d4deeb;border-radius:12px;width:210px}.setup-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.emoji-list{display:flex;flex-wrap:wrap;gap:6px}.emoji-btn{font-size:24px;background:#fff;border:2px solid #dce5ef;border-radius:10px;width:42px;height:42px;cursor:pointer}.emoji-btn.selected{border-color:var(--blue);background:#eaf4ff}
+.game-top{display:flex;justify-content:space-between;align-items:center}.score{font-size:20px;font-weight:900}.problem{font-size:76px;font-weight:900;text-align:center;padding:30px 5px 5px}.answer{height:70px;text-align:center;font-size:54px;font-weight:900;color:#2563eb}.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;max-width:570px;margin:13px auto}.num{height:78px;border:0;border-radius:18px;background:#f1f5fb;box-shadow:0 4px 0 #d7dfeb;font-size:34px;font-weight:900;color:var(--ink);cursor:pointer}.num:active{transform:translateY(3px);box-shadow:0 1px #d7dfeb}.clear{background:#fff0f0!important;color:#b63838!important}
+.countdown{position:fixed;inset:0;background:#17304df0;color:#fff;display:flex;align-items:center;justify-content:center;z-index:50;text-align:center}.countdown .message{font-size:42px;font-weight:900}.countdown .number{font-size:120px;line-height:1;margin-top:18px}
+.flash{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;pointer-events:none}.flash span{background:#fff;padding:25px 40px;border-radius:28px;font-size:68px;font-weight:900;box-shadow:0 10px 40px #0002;animation:flashPop .65s ease-out forwards}.flash.good span{color:var(--green);border:5px solid #65c99d}.flash.bad span{color:var(--red);border:5px solid #ed9b9b}@keyframes flashPop{0%{opacity:0;transform:scale(.75)}15%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1)}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f5f8fc;border-radius:16px;padding:15px;text-align:center}.stat b{display:block;font-size:29px;margin-top:4px}.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}.skill{background:#f7f9fc;border-radius:16px;padding:15px;font-size:18px;font-weight:900}.stars{font-size:25px;letter-spacing:2px;margin-top:5px}
+.improve{background:#effbf4;border:2px solid #a8dfc2;border-radius:16px;padding:15px;font-size:20px;font-weight:900;margin:15px 0}.warningbox{background:#fff7df;border:1px solid #efd486;border-radius:13px;padding:12px;margin:12px 0}
+.certificate{background:#fffdf5;border:11px double #d4a83a;border-radius:8px;padding:30px;text-align:center;position:relative}.certificate:before{content:"";position:absolute;inset:8px;border:1px solid #d8b967}.cert-icon{font-size:55px}.cert-title{font-size:29px;font-weight:900;letter-spacing:4px;color:#8a6415}.grade{font-size:36px;font-weight:900;color:#a9740d;margin:9px}.detail{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:18px}.detailbox{background:#f7f9fc;border-radius:15px;padding:15px;text-align:left}.detailbox b{font-size:22px}.bar{height:14px;background:#e8edf3;border-radius:20px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,#5fa8ff,#f4bd45);border-radius:20px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{background:#fff1f1;color:#b63838;border:1px solid #efb0b0;border-radius:12px;padding:7px 11px;font-weight:900}
+@media(max-width:700px){.mode-grid,.home-grid,.detail,.skills{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.problem{font-size:58px}.num{height:68px;font-size:30px}.timer{font-size:21px;min-width:120px}.logo{font-size:22px}}
+
+.title-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:18px}.title-item{border:2px solid #e1e7f0;border-radius:15px;padding:13px 15px;background:#fbfdff;display:flex;align-items:center;gap:12px}.title-item.current{border-color:#d4a83a;background:#fff9e8;box-shadow:0 3px 12px #d4a83a22}.title-num{width:34px;height:34px;border-radius:50%;background:#edf2f8;display:grid;place-items:center;font-weight:900;flex:none}.title-item.current .title-num{background:#f4d47b}.title-name{font-size:19px;font-weight:900}.title-condition{font-size:12px;color:#68758a;margin-top:2px}.titlebox b{display:block;font-size:27px;margin:5px 0 8px;color:#8a6415}.linkbtn{border:0;background:none;color:#3271c8;font-weight:800;padding:4px 0;cursor:pointer}.calc-level-box{text-align:center;background:#f8fbff;border-radius:15px;padding:15px;margin-top:15px}.calc-level-box strong{display:block;font-size:28px;color:#7654d8;margin:5px}.xp-card{margin-top:15px;background:#f8fbff;border-radius:15px;padding:18px}.xp-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:8px}.xp-head b{font-size:23px}.xp-head span{font-size:13px;color:#68758a}.xpbar{height:18px}.xpbar span{background:linear-gradient(90deg,#6fcf97,#f4bd45)}.xp-card #xpInfo{text-align:center;margin-top:8px;font-size:14px}.home-title-btn{width:100%;margin-top:10px}
+@media(max-width:700px){.title-list{grid-template-columns:1fr}}
+
+/* シンプルな横長A4風のけいさんレベルしょうじょう */
+.certificate{width:100%;max-width:1120px;aspect-ratio:297/210;margin:10px auto 0;background:#fffdf7;border:7px double #d4a83a;border-radius:6px;padding:28px 42px;position:relative;text-align:center;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.certificate:before{content:"";position:absolute;inset:10px;border:1px solid #dfc47d;pointer-events:none}
+.cert-icon{font-size:42px;line-height:1;margin-bottom:3px;position:relative}
+.cert-title{font-size:27px;font-weight:900;letter-spacing:7px;color:#806018;position:relative}
+.cert-name{font-size:27px;font-weight:900;margin:5px 0 2px;position:relative}
+.cert-level-label{font-size:13px;color:#6f7784;font-weight:800;position:relative}
+.grade{font-size:32px;font-weight:900;color:#7654d8;margin:2px 0 12px;position:relative}
+.cert-titles{display:grid;grid-template-columns:1fr 1fr;gap:18px;position:relative}
+.cert-titlebox{background:#faf7ed;border:1px solid #ead9a8;border-radius:12px;padding:10px 14px}
+.cert-titlelabel{font-size:14px;color:#7a6a49;font-weight:900}
+.cert-bigtitle{font-size:23px;font-weight:900;color:#8a6415;margin-top:4px;white-space:nowrap}
+.cert-skills{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0 12px;position:relative}
+.cert-skills>div{background:#f7f9fc;border-radius:10px;padding:7px 10px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:900}
+.cert-skills b{font-size:19px;letter-spacing:1px}
+.cert-xp{margin:0 auto;width:88%;padding:9px 15px;background:#f8fbff;position:relative}
+.cert-xp .xp-head{margin-bottom:5px}.cert-xp .xp-head b{font-size:18px}.cert-xp .xp-head span{font-size:12px}.cert-xp .xpbar{height:14px}.cert-xp #xpInfo{font-size:12px;margin-top:4px}
+@media(max-width:700px){.certificate{aspect-ratio:auto;padding:25px 16px}.cert-titles,.cert-skills{grid-template-columns:1fr}.cert-bigtitle{font-size:21px}.cert-xp{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="logo">🧮 けいさんレベルチャレンジ</div><div id="timer" class="timer">100.0秒</div></header>
+
+<section id="home" class="panel">
+<h1>100秒で、どこまでできる？</h1>
+<p class="sub">速く、正しく、たくさん！ 自分の計算力に挑戦しよう。</p>
+<div class="mode-grid">
+<div class="mode-card"><h2>＋ たしざん</h2><div class="formula">1〜10 ＋ 1〜10</div><p>100通りの組み合わせ。</p><button id="addStart">たしざんをする</button></div>
+<div class="mode-card sub"><h2>− ひきざん</h2><div class="formula">10〜19 − 1〜10</div><p>100通りの組み合わせ。</p><button id="subStart">ひきざんをする</button></div>
+</div>
+<div class="home-grid" style="margin-top:16px">
+<div class="panel" style="margin:0;background:#f8fbff"><h2>👤 じぶんのカード</h2><div id="summary" class="sub"></div><button class="primary" id="cardBtn">じぶんのけいさんレベルカードをひょうじする</button><button class="secondary home-title-btn" id="titlesBtn">🏅 どんなしょうごうがあるか見る</button></div>
+<div class="panel" style="margin:0;background:#fffdf7"><h2>⚙️ なまえ・アイコン</h2><form id="profileForm"><div class="setup-row"><input id="name" class="name-input" maxlength="12" placeholder="なまえを入力"><button class="secondary">保存する</button></div></form><div id="emojis" class="emoji-list" style="margin-top:9px"></div></div>
+</div>
+<div class="panel" style="margin:16px 0 0;background:#f8fbff"><h2>📚 にがてな計算をれんしゅう</h2><p class="sub">間違えた問題だけを練習できます。練習は計算レベルには影響しません。</p><button class="secondary" id="practiceBtn">にがてれんしゅう</button><span id="weakInfo" class="mini" style="margin-left:10px"></span></div>
+</section>
+
+<section id="game" class="panel hidden">
+<button class="secondary" id="gameHome">← ホームにもどる</button>
+<div class="game-top"><div id="modeTitle" class="score"></div><div id="score" class="score">正かい 0</div></div>
+<div id="problem" class="problem"></div><div id="answer" class="answer">&nbsp;</div>
+<div class="numpad">
+<button type="button" class="num" data-n="1">1</button><button type="button" class="num" data-n="2">2</button><button type="button" class="num" data-n="3">3</button>
+<button type="button" class="num" data-n="4">4</button><button type="button" class="num" data-n="5">5</button><button type="button" class="num" data-n="6">6</button>
+<button type="button" class="num" data-n="7">7</button><button type="button" class="num" data-n="8">8</button><button type="button" class="num" data-n="9">9</button>
+<button type="button" class="num clear" id="clearBtn">けす</button><button type="button" class="num" data-n="0">0</button><button type="button" class="num" id="backBtn">←</button>
+</div>
+</section>
+
+<section id="result" class="panel hidden">
+<h1>チャレンジ終了！</h1><div id="improve" class="improve"></div>
+<div class="stats"><div class="stat">正かい<b id="rCorrect">0</b></div><div class="stat">正しくこたえたかくりつ<b id="rAcc">0%</b></div><div class="stat">へいきん時間<b id="rAvg">0.00秒</b></div></div>
+<div class="skills"><div class="skill">⚡ はやさ<div id="speed" class="stars"></div></div><div class="skill">🎯 正確さ<div id="accuracy" class="stars"></div></div><div class="skill">💪 集中力<div id="focus" class="stars"></div></div></div>
+<h2 id="rLevel"></h2><p id="rDetail" class="sub"></p><button class="primary" id="resultHome">ホームにもどる</button>
+</section>
+
+<section id="card" class="panel hidden">
+<button class="secondary" id="cardHome">← ホームにもどる</button>
+<div class="certificate">
+<div class="cert-icon" id="cIcon">🌟</div>
+<div class="cert-title">けいさんレベルしょうじょう</div>
+<div class="cert-name" id="cName">なまえ</div>
+<div class="cert-level-label">げんざいのけいさんレベル</div>
+<div class="grade" id="cOverall"></div>
+<div class="cert-titles">
+<div class="cert-titlebox"><div class="cert-titlelabel">＋ たしざんのしょうごう</div><div class="cert-bigtitle" id="cAdd"></div></div>
+<div class="cert-titlebox"><div class="cert-titlelabel">− ひきざんのしょうごう</div><div class="cert-bigtitle" id="cSub"></div></div>
+</div>
+<div class="cert-skills">
+<div><span>⚡ はやさ</span><b id="cSpeed"></b></div>
+<div><span>🎯 正確さ</span><b id="cAccuracy"></b></div>
+<div><span>💪 集中力</span><b id="cFocus"></b></div>
+</div>
+<div class="xp-card cert-xp"><div class="xp-head"><b id="xpLevelText"></b><span id="xpNextText"></span></div><div class="bar xpbar"><span id="xpBar"></span></div><div id="xpInfo"></div></div>
+</div>
+</section>
+
+<section id="titles" class="panel hidden">
+<button class="secondary" id="titlesHome">← ホームにもどる</button>
+<h1>🏅 しょうごうずかん</h1>
+<p class="sub">本番チャレンジで身につけた計算力に応じて、しょうごうが変わります。</p>
+<div class="title-list" id="titleList"></div>
+</section>
+
+<section id="practice" class="panel hidden">
+<button class="secondary" id="practiceHome">← ホームにもどる</button>
+<h1>📚 にがてれんしゅう</h1><p id="practiceProgress" class="sub"></p><div id="practiceProblem" class="problem"></div><div id="practiceAnswer" class="answer">&nbsp;</div>
+<div class="numpad practicePad">
+<button type="button" class="num pnum" data-n="1">1</button><button type="button" class="num pnum" data-n="2">2</button><button type="button" class="num pnum" data-n="3">3</button>
+<button type="button" class="num pnum" data-n="4">4</button><button type="button" class="num pnum" data-n="5">5</button><button type="button" class="num pnum" data-n="6">6</button>
+<button type="button" class="num pnum" data-n="7">7</button><button type="button" class="num pnum" data-n="8">8</button><button type="button" class="num pnum" data-n="9">9</button>
+<button type="button" class="num clear" id="pclear">けす</button><button type="button" class="num pnum" data-n="0">0</button><button type="button" class="num" id="pback">←</button>
+</div>
+</section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const KEY="keisan_level_challenge_v5";
+const EMOJIS=["😀","😎","🤓","🥳","🦊","🐱","🐶","🐼","🐸","🐵","🐰","🦁","🐯","🐨","🐻","🐥","🐧","🦄","🐲","🦖","🐙","🦋","🌟","🚀","🎯","🏆","⚡","🍀","🌈","🎈"];
+const LEVELS=["けいさんのたね","けいさんのめ","けいさんのは","けいさんひよこ","けいさんビギナー","すらすらけいさん","はやうちけいさん","けいさん名人","けいさんはやぶさ","けいさんスピードスター","けいさんロケット","けいさんジェット","けいさんスター","けいさんチャンピオン","けいさんマスター","超すらすらけいさん","超はやうちけいさん","超けいさん名人","けいさんエース","けいさんマスター・極"];
+function blank(){return{attempts:0,correct:0,totalTime:0,bestCorrect:0,bestAcc:0,bestAvg:Infinity,runs:0,history:[],weak:{}}}
+function normalizeMode(v){const b=blank();if(!v||typeof v!=="object")return b;b.attempts=Number(v.attempts)||0;b.correct=Number(v.correct)||0;b.totalTime=Number(v.totalTime)||0;b.bestCorrect=Number(v.bestCorrect)||0;b.bestAcc=Number(v.bestAcc)||0;b.bestAvg=Number.isFinite(Number(v.bestAvg))?Number(v.bestAvg):Infinity;b.runs=Number(v.runs)||0;b.history=Array.isArray(v.history)?v.history.filter(h=>h&&Number.isFinite(Number(h.correct))&&Number.isFinite(Number(h.acc))&&Number.isFinite(Number(h.avg))).map(h=>({correct:Number(h.correct),acc:Number(h.acc),avg:Number(h.avg)})).slice(-8):[];b.weak=v.weak&&typeof v.weak==="object"?v.weak:{};return b}
+function defaultData(){return{name:"",icon:"😀",xp:0,streak:0,lastDay:"",add:blank(),sub:blank()}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&typeof x==="object"){return{name:typeof x.name==="string"?x.name:"",icon:EMOJIS.includes(x.icon)?x.icon:"😀",xp:Number(x.xp)||0,streak:Number(x.streak)||0,lastDay:typeof x.lastDay==="string"?x.lastDay:"",add:normalizeMode(x.add),sub:normalizeMode(x.sub)}}}catch(e){}return defaultData()}
+let data=load();
+let game=null;
+let practiceState=null;
+
+const $=id=>document.getElementById(id);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function show(id){["home","game","result","card","titles","practice"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function makeDeck(mode){const a=[];if(mode==="add"){for(let x=1;x<=10;x++)for(let y=1;y<=10;y++)a.push({x,y,ans:x+y})}else{for(let x=10;x<=19;x++)for(let y=1;y<=10;y++)a.push({x,y,ans:x-y})}return shuffle(a)}
+function updateHome(){
+ $("name").value=data.name;
+ $("summary").innerHTML=data.icon+" <b>"+esc(data.name||"なまえ")+"</b><br>たしざん："+LEVELS[getLevel(data.add)]+"　ひきざん："+LEVELS[getLevel(data.sub)];
+ const weakCount=new Set([...Object.keys(data.add.weak),...Object.keys(data.sub.weak)]).size;
+ $("weakInfo").textContent=weakCount?("苦手な問題 "+weakCount+"こ"):"まだ苦手問題はありません";
+ $("emojis").innerHTML="";
+ EMOJIS.forEach(e=>{const b=document.createElement("button");b.type="button";b.className="emoji-btn"+(data.icon===e?" selected":"");b.textContent=e;b.addEventListener("click",()=>{data.icon=e;save();updateHome();});$("emojis").appendChild(b)});
+}
+function start(mode){
+ stopGame();
+ game={mode,deck:makeDeck(mode),index:0,q:null,input:"",correct:0,attempts:0,totalTime:0,start:0,qStart:0,timer:null,active:false};
+ show("game");$("modeTitle").textContent=mode==="add"?"＋ たしざん":"− ひきざん";$("score").textContent="正かい 0";$("timer").classList.remove("warning");$("timer").textContent="100.0秒";
+ const overlay=document.createElement("div");overlay.className="countdown";overlay.id="countdown";overlay.innerHTML='<div><div class="message">１００びょうでできるだけ多く正かいしよう！</div><div class="number">３</div></div>';document.body.appendChild(overlay);
+ let n=3;const number=overlay.querySelector(".number");const timer=setInterval(()=>{n--;if(n>0)number.textContent=n;else if(n===0)number.textContent="スタート！";else{clearInterval(timer);overlay.remove();beginGame()}},900);
+}
+function beginGame(){if(!game)return;game.active=true;game.start=performance.now();nextQuestion();game.timer=setInterval(updateTimer,50)}
+function nextQuestion(){if(!game||!game.active)return;if(game.index>=game.deck.length){game.deck=makeDeck(game.mode);game.index=0}const q=game.deck[game.index++];game.q=q;game.input="";game.qStart=performance.now();const problem=$("problem"),answer=$("answer");if(problem)problem.textContent=q.x+" "+(game.mode==="add"?"＋":"−")+" "+q.y+" ＝";if(answer)answer.innerHTML="&nbsp;"}
+function updateTimer(){if(!game||!game.active)return;const left=Math.max(0,100-(performance.now()-game.start)/1000);$("timer").textContent=left.toFixed(1)+"秒";if(left<=10)$("timer").classList.add("warning");if(left<=0)finishGame()}
+function digits(n){return Math.abs(n)>=10?2:1}
+function inputGame(n){if(!game||!game.active||game.input.length>=digits(game.q.ans))return;game.input+=String(n);$("answer").textContent=game.input;if(game.input.length>=digits(game.q.ans))judgeGame()}
+function judgeGame(){
+ const elapsed=(performance.now()-game.qStart)/1000,val=Number(game.input),d=data[game.mode];
+ game.attempts++;game.totalTime+=elapsed;d.attempts++;d.totalTime+=elapsed;
+ const key=game.q.x+"_"+game.q.y;
+ if(val===game.q.ans){game.correct++;d.correct++;flash("good","せいかい！")}else{d.weak[key]=(d.weak[key]||0)+1;flash("bad","ちがうよ！")}
+ $("score").textContent="正かい "+game.correct;save();nextQuestion();
+}
+function finishGame(){
+ if(!game||!game.active)return;game.active=false;if(game.timer)clearInterval(game.timer);
+ $("timer").classList.remove("warning");$("timer").textContent="100.0秒";
+ const d=data[game.mode],acc=game.attempts?game.correct/game.attempts*100:0,avg=game.attempts?game.totalTime/game.attempts:0;
+ const old={correct:d.bestCorrect,acc:d.bestAcc,avg:d.bestAvg};
+ d.bestCorrect=Math.max(d.bestCorrect,game.correct);d.bestAcc=Math.max(d.bestAcc,acc);d.bestAvg=Math.min(d.bestAvg,avg);d.runs++;
+ d.history.push({correct:game.correct,acc,avg});if(d.history.length>8)d.history.shift();
+ data.xp+=50+game.attempts*10+game.correct*10;updateStreak();save();
+ $("rCorrect").textContent=game.correct;$("rAcc").textContent=acc.toFixed(1)+"%";$("rAvg").textContent=avg.toFixed(2)+"秒";
+ $("speed").textContent=stars(speedStars(game.correct,avg));$("accuracy").textContent=stars(accStars(acc));$("focus").textContent=stars(focusStars(game.correct,game.attempts,acc));
+ $("rLevel").textContent="げんざいのレベル："+LEVELS[getLevel(d)];
+ $("rDetail").textContent="今回の記録："+game.correct+"問正かい ／ "+game.attempts+"問こたえた ／ 正しくこたえたかくりつ "+acc.toFixed(1)+"%";
+ const messages=[];if(game.correct>old.correct)messages.push("前よりも多く答えられたよ！");if(acc>old.acc)messages.push("前よりも正しくこたえられたよ！");if(avg<old.avg)messages.push("前よりもはやくこたえられたよ！");$("improve").textContent=messages.length?messages.join("　"): "今日もチャレンジできたよ！ 少しずつ力をのばそう！";
+ show("result");
+}
+function performanceScore(h){const count=Math.min(100,h.correct/45*100);const acc=h.acc;const speed=Math.max(0,Math.min(100,(4-h.avg)/3*100));return acc*.50+speed*.30+count*.20}
+function getLevel(d){
+ if(!d||!d.runs||!d.history.length)return 0;
+ const scores=d.history.slice(-3).map(performanceScore).sort((a,b)=>a-b);
+ const score=scores[Math.floor(scores.length/2)];
+ let lv=Math.min(19,Math.max(0,Math.floor(score/5)));
+ if(d.runs<2)lv=Math.min(lv,5);
+ else if(d.runs<3)lv=Math.min(lv,9);
+ return lv;
+}
+function speedStars(correct,avg){const s=Math.min(1,correct/45)*.55+Math.max(0,Math.min(1,(4-avg)/3))*.45;return Math.max(0,Math.min(5,Math.round(s*5)))}
+function accStars(acc){return Math.max(0,Math.min(5,Math.round(acc/20)))}
+function focusStars(correct,attempts,acc){const s=Math.min(1,correct/45)*.55+Math.min(1,acc/100)*.45;return Math.max(0,Math.min(5,Math.round(s*5)))}
+function stars(n){return "★".repeat(n)+"☆".repeat(5-n)}
+function updateStreak(){const today=new Date().toISOString().slice(0,10);if(data.lastDay!==today){data.streak++;data.lastDay=today}}
+function cardStats(d){if(!d.runs)return"まだチャレンジしていません";return"正かい "+d.bestCorrect+"問 ／ 正しくこたえたかくりつ "+d.bestAcc.toFixed(1)+"% ／ へいきん時間 "+(isFinite(d.bestAvg)?d.bestAvg.toFixed(2):"—")+"秒"}
+function kotukottoLevel(){return Math.floor(data.xp/1000)+1}
+function xpInto(){return data.xp%1000}
+function xpToNext(){return 1000-xpInto()}
+function renderTitleList(currentAdd,currentSub){
+ const current=Math.max(currentAdd,currentSub);
+ $("titleList").innerHTML=LEVELS.map((name,i)=>`<div class="title-item ${i===current?"current":""}"><div class="title-num">${i+1}</div><div><div class="title-name">${esc(name)}</div><div class="title-condition">${i===current?"いまのしょうごう":"けいさんレベル "+(i+1)}</div></div></div>`).join("");
+}
+function showTitles(){
+ stopGame();
+ renderTitleList(getLevel(data.add),getLevel(data.sub));
+ show("titles");
+}
+function showCard(){
+ stopGame();
+ // カードを開く直前にも入力欄の内容を読み取り、必ず最新の名前を反映する
+ const nameInput=$("name");
+ if(nameInput){ const latest=nameInput.value.trim(); if(latest!==data.name){ data.name=latest; save(); } }
+ const a=getLevel(data.add),s=getLevel(data.sub),o=Math.max(a,s),into=xpInto();
+ $("cIcon").textContent=data.icon;$("cName").textContent=data.name||"なまえ";
+ $("cOverall").textContent="レベル "+(o+1)+"　"+LEVELS[o];
+ $("cAdd").textContent=LEVELS[a];$("cSub").textContent=LEVELS[s];
+ $("cSpeed").textContent=stars(Math.max(speedStars(data.add.bestCorrect,data.add.bestAvg),speedStars(data.sub.bestCorrect,data.sub.bestAvg)));
+ $("cAccuracy").textContent=stars(Math.max(accStars(data.add.bestAcc),accStars(data.sub.bestAcc)));
+ $("cFocus").textContent=stars(Math.max(focusStars(data.add.bestCorrect,Math.max(data.add.attempts,1),data.add.bestAcc),focusStars(data.sub.bestCorrect,Math.max(data.sub.attempts,1),data.sub.bestAcc)));
+ $("xpLevelText").textContent="こつこつレベル "+kotukottoLevel();
+ $("xpNextText").textContent="あと "+xpToNext().toLocaleString()+" けいけんちでレベルアップ";
+ $("xpBar").style.width=(into/1000*100)+"%";
+ $("xpInfo").textContent="けいけんち："+data.xp.toLocaleString()+" ／ あと "+xpToNext().toLocaleString()+" で次のレベル";
+ show("card");
+}
+function startPractice(){
+ const list=[];
+ [["add",data.add.weak],["sub",data.sub.weak]].forEach(([mode,weak])=>Object.entries(weak).forEach(([key,count])=>{const [x,y]=key.split("_").map(Number);list.push({mode,x,y,ans:mode==="add"?x+y:x-y,count})}));
+ if(!list.length){alert("まだ苦手な計算はありません。まず100秒チャレンジをしてみよう！");return}
+ list.sort((a,b)=>b.count-a.count);
+ practiceState={list:list.slice(0,20),index:0,input:"",active:true};
+ show("practice");nextPractice();
+}
+function nextPractice(){
+ if(!practiceState.active)return;if(practiceState.index>=practiceState.list.length){practiceState.active=false;alert("れんしゅうおわり！");home();return}
+ const q=practiceState.list[practiceState.index];practiceState.input="";$("practiceProgress").textContent=(practiceState.index+1)+" / "+practiceState.list.length;$("practiceProblem").textContent=q.x+" "+(q.mode==="add"?"＋":"−")+" "+q.y+" ＝";$("practiceAnswer").innerHTML="&nbsp;";
+}
+function inputPractice(n){if(!practiceState||!practiceState.active)return;const q=practiceState.list[practiceState.index];if(practiceState.input.length>=digits(q.ans))return;practiceState.input+=String(n);$("practiceAnswer").textContent=practiceState.input;if(practiceState.input.length>=digits(q.ans)){const correct=Number(practiceState.input)===q.ans;flash(correct?"good":"bad",correct?"せいかい！":"もういちど！");setTimeout(()=>{if(practiceState&&practiceState.active){practiceState.index++;nextPractice()}},250)}}
+function flash(type,msg){const el=document.createElement("div");el.className="flash "+type;el.innerHTML="<span>"+msg+"</span>";document.body.appendChild(el);setTimeout(()=>el.remove(),650)}
+function stopGame(){if(game){game.active=false;if(game.timer)clearInterval(game.timer);game=null}if(practiceState){practiceState.active=false;practiceState=null}const c=$("countdown");if(c)c.remove()}
+function home(){stopGame();$("timer").classList.remove("warning");$("timer").textContent="100.0秒";show("home");updateHome()}
+$("addStart").addEventListener("click",()=>start("add"));$("subStart").addEventListener("click",()=>start("sub"));$("cardBtn").addEventListener("click",showCard);$("practiceBtn").addEventListener("click",startPractice);$("titlesHome").addEventListener("click",home);$("titlesBtn").addEventListener("click",showTitles);
+$("profileForm").addEventListener("submit",e=>{e.preventDefault();data.name=$("name").value.trim();save();updateHome();});
+$("name").addEventListener("input",()=>{data.name=$("name").value.trim();save();});
+$("gameHome").addEventListener("click",home);$("resultHome").addEventListener("click",home);$("cardHome").addEventListener("click",home);$("practiceHome").addEventListener("click",home);
+document.querySelectorAll(".num[data-n]").forEach(b=>b.addEventListener("click",()=>{if(practiceState)inputPractice(Number(b.dataset.n));else inputGame(Number(b.dataset.n))}));
+$("clearBtn").addEventListener("click",()=>{if(game&&game.active){game.input="";$("answer").innerHTML="&nbsp;"}});
+$("backBtn").addEventListener("click",()=>{if(game&&game.active){game.input=game.input.slice(0,-1);$("answer").textContent=game.input||" "}});
+$("pclear").addEventListener("click",()=>{if(practiceState){practiceState.input="";$("practiceAnswer").innerHTML="&nbsp;"}});
+$("pback").addEventListener("click",()=>{if(practiceState){practiceState.input=practiceState.input.slice(0,-1);$("practiceAnswer").textContent=practiceState.input||" "}});
+document.addEventListener("keydown",e=>{if(/^[0-9]$/.test(e.key)){if(game&&game.active)inputGame(Number(e.key));else if(practiceState&&practiceState.active)inputPractice(Number(e.key))}if(e.key==="Backspace"){if(game&&game.active)$("backBtn").click();else if(practiceState&&practiceState.active)$("pback").click()}});
+updateHome();
+})();
+</script>
+</body>
+</html>
