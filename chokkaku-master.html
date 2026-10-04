@@ -1,0 +1,149 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>直角三角形マスター</title>
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}body{margin:0;background:#fff7e0;color:#333;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;text-align:center}
+#app{max-width:520px;margin:0 auto;padding:10px}
+button{font:inherit;font-size:18px;border:0;border-radius:14px;padding:10px 14px;margin:4px;background:#ffb703;color:#333;box-shadow:0 3px #c98600;cursor:pointer}
+button.b{background:#4cc9f0;box-shadow:0 3px #2a8fb0}button.g{background:#7bd88f;box-shadow:0 3px #3e9a52}button.r{background:#ff8fa3;box-shadow:0 3px #c25a6e}
+button:disabled{background:#ccc;box-shadow:none;color:#888}
+.m{display:block;width:100%;text-align:left;font-size:20px}
+svg{touch-action:none;background:#fff;border-radius:16px;max-width:100%}
+#ck{display:flex;align-items:center;gap:8px;text-align:left;min-height:84px}
+#ck svg.c,#ck img{width:72px;height:72px;flex:none;background:none}
+#bub{background:#fff;border:3px solid #ffb703;border-radius:16px;padding:8px 12px;font-size:17px}
+.t{width:100%;border:3px solid #ddd}
+</style></head><body><div id="app"></div><script>
+const $=s=>document.querySelector(s),R=(a,b)=>a+Math.random()*(b-a),RI=(a,b)=>Math.floor(R(a,b+1)),pick=a=>a[RI(0,a.length-1)],sh=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+let S={u:1,st:{},b2:0},tid;try{Object.assign(S,JSON.parse(localStorage.getItem('tri1')))}catch(e){}
+const save=()=>{try{localStorage.setItem('tri1',JSON.stringify(S))}catch(e){}};
+let AC;const beep=(f,d=.12)=>{try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.connect(g);g.connect(AC.destination);g.gain.value=.1;o.start();o.stop(AC.currentTime+d)}catch(e){}};
+const ok=()=>{beep(660);setTimeout(()=>beep(880),110)},ng=()=>beep(200,.25);
+const btn=(t,c,f)=>{const b=document.createElement('button');b.textContent=t;b.className=c||'';b.onclick=f;return b};
+const FB='<svg class="c" viewBox="0 0 76 76"><polygon points="8,8 8,68 68,68" fill="#ffd166" stroke="#e09f00" stroke-width="4" stroke-linejoin="round"/><path d="M8 50h14v18" fill="none" stroke="#e63946" stroke-width="3"/><circle cx="22" cy="48" r="3"/><circle cx="36" cy="58" r="3"/></svg>';
+function ckImg(){const i=new Image();i.src='https://mrs-shrimp.github.io/2math/image/chokkakun.png';i.onerror=()=>{const d=document.createElement('span');d.innerHTML=FB;i.replaceWith(d.firstChild)};return i}
+function page(m){clearInterval(tid);$('#app').innerHTML='<div id="ck"><span id="cki"></span><div id="bub"></div></div><div id="hd"></div><div id="q"></div><div id="fb"></div>';$('#cki').append(ckImg());say(m)}
+const say=t=>{$('#bub').textContent=t};
+// ---- shapes
+const nv=(a,v)=>{const x=a[0]-v[0],y=a[1]-v[1],l=Math.hypot(x,y);return[x/l,y/l]};
+const dt=(a,b,c)=>(b[0]-a[0])*(c[0]-a[0])+(b[1]-a[1])*(c[1]-a[1]),hasR=p=>p.some((v,i)=>dt(v,p[(i+1)%p.length],p[(i+2)%p.length])==0);
+const TL=[[1,0],[1,0],[1,0],[1,1],[2,1],[1,2]];
+function mk(k){let p;
+ if(k=='r'){const tl=Math.random()<.4?pick(TL.slice(3)):TL[0],a=tl[0],b=tl[1],bg=a+b==1,m=bg?RI(2,6):RI(1,2),n=(bg?RI(2,5):RI(1,2))*pick([1,-1]),r=RI(0,2);p=[[0,0],[a*m,b*m],[-b*n,a*n]];p=p.map((_,i)=>p[(i+r)%3])}
+ else do{const W=RI(3,7),h=RI(2,5),k2=RI(1,3);p=pick([[[0,0],[2*k2,0],[k2,h]],[[0,0],[W,0],[2,h]],[[0,0],[W,0],[-RI(1,3),h]]])}while(hasR(p));
+ return{k,p}}
+const PX=o=>{const X=o.p.map(q=>q[0]),Y=o.p.map(q=>q[1]),x0=Math.min(...X),x1=Math.max(...X),y0=Math.min(...Y),y1=Math.max(...Y),c=Math.min(36,Math.floor(230/Math.max(x1-x0,y1-y0,1))),ox=150-(x0+x1)/2*c,oy=150-(y0+y1)/2*c;return{c,ox,oy,P:o.p.map(q=>[ox+q[0]*c,oy+q[1]*c])}};
+let RC=0;
+const gp=(c,ox,oy)=>{let g='';for(let k=-40;k<=40;k++){const x=ox+k*c,y=oy+k*c;if(x>=0&&x<=300)g+=`M${x} 0V300`;if(y>=0&&y<=300)g+=`M0 ${y}H300`}return g};
+function rm(P,c,marks){let m='';const n=P.length;RC=0;P.forEach((v,i)=>{const u=nv(P[(i+n-1)%n],v),w=nv(P[(i+1)%n],v);if(Math.abs(u[0]*w[0]+u[1]*w[1])<.03){RC++;const d=Math.max(10,c/2);if(marks)m+=`<path d="M${v[0]+u[0]*d} ${v[1]+u[1]*d}L${v[0]+(u[0]+w[0])*d} ${v[1]+(u[1]+w[1])*d}L${v[0]+w[0]*d} ${v[1]+w[1]*d}" fill="none" stroke="#e63946" stroke-width="4"/>`}});return m}
+function sv(o,marks,col){const{c,ox,oy,P}=PX(o);return`<path d="${gp(c,ox,oy)}" stroke="#b8d4e8" stroke-width="1" fill="none"/><polygon points="${P.join(' ')}" fill="${col||'rgba(76,201,240,.45)'}" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>${rm(P,c,marks)}`}
+// ---- run
+function run(id,qs,need){let i=0,c=0,cb=0;const n=()=>{if(i>=qs.length)return end(id,c,qs.length,need);page('よく みてね！');$('#hd').textContent=`もんだい ${i+1}/${qs.length}　⭐${c} ${cb>1?'🔥'+cb+'れんぞく！':''}`;
+ qs[i]($('#q'),(good,msg,corner)=>{good?(c++,cb++,ok()):(cb=0,ng());$('#fb').innerHTML=`<p>${msg||''}</p>`;
+  say(corner?'直角だぁ！気持ちいい⤴💗':good?(cb>=3?cb+'れんぞく！すごすぎる！':pick(['せいかい！','いいね！','すごい！'])):pick(['おしい！つぎは できるよ','よく みて たしかめよう']));
+  $('#fb').append(btn('つぎへ ▶','g',()=>{i++;n()}))})};n()}
+function end(id,c,n,need){const p=c>=need,r=c/n;result(id,p,r>=.9?3:r>=.7?2:1,`${n}もん中 ${c}もん せいかい！`+(p?'':`（${need}もん せいかいで クリア）`),()=>$('#q')&&0,id)}
+function result(id,pass,stars,txt){const was=S.u;if(pass){S.st[id]=Math.max(S.st[id]||0,stars);if(id<7&&S.u<id+1)S.u=id+1;save()}
+ page(pass?'やったね！':'もういちど ちょうせん！');const tips=['直角三角形は 直角の かどが 1つ ある さんかく','長方形や 正方形を 対角線で きると 直角三角形が 2つ できるよ','直角三角形を 2つ あわせると 長方形に なるよ','直角は 三角じょうぎで たしかめられるよ'];
+ $('#q').innerHTML=`<h2>${pass?'⭐'.repeat(stars)+'☆'.repeat(3-stars):'ざんねん…'}</h2><p>${txt}</p>${pass&&S.u>was?`<h3>🎉 モード${S.u}が ひらいたよ！</h3>`:''}<p>💡 ${pick(tips)}</p>`;
+ $('#q').append(btn('もういちど','b',()=>start(id)),btn('ホーム','',home))}
+// ---- questions
+const qJudge=(box,done)=>{const sp=mk(pick(['r','o'])),rs=[];let sel=-1,dr=null;
+ box.innerHTML=`<div>この かたちは 直角三角形かな？<br><small>三角じょうぎで たしかめよう</small></div><svg id="bd" viewBox="0 0 300 300" width="300"><g id="shp">${sv(sp)}</g><g id="rl"></g></svg><div id="tb"></div><div id="an"></div>`;
+ const bd=$('#bd'),draw=()=>$('#rl').innerHTML=rs.map(r=>`<g transform="translate(${r.x} ${r.y}) rotate(${r.a})"><polygon points="0,0 120,0 0,120" fill="rgba(255,193,7,.55)" stroke="#b07d00" stroke-width="2"/><path d="M0 22h22V0" fill="none" stroke="#e63946" stroke-width="2"/></g>`).join(''),
+ pt=e=>{const p=bd.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(bd.getScreenCTM().inverse());return[q.x,q.y]};
+ bd.onpointerdown=e=>{const g=e.target.closest('#rl g');if(!g)return;const k=[...$('#rl').children].indexOf(g),r=rs.splice(k,1)[0],q=pt(e);rs.push(r);sel=rs.length-1;dr=[q[0]-r.x,q[1]-r.y];bd.setPointerCapture(e.pointerId);draw()};
+ bd.onpointermove=e=>{if(!dr)return;const q=pt(e),r=rs[sel];r.x=q[0]-dr[0];r.y=q[1]-dr[1];draw()};bd.onpointerup=()=>dr=null;
+ const rot=d=>{if(sel>=0&&rs[sel]){rs[sel].a+=d;draw()}},tb=$('#tb');
+ let ci=0;const PP=PX(sp).P;
+ const chk=()=>{const n=PP.length,i=ci++%n,v=PP[i],u=nv(PP[(i+n-1)%n],v),w=nv(PP[(i+1)%n],v),d=u[0]*w[1]-u[1]*w[0]>0?u:w,ta=Math.atan2(d[1],d[0])*180/Math.PI,r={x:12,y:12,a:0},x0=12,y0=12;rs.push(r);sel=rs.length-1;let t0=null;
+  const stp=T=>{if(!bd.isConnected)return;t0=t0||T;const k=Math.min((T-t0)/500,1),e=1-Math.pow(1-k,3);r.x=x0+(v[0]-x0)*e;r.y=y0+(v[1]-y0)*e;r.a=ta*e;draw();if(k<1)requestAnimationFrame(stp);else{const rt=Math.abs(u[0]*w[0]+u[1]*w[1])<.03;rt?ok():ng();say(rt?'ぴったり！直角だぁ！気持ちいい⤴💗':'すきまが あるよ…ここは 直角じゃない！')}};requestAnimationFrame(stp)};
+ tb.append(btn('📐 直角があるか しらべる','b',chk),btn('↺','b',()=>rot(-15)),btn('↻','b',()=>rot(15)),btn('🗑','b',()=>{if(sel>=0){rs.splice(sel,1);sel=rs.length-1;draw()}}));
+ const ans=a=>{$('#an').innerHTML='';$('#shp').innerHTML=sv(sp,1);const good=a===(sp.k=='r');done(good,sp.k=='r'?'直角の かどが 1つ ある！ 直角三角形だよ':'直角の かどが ないよ。直角三角形じゃないね',good&&sp.k=='r')};
+ $('#an').append(btn('○ 直角三角形！','g',()=>ans(true)),btn('× ちがう','r',()=>ans(false)))};
+const qPick=(box,done)=>{const L=sh([mk('r'),mk('o'),mk('o'),mk('o')]);box.innerHTML='<div>直角三角形は どれ？</div><div id="pg" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+L.map((o,i)=>`<svg class="t" data-i="${i}" viewBox="0 0 300 300">${sv(o)}</svg>`).join('')+'</div>';
+ $('#pg').onclick=e=>{const s=e.target.closest('svg');if(!s)return;const o=L[+s.dataset.i],g=o.k=='r';$('#pg').onclick=null;[...$('#pg').children].forEach((v,i)=>v.innerHTML=sv(L[i],1));s.style.borderColor=g?'#2a9d4a':'#e63946';done(g,g?'直角の かどが ある！ 直角三角形だね':'それは 直角が ないよ。赤い□が 直角のしるし',g)}};
+const qSort=(box,done)=>{const ns=RI(2,4),L=sh([...Array.from({length:ns},()=>mk('s')),...Array.from({length:6-ns},()=>mk('r'))]),dn=[],sm=[];let sel=-1,miss=0,cs=0,cr=0;
+ box.innerHTML='<div>ずけいを タップして、あう ばこに いれよう</div><div id="sg" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div><div id="sb"></div>';
+ const d=()=>{$('#sg').innerHTML=L.map((o,i)=>`<svg class="t" data-i="${i}" viewBox="0 0 300 300" style="${i==sel?'border-color:#fb8500':''}">${dn[i]?'<text x="150" y="195" font-size="120" text-anchor="middle">✅</text>':sv(o,sm[i])}</svg>`).join('');
+  $('#sb').innerHTML='';$('#sb').append(btn(`🟦 正方形ばこ（${cs}）`,'b',()=>put(1)),btn(`🟧 長方形ばこ（${cr}）`,'',()=>put(0)))},
+ put=q=>{if(sel<0)return say('さきに ずけいを タップしてね');const o=L[sel];if((o.k=='s')==!!q){dn[sel]=1;q?cs++:cr++;ok();sel=-1;say(pick(['ぴったり！','いいね！']))}else{miss=1;sm[sel]=1;ng();say('ちがうよ。赤い□が 直角のしるし。へんの ながさも くらべてね')}
+  d();if(dn.filter(x=>x).length==6){$('#sb').innerHTML='';done(!miss,'ぜんぶ しわけられたね！',false)}};
+ $('#sg').onclick=e=>{const s=e.target.closest('svg');if(!s)return;const i=+s.dataset.i;if(dn[i])return;sel=i;d()};d()};
+const bb=s=>{const a=[...s].map(k=>k.split(',').map(Number)),X=a.map(q=>q[0]),Y=a.map(q=>q[1]),x0=Math.min(...X),y0=Math.min(...Y);return{x0,y0,w:Math.max(...X)-x0+1,h:Math.max(...Y)-y0+1}};
+function grid(host,C,Rw,lock,init,chg){const z=34,set=new Set(init),L=new Set(lock);host.innerHTML=`<svg viewBox="0 0 ${C*z+4} ${Rw*z+4}" width="${C*z+4}"></svg>`;const el=host.firstChild,
+ d=()=>{let h='';for(let y=0;y<Rw;y++)for(let x=0;x<C;x++){const k=x+','+y,on=set.has(k);h+=`<rect data-k="${k}" x="${x*z+2}" y="${y*z+2}" width="${z}" height="${z}" fill="${on?L.has(k)?'#8ecae6':'#ffb703':'#fff'}" stroke="#aaa"/>`}el.innerHTML=h;chg&&chg(set)};
+ el.onclick=e=>{const k=e.target.dataset.k;if(!k||L.has(k))return;set.has(k)?set.delete(k):set.add(k);d()};d();return set}
+const qBuild=(box,done)=>{const a=RI(2,5),byc=Math.random()<.5,N=a*a;let miss=0;box.innerHTML=`<div>${byc?`1つの へんが ${a}こ の 正方形を つくろう`:`タイルを ${N}こ つかって 正方形を つくろう`}<br><small>（1cm×1cm のタイル。タップで おく／とる）</small></div><div id="gh"></div><div>いま <b id="cn">0</b>こ</div><div id="an"></div>`;
+ const set=grid($('#gh'),9,7,[],[],s=>$('#cn')&&($('#cn').textContent=s.size));
+ $('#an').append(btn('できた！','g',()=>{if(!set.size)return;const o=bb(set);if(set.size==N&&o.h==a&&o.w==a){$('#an').innerHTML='';done(!miss,`${a}×${a}=${N}こ！ 正方形が できた`,true)}else{miss=1;ng();say(set.size==o.w*o.h&&o.w!=o.h?'長方形だけど たてと よこが ちがうよ':'まだ 正方形に なってないよ')}}))};
+const qFix=(box,done)=>{const a=RI(3,5),b=a,ox=RI(0,9-b),oy=RI(0,7-a),full=new Set(),rm=new Set();let miss=0;
+ for(let y=0;y<a;y++)for(let x=0;x<b;x++)full.add((ox+x)+','+(oy+y));
+ if(Math.random()<.5){const p=RI(1,2),q=RI(1,2),cx=pick([0,b-q]),cy=pick([0,a-p]);for(let y=0;y<p;y++)for(let x=0;x<q;x++)rm.add((ox+cx+x)+','+(oy+cy+y))}else{const f=[...full];while(rm.size<RI(2,4))rm.add(pick(f))}
+ const lk=[...full].filter(k=>!rm.has(k));box.innerHTML='<div>タイルを たして 正方形に なおそう<br><small>（水色は うごかせないよ）</small></div><div id="gh"></div><div id="an"></div>';
+ const set=grid($('#gh'),9,7,lk,lk);
+ $('#an').append(btn('できた！','g',()=>{const ex=[...set].some(k=>!full.has(k));if(!ex&&set.size==full.size){$('#an').innerHTML='';done(!miss,`${a}×${a}の 正方形に なおせたね`,true)}else{miss=1;ng();say(ex?'ひろげすぎかも。いちばん ちいさい 正方形に してね':'まだ たりないところが あるよ')}}))};
+
+function ltap(host,fx,mx){const z=36,C=9,Rw=7,sel=[];host.innerHTML=`<svg id="lt" viewBox="0 0 ${C*z} ${Rw*z}" width="${C*z}"></svg>`;const el=$('#lt'),X=i=>18+i*z,
+ d=()=>{let g='',h='';for(let i=0;i<C;i++)g+=`M${X(i)} 0V${Rw*z}`;for(let j=0;j<Rw;j++)g+=`M0 ${X(j)}H${C*z}`;const pts=[...fx,...sel],Q=pts.map(q=>X(q[0])+','+X(q[1])).join(' ');
+  for(let i=0;i<C;i++)for(let j=0;j<Rw;j++){const on=sel.some(q=>q[0]==i&&q[1]==j);h+=`<circle cx="${X(i)}" cy="${X(j)}" r="${on?9:5}" fill="${on?'#fb8500':'#667'}"/><circle data-k="${i},${j}" cx="${X(i)}" cy="${X(j)}" r="15" fill="transparent"/>`}
+  el.innerHTML=`<path d="${g}" stroke="#b8d4e8" fill="none"/>${pts.length>1?`<polygon points="${Q}" fill="rgba(76,201,240,.35)" stroke="#1d3557" stroke-width="3"/>`:''}`+h+fx.map(q=>`<circle cx="${X(q[0])}" cy="${X(q[1])}" r="9" fill="#1d3557"/><text x="${X(q[0])}" y="${X(q[1])-13}" text-anchor="middle" font-size="18" font-weight="bold">${q[2]||''}</text>`).join('')};
+ el.onclick=e=>{const k=e.target.dataset.k;if(!k)return;const q=k.split(',').map(Number);if(fx.some(f=>f[0]==q[0]&&f[1]==q[1]))return;const i=sel.findIndex(s=>s[0]==q[0]&&s[1]==q[1]);if(i>=0)sel.splice(i,1);else if(sel.length<mx)sel.push(q);else if(mx==1)sel[0]=q;d()};d();return{sel}}
+const LP=q=>[18+q[0]*36,18+q[1]*36];
+const qMake=(box,done)=>{const a=RI(2,4),b=RI(2,5);let miss=0;box.innerHTML=`<div>たて ${a}こ、よこ ${b}こ の 直角三角形を つくろう<br><small>方眼の てんを 3つ タップ（もういちどで とりけし）</small></div><div id="gh"></div><div id="an"></div>`;
+ const t=ltap($('#gh'),[],3);
+ $('#an').append(btn('できた！','g',()=>{const s=t.sel;if(s.length<3)return say('てんを 3つ えらんでね');const g=s.some((v,i)=>{const o=s.filter((_,j)=>j!=i).map(q=>[Math.abs(q[0]-v[0]),Math.abs(q[1]-v[1])]);return o.some(q=>q[0]==b&&q[1]==0)&&o.some(q=>q[0]==0&&q[1]==a)});
+  if(g){$('#an').innerHTML='';$('#lt').insertAdjacentHTML('beforeend',rm(s.map(LP),36,1));done(!miss,`たて${a}・よこ${b}の 直角三角形が できた！`,true)}else{miss=1;ng();say(hasR(s)?'直角は あるけど ながさが ちがうよ':'直角の かどが ないよ')}}))};
+const qFix2=(box,done)=>{const tl=pick([[1,0],[0,1]]),a=tl[0],b=tl[1],d=RI(2,3),sg=pick([1,-1]),A=[RI(3,5),RI(2,4)];let B=[A[0]+sg*d*a,A[1]+sg*d*b],miss=0;if(B[0]<0||B[0]>8||B[1]<0||B[1]>6)B=[A[0]-sg*d*a,A[1]-sg*d*b];
+ box.innerHTML='<div>Aの かどが 直角に なるように、のこりの 1てんを タップしよう</div><div id="gh"></div><div id="an"></div>';const t=ltap($('#gh'),[[A[0],A[1],'A'],[B[0],B[1],'B']],1);
+ $('#an').append(btn('できた！','g',()=>{const c=t.sel[0];if(!c)return say('てんを 1つ えらんでね');if(dt(A,B,c)==0&&(c[0]!=A[0]||c[1]!=A[1])){$('#an').innerHTML='';$('#lt').insertAdjacentHTML('beforeend',rm([A,B,c].map(LP),36,1));done(!miss,'Aが 直角の 三角形に なおせたね！',true)}else{miss=1;ng();say('そこだと Aが 直角に ならないよ。しかくい かどに なる てんは？')}}))};
+const qCut=(box,done)=>{const sq=Math.random()<.5,w=RI(2,5);let h=w;if(!sq)while(h==w)h=RI(2,5);const four=sq&&Math.random()<.5,need=four?2:1,cuts=[];let miss=0,A=null,mo=null,fin=0;
+ box.innerHTML=`<div>${sq?'正方形':'長方形'}を ${need}かい きって、直角三角形を ${need*2}つ つくろう<br><small>かどを おして、はんたいの かどまで すーっと ひこう</small></div><svg id="cd" viewBox="0 0 300 300" width="300"></svg><div id="an"></div>`;
+ const o={p:[[0,0],[w,0],[w,h],[0,h]]},{c,ox,oy,P}=PX(o),L=(x,y)=>[ox+x*c,oy+y*c],per=[];
+ for(let x=0;x<w;x++)per.push([x,0]);for(let y=0;y<h;y++)per.push([w,y]);for(let x=w;x>0;x--)per.push([x,h]);for(let y=h;y>0;y--)per.push([0,y]);
+ const isC=q=>(q[0]==0||q[0]==w)&&(q[1]==0||q[1]==h),cd=$('#cd');
+ cd.innerHTML=`<g id="cg">${sv(o)}</g><g id="cl"></g>`+P.map(v=>`<circle cx="${v[0]}" cy="${v[1]}" r="9" fill="#fb8500" opacity=".85"/>`).join('');
+ const pt=e=>{const p=cd.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(cd.getScreenCTM().inverse());return[q.x,q.y]},
+ snap=q=>{let b=null,bs=14;per.forEach(r=>{const l=L(...r),s=Math.hypot(l[0]-q[0],l[1]-q[1])*(isC(r)?.4:1);if(s<bs){bs=s;b=r}});return b},
+ ln=(p,q)=>`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#e63946" stroke-width="5" stroke-dasharray="9 6" stroke-linecap="round"/>`,
+ draw=()=>$('#cl').innerHTML=cuts.map(k=>ln(L(...k[0]),L(...k[1]))).join('')+(A&&mo?ln(L(...A),mo):''),
+ isD=k=>Math.abs(k[0][0]-k[1][0])==w&&Math.abs(k[0][1]-k[1][1])==h,
+ ds=q=>q.length==3?(hasR(q)?'直角三角形':'さんかく'):q.length==4?'四角形':q.length+'かっけい',
+ pcs=k=>{const n=per.length,f=r=>per.findIndex(q=>q[0]==r[0]&&q[1]==r[1]),seg=(i,j)=>{const r=[];for(let t=i;;t=(t+1)%n){r.push(per[t]);if(t==j)break}return r.filter((q,ix)=>isC(q)||ix==0||ix==r.length-1)};return[seg(f(k[0]),f(k[1])),seg(f(k[1]),f(k[0]))]};
+ cd.onpointerdown=e=>{if(fin)return;A=snap(pt(e));if(A){mo=pt(e);cd.setPointerCapture(e.pointerId);draw()}};
+ cd.onpointermove=e=>{if(A){mo=pt(e);draw()}};
+ cd.onpointerup=e=>{if(!A)return;const B=snap(pt(e)),a=A;A=null;if(B&&(B[0]!=a[0]||B[1]!=a[1])&&!((a[0]==B[0]&&(a[0]==0||a[0]==w))||(a[1]==B[1]&&(a[1]==0||a[1]==h)))&&cuts.length<3)cuts.push([a,B]);draw()};
+ $('#an').append(btn('できた！','g',()=>{if(fin)return;if(!cuts.length)return say('まだ きってないよ');const dg=new Set(cuts.map(k=>k.map(String).sort().join('|'))).size==cuts.length;
+  if(cuts.length==need&&dg&&cuts.every(isD)){fin=1;const col=['#ffd166','#06d6a0','#4cc9f0','#ff8fa3'],M=L(w/2,h/2);let T;
+   if(four)T=[0,1,2,3].map(i=>[P[i],P[(i+1)%4],M]);else{const d02=cuts[0].every(q=>(q[0]==0&&q[1]==0)||(q[0]==w&&q[1]==h));T=d02?[[P[0],P[1],P[2]],[P[0],P[2],P[3]]]:[[P[0],P[1],P[3]],[P[1],P[2],P[3]]]}
+   $('#cg').innerHTML=`<path d="${gp(c,ox,oy)}" stroke="#b8d4e8" fill="none"/>`+T.map((t,i)=>`<polygon points="${t.join(' ')}" fill="${col[i]}" stroke="#1d3557" stroke-width="3" stroke-linejoin="round"/>`+rm(t,c,1)).join('');$('#cl').innerHTML='';$('#an').innerHTML='';done(!miss,`直角三角形が ${T.length}つ できたね！`,true)}
+  else{miss=1;ng();say(cuts.length==1&&need==1?pcs(cuts[0]).map(ds).join(' と ')+' に わかれたよ。直角三角形が 2つに なるように きろう':cuts.length<need?'もう 1かい きろう':'ちがうよ。かどから はんたいの かどへ ななめに きろう')}}),btn('やりなおす','r',()=>{cuts.length=0;draw()}))};
+const qPuz=(box,done)=>{const ty=pick([0,1,2]),a=RI(1,2);let tw,th,b0,cnt=2;
+ if(ty==0){tw=th=RI(2,4);b0=[[0,0],[tw,0],[0,tw]]}else if(ty==1){tw=RI(2,4);th=tw;while(th==tw)th=RI(2,4);b0=[[0,0],[tw,0],[0,th]]}else{tw=th=2*a;b0=[[0,0],[a,0],[0,2*a]];cnt=4}
+ const z=26,C=14,Rw=8,tx=9,ty0=2,col=['#ffd166','#06d6a0','#4cc9f0','#ff8fa3'],pcs=Array.from({length:cnt},(_,i)=>({p:b0.map(q=>q.slice()),x:[0,5,0,5][i],y:[0,0,4,4][i],c:col[i]}));let sel=-1,dr=null,miss=0,gr='';
+ for(let i=0;i<=C;i++)gr+=`M${i*z} 0V${Rw*z}`;for(let j=0;j<=Rw;j++)gr+=`M0 ${j*z}H${C*z}`;
+ box.innerHTML=`<div>${cnt}つの 直角三角形を くみあわせて ${tw==th?'正方形':'長方形'}を つくろう<br><small>オレンジの わくに ぴったり。ドラッグで うごかす／↻ まわす／⇋ うらがえす</small></div><svg id="pz" viewBox="0 0 ${C*z} ${Rw*z}" width="${C*z}"></svg><div id="tb"></div><div id="an"></div>`;
+ const bd=$('#pz'),nm=p=>{const x=Math.min(...p.map(q=>q[0])),y=Math.min(...p.map(q=>q[1]));return p.map(q=>[q[0]-x,q[1]-y])},bw=s=>Math.max(...s.p.map(q=>q[0])),bh=s=>Math.max(...s.p.map(q=>q[1])),cl=s=>{s.x=Math.max(0,Math.min(s.x,C-bw(s)));s.y=Math.max(0,Math.min(s.y,Rw-bh(s)))},
+ draw=()=>bd.innerHTML=`<path d="${gr}" stroke="#b8d4e8" fill="none"/><rect x="${tx*z}" y="${ty0*z}" width="${tw*z}" height="${th*z}" fill="#fff3c4" stroke="#fb8500" stroke-width="3" stroke-dasharray="8 5"/>`+pcs.map((s,i)=>{const P=s.p.map(q=>[(s.x+q[0])*z,(s.y+q[1])*z]);return`<g data-i="${i}"><polygon points="${P.join(' ')}" fill="${s.c}" fill-opacity=".85" stroke="${i==sel?'#e63946':'#1d3557'}" stroke-width="${i==sel?5:3}" stroke-linejoin="round"/>${rm(P,z,1)}</g>`}).join(''),
+ pt=e=>{const p=bd.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(bd.getScreenCTM().inverse());return[q.x/z,q.y/z]},
+ inT=(p,t)=>{const f=(a,b,c)=>(a[0]-c[0])*(b[1]-c[1])-(b[0]-c[0])*(a[1]-c[1]),d1=f(p,t[0],t[1]),d2=f(p,t[1],t[2]),d3=f(p,t[2],t[0]);return(d1>0&&d2>0&&d3>0)||(d1<0&&d2<0&&d3<0)};
+ bd.onpointerdown=e=>{const g=e.target.closest('g[data-i]');if(!g)return;const s=pcs.splice(+g.dataset.i,1)[0],q=pt(e);pcs.push(s);sel=pcs.length-1;dr=[q[0]-s.x,q[1]-s.y];bd.setPointerCapture(e.pointerId);draw()};
+ bd.onpointermove=e=>{if(!dr)return;const s=pcs[sel],q=pt(e);s.x=Math.round(q[0]-dr[0]);s.y=Math.round(q[1]-dr[1]);cl(s);draw()};bd.onpointerup=()=>dr=null;
+ const tf=f=>{if(sel<0)return say('さきに さんかくを タップしてね');const s=pcs[sel];s.p=nm(s.p.map(f));cl(s);draw()};
+ $('#tb').append(btn('↻ まわす','b',()=>tf(q=>[-q[1],q[0]])),btn('⇋ うらがえす','b',()=>tf(q=>[-q[0],q[1]])));
+ $('#an').append(btn('できた！','g',()=>{let gap=0,ov=0,out=0;const W=pcs.map(s=>s.p.map(q=>[s.x+q[0],s.y+q[1]]));
+  for(let gx=0;gx<C;gx++)for(let gy=0;gy<Rw;gy++)for(const[ax,ay]of[[.13,.29],[.61,.37],[.27,.81],[.77,.71]]){const n=W.filter(t=>inT([gx+ax,gy+ay],t)).length;if(gx>=tx&&gx<tx+tw&&gy>=ty0&&gy<ty0+th){if(!n)gap=1;if(n>1)ov=1}else if(n)out=1}
+  if(!gap&&!ov&&!out){$('#an').innerHTML='';sel=-1;draw();done(!miss,`直角三角形を くみあわせて ${tw==th?'正方形':'長方形'}が できた！`,true)}else{miss=1;ng();say(out?'ぜんぶの さんかくを オレンジの わくの なかに いれよう':ov?'さんかくが かさなってるよ':'すきまが あるよ。むきを かえてみよう')}}));draw()};
+// ---- time attack
+function timeAtk(){let t=60,sc=0;const nb=()=>{const k=RI(3,4);return sh([...Array.from({length:k},()=>mk('r')),...Array.from({length:9-k},()=>mk('o'))])};let bd=nb();page('直角三角形を ぜんぶ タップ！ ぜんぶ みつけたら あたらしくなるよ（まちがい -3びょう）');
+ $('#q').innerHTML='<div id="tm" style="font-size:22px"></div><div id="bg" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>';
+ const d=()=>{$('#tm').textContent=`⏱ ${Math.max(t,0)}びょう　⭐ ${sc}`;$('#bg').innerHTML=bd.map((o,i)=>`<svg class="t" data-i="${i}" viewBox="0 0 300 300">${o?sv(o):'<text x="150" y="195" font-size="120" text-anchor="middle">✅</text>'}</svg>`).join('')},
+ fin=()=>{clearInterval(tid);S.b2=Math.max(S.b2,sc);save();result(2,sc>=12,sc>=20?3:sc>=16?2:1,`${sc}こ みつけた！（ベスト ${S.b2}こ ／ 12こで クリア）`)};d();
+ tid=setInterval(()=>{t--;if(t<=0)fin();else d()},1000);
+ $('#bg').onclick=e=>{const s=e.target.closest('svg');if(!s||t<=0)return;const i=+s.dataset.i;if(!bd[i])return;if(bd[i].k=='r'){sc++;ok();bd[i]=null;if(!bd.some(o=>o&&o.k=='r')){bd=nb();say('ぜんぶ みつけた！あたらしい ずけいだよ✨')}else say(sc%5==0?'直角だぁ！気持ちいい⤴💗':pick(['ナイス！','はやい！','いいぞ！']))}else{t-=3;ng();say('ざんねん！-3びょう')}if(t<=0)fin();else d()};
+ $('#fb').append(btn('やめる','r',home))}
+// ---- home
+function start(id){[0,()=>run(1,Array(10).fill(qJudge),8),timeAtk,()=>run(3,Array(5).fill(qMake),0),()=>run(4,Array(5).fill(qFix2),0),()=>run(5,Array(5).fill(qCut),0),()=>run(6,Array(4).fill(qPuz),0),()=>run(7,sh([qJudge,qJudge,qPick,qMake,qFix2,qCut,qCut,qPuz,qPuz,qPuz]),8)][id]()}
+function home(){page('いっしょに 直角三角形マスターに なろう！');const N=['直角三角形かな？','直角三角形を さがそう（タイムアタック）','直角三角形を つくろう','直角三角形に なおそう','きって 直角三角形を つくろう','くみあわせて つくろう','直角三角形マスター'];
+ $('#q').innerHTML='<h2>📐 直角三角形マスター</h2>';N.forEach((n,i)=>{const id=i+1,b=btn((S.u>=id?'':'🔒 ')+id+'. '+n+'　'+('⭐'.repeat(S.st[id]||0)),id==7?'r':'b',()=>start(id));b.className+=' m';b.disabled=S.u<id;$('#q').append(b)})}
+home();
+</script></body></html>
