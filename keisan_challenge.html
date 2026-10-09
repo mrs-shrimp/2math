@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>けいさんチャレンジ</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#243047;background:#f3f7ff}
+*{box-sizing:border-box}body{margin:0;padding:16px}main{max-width:760px;margin:auto}
+h1{text-align:center;margin:8px 0 4px;font-size:clamp(25px,5vw,36px)}.sub{text-align:center;margin:0 0 18px;color:#5d6b82}
+.panel{background:white;border-radius:22px;padding:clamp(16px,4vw,28px);box-shadow:0 5px 18px #25385813;margin:12px 0}
+.modes{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.mode,.action{border:0;border-radius:14px;padding:13px 18px;font-size:18px;font-weight:800;cursor:pointer;background:#e8eef8;color:#27354d}.mode.active{background:#365bd6;color:white}
+.progress{display:flex;justify-content:space-between;gap:10px;font-weight:700;color:#59677d;font-size:14px}
+.bar{height:10px;background:#e8edf5;border-radius:99px;overflow:hidden;margin:10px 0 22px}.bar>div{height:100%;width:0;background:#4b72ec;transition:width .2s}
+.question{text-align:center;font-size:clamp(52px,13vw,82px);font-weight:900;letter-spacing:2px;margin:12px 0 20px;color:#202c45}
+.answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:500px;margin:auto}
+.num{min-height:66px;border:2px solid #dce4f3;border-radius:16px;background:#f8faff;font-size:clamp(25px,6vw,34px);font-weight:850;color:#263755;cursor:pointer;box-shadow:0 3px 0 #dce4f3}
+.num:active{transform:translateY(2px);box-shadow:none}.num:disabled{opacity:.55}
+.feedback{text-align:center;min-height:40px;font-size:21px;font-weight:800;margin:14px 0 0}.good{color:#15945b}.bad{color:#d83b3b}
+.hint{display:none;margin:14px auto 0;padding:16px;border:2px solid #f2a4a4;background:#fff2f2;border-radius:16px;max-width:520px;text-align:center}.hint.show{display:block}.blocks{font-size:30px;letter-spacing:2px;margin-bottom:6px}.hint p{margin:4px 0;font-size:18px;font-weight:750;color:#9e2828}.small{font-size:14px!important;font-weight:500!important}
+.bottom{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}.action{background:#e7edff}.action.primary{background:#365bd6;color:#fff}
+.finish{text-align:center}.finish strong{font-size:30px}
+@media(max-width:420px){body{padding:9px}.panel{padding:14px}.num{min-height:60px}.answers{gap:7px}}
+</style>
+</head>
+<body>
+<main>
+<h1>けいさんチャレンジ</h1><p class="sub">すうじをおして こたえよう！</p>
+<section class="panel">
+<div class="modes">
+<button class="mode active" id="addMode">たしざんモード</button>
+<button class="mode" id="subMode">ひきざんモード</button>
+</div>
+</section>
+<section class="panel" id="game">
+<div class="progress"><span id="modeLabel">たしざん</span><span id="count">1 / 36</span><span id="score">せいかい 0</span></div>
+<div class="bar"><div id="bar"></div></div>
+<div class="question" id="question">9 + 7</div>
+<div class="answers" id="answers"></div>
+<div class="feedback" id="feedback" aria-live="polite"></div>
+<div class="hint" id="hint" aria-live="polite">
+<div class="blocks" id="blocks">🔴🔴🔴</div>
+<p id="hintText"></p><p class="small" id="hintExplain"></p>
+</div>
+<div class="bottom">
+<button class="action" id="hintButton">ヒントをみる</button>
+<button class="action" id="skipButton">つぎのもんだい</button>
+</div>
+</section>
+<section class="panel finish" id="finish" hidden>
+<h2>チャレンジ クリア！</h2><p>さいごまで よくがんばったね。</p>
+<p><strong id="finalScore">0 / 36</strong></p>
+<button class="action primary" id="again">もういちど</button>
+</section>
+</main>
+<script>
+const additions = [
+[9,7],[7,8],[7,9],[8,7],[6,9],[8,8],[9,6],[9,9],
+[7,5],[2,9],[3,8],[6,8],[9,2],[4,8],[7,7],[5,6],
+[8,6],[7,6],[5,7],[5,8],[4,7],[9,5],[8,4],[7,4],
+[5,9],[8,3],[6,5],[6,6],[9,4],[9,3],[4,9],[8,9],
+[3,9],[8,5],[9,8],[6,7]
+];
+const subtractions = [
+[14,9],[12,8],[15,9],[11,5],[12,4],[13,7],[11,7],[12,6],
+[17,8],[17,9],[14,8],[11,8],[11,3],[12,3],[16,7],[12,9],
+[14,5],[11,9],[15,7],[13,4],[16,8],[15,6],[18,9],[13,6],
+[11,2],[13,5],[13,9],[15,8],[14,6],[12,7],[12,5],[11,6],
+[16,9],[11,4],[13,8],[14,7]
+];
+let mode='add', problems=[], index=0, score=0, locked=false, hintVisible=false;
+const $=id=>document.getElementById(id);
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function start(newMode=mode){
+ mode=newMode; problems=shuffle(mode==='add'?additions:subtractions); index=0;score=0;locked=false;
+ $('game').hidden=false;$('finish').hidden=true;
+ $('addMode').classList.toggle('active',mode==='add');$('subMode').classList.toggle('active',mode==='sub');
+ $('modeLabel').textContent=mode==='add'?'たしざん':'ひきざん'; render();
+}
+function answer(p){return mode==='add'?p[0]+p[1]:p[0]-p[1]}
+function render(){
+ if(index>=problems.length){finish();return}
+ locked=false;hintVisible=false;
+ $('hint').classList.remove('show');$('feedback').textContent='';$('feedback').className='feedback';
+ const p=problems[index];$('question').textContent=`${p[0]} ${mode==='add'?'+':'−'} ${p[1]}`;
+ $('count').textContent=`${index+1} / ${problems.length}`;$('score').textContent=`せいかい ${score}`;
+ $('bar').style.width=`${index/problems.length*100}%`;
+ const correct=answer(p), choices=new Set([correct]);
+ while(choices.size<6){let n=correct+Math.floor(Math.random()*9)-4;if(n>=0&&n<=18)choices.add(n)}
+ const nums=shuffle([...choices]);
+ $('answers').innerHTML='';
+ nums.forEach(n=>{const b=document.createElement('button');b.className='num';b.textContent=n;b.addEventListener('click',()=>check(n,b));$('answers').appendChild(b)});
+}
+function explain(){
+ const p=problems[index], a=p[0], b=p[1];
+ if(mode==='add'){
+  const need=10-a;
+  if(need>0 && b>=need) return {blocks:'🔴'.repeat(Math.min(need,10)),text:`${a} に ${b} をたすよ。まず ${a} を 10 にするには ${need} がいるね。`,ex:`${b} を ${need} と ${b-need} にわけると、10 + ${b-need} になるよ。こたえは ${answer(p)}。`};
+  return {blocks:'🔴'.repeat(Math.min(b,10)),text:`${a} から かぞえて、${b} こ すすもう。`,ex:`${a} + ${b} = ${answer(p)}。ゆびや まるをつかって かぞえてみよう。`};
+ }
+ return {blocks:'🔴'.repeat(Math.min(b,10)),text:`${a} こ あるよ。${b} こ とると、のこりは いくつかな？`,ex:`${a} から ${b} こ へらすよ。${a} − ${b} = ${answer(p)}。🔴を ${b} こ けしてみよう。`};
+}
+function showHint(){
+ if(index>=problems.length)return;
+ const h=explain();$('blocks').textContent=h.blocks;$('hintText').textContent=h.text;$('hintExplain').textContent=h.ex;$('hint').classList.add('show');hintVisible=true;
+}
+function check(n,button){
+ if(locked)return;
+ const correct=answer(problems[index]);
+ if(n===correct){
+  locked=true;score++;$('feedback').textContent='ピンポン！ せいかい！';$('feedback').className='feedback good';
+  document.querySelectorAll('.num').forEach(b=>b.disabled=true);
+  try{const Ctx=window.AudioContext||window.webkitAudioContext;if(Ctx){const c=new Ctx();[880,1175].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.12,c.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.13);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+.14)});setTimeout(()=>c.close(),500)}}catch(e){}
+  setTimeout(()=>{index++;render()},650);
+ }else{
+  $('feedback').textContent='おしい！ ヒントをみてみよう。';$('feedback').className='feedback bad';showHint();
+  button.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:180});
+ }
+}
+function finish(){
+ $('game').hidden=true;$('finish').hidden=false;$('finalScore').textContent=`${score} / ${problems.length}`;$('bar').style.width='100%';
+}
+$('addMode').onclick=()=>start('add');$('subMode').onclick=()=>start('sub');
+$('hintButton').onclick=showHint;
+$('skipButton').onclick=()=>{if(index<problems.length){index++;render()}};
+$('again').onclick=()=>start(mode);
+start('add');
+</script>
+</body></html>
