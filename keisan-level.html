@@ -17,15 +17,15 @@ header{display:flex;justify-content:space-between;align-items:center;gap:8px;mar
 .logo{font-size:clamp(20px,4.5vw,28px);font-weight:900}.chips{display:flex;gap:8px}.chip{background:var(--card);border-radius:20px;padding:6px 14px;font-weight:900;box-shadow:0 2px 8px #0001}
 .card{background:var(--card);border-radius:22px;padding:20px;box-shadow:0 6px 24px #21324a18;margin-bottom:14px}
 h1,h2{margin:0 0 10px}h1{font-size:26px}h2{font-size:20px}.sub{color:var(--sub)}.small{font-size:13px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
 .big{font-size:clamp(22px,5vw,32px);font-weight:900;margin:8px 0}.lvt{font-weight:900;color:var(--pur);margin-bottom:2px}
 .btn{border:0;border-radius:15px;padding:13px 20px;font-weight:900;cursor:pointer;min-height:48px}
-.btn.p{background:var(--blue);color:#fff}.pu .btn.p{background:var(--pur)}.btn.s{background:var(--card);border:2px solid var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.p{background:var(--blue);color:#fff}.pu .btn.p{background:var(--pur)}.mu .btn.p{background:var(--grn)}.btn.s{background:var(--card);border:2px solid var(--line)}.btn:disabled{opacity:.45;cursor:not-allowed}
 .row3 .btn{padding:16px 8px;box-shadow:0 3px 10px #0001}.row3 small{display:block;font-weight:700;color:var(--sub);margin-top:3px}
 input{padding:11px 13px;border:2px solid var(--line);border-radius:12px;background:var(--card);width:min(260px,100%)}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
 .timer{background:#17233a;color:#fff;border-radius:14px;padding:8px 16px;min-width:130px;text-align:center;font-size:24px;font-weight:900}.timer.w{background:#d83d3d;animation:pl .6s infinite alternate}@keyframes pl{to{transform:scale(1.06)}}
-.prob{font-size:clamp(52px,12vw,80px);font-weight:900;text-align:center;padding:10px 0 4px}.ans{min-height:92px;text-align:center;font-size:52px;font-weight:900;color:#2563eb;padding-top:6px}.am{position:relative;display:inline-block;padding:0 .45em;min-width:1.6em}.am.o::after{content:"";position:absolute;left:-6px;right:-6px;top:-4px;bottom:-4px;border:8px solid #e03030;border-radius:50%}.am.x::before,.am.x::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:8px;margin-top:-4px;background:#e03030;border-radius:4px}.am.x::before{transform:rotate(40deg)}.am.x::after{transform:rotate(-40deg)}.co{font-size:20px;color:var(--ink);margin-top:10px}.tg{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:8px;z-index:40;display:flex;gap:6px}.sw{border:2px solid var(--line);background:var(--card);border-radius:20px;padding:6px 11px;font-weight:900;font-size:13px;cursor:pointer;min-height:40px;box-shadow:0 2px 8px #0002;white-space:nowrap}.sw.on{background:#fff3b0;border-color:#e0b400;color:#5a4300}.hint{text-align:center;margin:2px 0}.hint:empty{display:none}.ht{font-weight:900;font-size:18px;margin-bottom:5px}.ht b{color:#3b82f6}.ht i{font-style:normal;color:#e03030}.ht small{font-size:12px;color:var(--sub);font-weight:700}.hrow{display:flex;justify-content:center;flex-wrap:nowrap}.hg{display:flex;gap:2px;margin:0 4px}.d{flex:0 0 auto;border-radius:50%;width:var(--s);height:var(--s)}.d.b{background:#3b82f6}.d.r{background:#e03030}
+.prob{font-size:clamp(52px,12vw,80px);font-weight:900;text-align:center;padding:10px 0 4px}.ans{min-height:92px;text-align:center;font-size:52px;font-weight:900;color:#2563eb;padding-top:6px}.am{position:relative;display:inline-block;padding:0 .45em;min-width:1.6em}.am.o::after{content:"";position:absolute;left:-6px;right:-6px;top:-4px;bottom:-4px;border:8px solid #e03030;border-radius:50%}.am.x::before,.am.x::after{content:"";position:absolute;left:-4px;right:-4px;top:50%;height:8px;margin-top:-4px;background:#e03030;border-radius:4px}.am.x::before{transform:rotate(40deg)}.am.x::after{transform:rotate(-40deg)}.co{font-size:20px;color:var(--ink);margin-top:10px}.tg{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);right:8px;z-index:40;display:flex;gap:6px}.sw{border:2px solid var(--line);background:var(--card);border-radius:20px;padding:6px 11px;font-weight:900;font-size:13px;cursor:pointer;min-height:40px;box-shadow:0 2px 8px #0002;white-space:nowrap}.sw.on{background:#fff3b0;border-color:#e0b400;color:#5a4300}.hint{text-align:center;margin:2px 0}.hint:empty{display:none}.ht{font-weight:900;font-size:18px;margin-bottom:5px}.ht b{color:#3b82f6}.ht i{font-style:normal;color:#e03030}.ht small{font-size:12px;color:var(--sub);font-weight:700}.hrow{display:flex;justify-content:center;flex-wrap:nowrap}.hg{display:flex;gap:2px;margin:0 4px}.d{flex:0 0 auto;border-radius:50%;width:var(--s);height:var(--s)}.d.b{background:#3b82f6}.d.r{background:#e03030}.blk{margin:4px 0}.blk .hrow{gap:2px;margin:2px 0}.rd{text-align:center;font-size:clamp(22px,6vw,34px);font-weight:900;color:var(--pur);padding-top:6px}.rd:empty{display:none}.dan{display:flex;flex-wrap:wrap;gap:6px}.dan .sw{min-width:42px;padding:6px 10px}.lic>*{position:relative;z-index:1}.lic>.pl{position:absolute;inset:0;z-index:0;opacity:.45;pointer-events:none}.lic>.sk{position:absolute;right:12px;bottom:36px;font-size:44px;transform:rotate(-12deg);z-index:2;pointer-events:none;line-height:1}.ph{position:relative}.cm{position:absolute;right:-10px;bottom:-10px;font-size:30px;line-height:1;filter:drop-shadow(0 1px 2px #0004)}.tt{font-size:12px;font-weight:900;color:#b07a00;line-height:1.2}
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:560px;margin:10px auto;user-select:none;-webkit-user-select:none}
 .num{height:clamp(52px,10vh,80px);border:0;border-radius:18px;background:var(--soft);box-shadow:0 4px 0 var(--line);font-size:32px;font-weight:900;cursor:pointer}.num:active{transform:translateY(3px);box-shadow:0 1px var(--line)}.num.clr{background:#ffe9e9;color:#b63838;font-size:22px}
 .cd{position:fixed;inset:0;background:#17304df0;color:#fff;display:flex;align-items:center;justify-content:center;z-index:50;text-align:center;padding:20px}.cd .m{font-size:clamp(24px,6vw,40px);font-weight:900}.cd .n{font-size:110px;line-height:1.1;margin-top:14px}
@@ -60,6 +60,7 @@ input{padding:11px 13px;border:2px solid var(--line);border-radius:12px;backgrou
 <div class="row2">
 <div class="card"><h2>＋ たしざん</h2><div class="big">1〜10 ＋ 1〜10</div><div id="addLv" class="lvt"></div><div id="addBest" class="sub small" style="margin-bottom:12px"></div><button class="btn p" id="addStart">100秒チャレンジ！</button></div>
 <div class="card pu"><h2>− ひきざん</h2><div class="big">10〜19 − 1〜10</div><div id="subLv" class="lvt"></div><div id="subBest" class="sub small" style="margin-bottom:12px"></div><button class="btn p" id="subStart">100秒チャレンジ！</button></div>
+<div class="card mu"><h2>× かけざん</h2><div class="big">九九 1〜9 × 1〜9</div><div id="mulLv" class="lvt"></div><div id="mulBest" class="sub small" style="margin-bottom:12px"></div><button class="btn p" id="mulStart">ランダム 100秒チャレンジ！</button><div class="sub small" style="margin:14px 0 6px">📖 じゅんばんに となえよう（だんをえらぶ）</div><div class="dan"><button type="button" class="sw" data-o="0">ぜんぶ</button><button type="button" class="sw" data-o="1">1</button><button type="button" class="sw" data-o="2">2</button><button type="button" class="sw" data-o="3">3</button><button type="button" class="sw" data-o="4">4</button><button type="button" class="sw" data-o="5">5</button><button type="button" class="sw" data-o="6">6</button><button type="button" class="sw" data-o="7">7</button><button type="button" class="sw" data-o="8">8</button><button type="button" class="sw" data-o="9">9</button></div></div>
 </div>
 <div class="row3">
 <button class="btn s" id="goTrain">💪 とっくん<small>コインがもらえる</small></button>
@@ -72,7 +73,7 @@ input{padding:11px 13px;border:2px solid var(--line);border-radius:12px;backgrou
 <section id="game" class="card hidden">
 <div class="top"><button class="btn s" id="gHome">← やめる</button><div id="timer" class="timer">100.0秒</div></div>
 <div class="top"><b id="mTitle"></b><b id="score">正かい 0</b></div>
-<div id="prob" class="prob"></div><div id="hint" class="hint"></div><div id="ans" class="ans">&nbsp;</div><div class="pad"></div>
+<div id="rd" class="rd"></div><div id="prob" class="prob"></div><div id="hint" class="hint"></div><div id="ans" class="ans">&nbsp;</div><div class="pad"></div>
 </section>
 
 <section id="result" class="card hidden">
@@ -86,9 +87,9 @@ input{padding:11px 13px;border:2px solid var(--line);border-radius:12px;backgrou
 <section id="train" class="card hidden">
 <button class="btn s" id="tHome">← ホームにもどる</button>
 <div id="tMenu"><h1>💪 とっくん</h1><p class="sub">れんしゅうするとコインがもらえるよ。レベルにはえいきょうしないから、安心してまちがえてOK！</p>
-<div class="tbtns"><button class="btn p" data-k="weak">📚 にがてをなおす<br><small id="weakInfo"></small></button><button class="btn p" data-k="mix">🎲 ミックス 20もん</button><button class="btn p" data-k="add">＋ たしざん 20もん</button><button class="btn p" data-k="sub">− ひきざん 20もん</button></div>
+<div class="tbtns"><button class="btn p" data-k="weak">📚 にがてをなおす<br><small id="weakInfo"></small></button><button class="btn p" data-k="mix">🎲 ミックス 20もん</button><button class="btn p" data-k="add">＋ たしざん 20もん</button><button class="btn p" data-k="sub">− ひきざん 20もん</button><button class="btn p" data-k="mul">× かけざん（九九）20もん</button></div>
 <p class="sub small">コイン：1もんせいかい＝3まい。ぜんぶ正かい＆はやいと +15まいボーナス！</p></div>
-<div id="tPlay" class="hidden"><p id="tProg" class="sub"></p><div id="tprob" class="prob"></div><div id="thint" class="hint"></div><div id="tans" class="ans">&nbsp;</div><div class="pad"></div></div>
+<div id="tPlay" class="hidden"><p id="tProg" class="sub"></p><div id="trd" class="rd"></div><div id="tprob" class="prob"></div><div id="thint" class="hint"></div><div id="tans" class="ans">&nbsp;</div><div class="pad"></div></div>
 <div id="tEnd" class="hidden"><h1>れんしゅうおわり！</h1><div id="tRes" class="ok"></div><div class="tbtns"><button class="btn p" id="tAgain">もういちど</button><button class="btn s" id="tMenuBtn">とっくんメニュー</button></div></div>
 </section>
 
@@ -121,21 +122,27 @@ const AVG=[["fa","🙂 かお",[["😀 😎 🤓 🥳",0],["😄 😆 😊 🙂 
 ["vh","🚗 のりもの",[["🚗 🚕 🚌 🚓 🚑 🚒 🚜 🚲",30],["🚃 🚄 🚅 🚂 🚤 🚢 🛵 🚁",60],["🛸 🚀 🏰 🗼 🎡 🎢 🎠 🎪",100]]],
 ["sp","⚽ スポーツ",[["⚽ 🏀 🏈 ⚾ 🎾 🏐 🏉 🎱",30],["🏓 🏸 🥊 🥋 🎳 🛹 🏹 🎣",60],["🏆 🥇 🥈 🥉 🏅 🎯 🎮 🎲",100]]],
 ["fn","🧙 ファンタジー",[["🧙 🧚 🧜 🧛 🧞 🦸 🦹 🤴 👸 🎅",80],["👑 💎 🔮 🎩 🎭 🔱",150],["🌌 🌠 🎆 🎇 ✨ 💫 🌟 ⭐",300]]],
-["na","🌈 しぜん",[["🌸 🌻 🌷 🌹 🌼 🍀 🌵 🌴 🍁 🍄",30],["🌈 🌙 🌞 🌝 🌎 ⛄ ⚡ 🔥 💧 🌊",60],["🌋 🗻 🎈 🎁 🎀 🎵 🔔 💡",100]]]];
-const FR=[["ふつう",0,"border:6px solid #cfd6df"],["ぎんいろ",60,"border:6px solid #aab4c0"],["きんいろ",120,"border:6px solid #d4a83a;box-shadow:0 0 14px #f4d47b"],["にじいろ",200,"border:6px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#f55,#fc3,#4c8,#38f,#a5f) border-box"],["ほのお",260,"border:6px solid #f26a21;box-shadow:0 0 16px #ffb347"],["ダイヤ",400,"border:6px solid #7fd8ff;box-shadow:0 0 16px #bdf0ff"]];
-const BG=[["しろ",0,"background:#fffdf7"],["そら",60,"background:linear-gradient(135deg,#d6ecff,#fff)"],["さくら",100,"background:linear-gradient(135deg,#ffd6e6,#fff6fa)"],["くさはら",100,"background:linear-gradient(135deg,#d6f5dd,#fbfffb)"],["ゆうやけ",200,"background:linear-gradient(135deg,#ffd9a8,#ffc4da)"],["うちゅう",300,"background:linear-gradient(135deg,#3a3f86,#8a62c8)"]];
-const IT={a:[],f:FR.map(([n,p,s],i)=>({id:"f"+i,n,p,s})),b:BG.map(([n,p,s],i)=>({id:"b"+i,n,p,s}))},GI={f:IT.f,b:IT.b};
+["na","🌈 しぜん",[["🌸 🌻 🌷 🌹 🌼 🍀 🌵 🌴 🍁 🍄",30],["🌈 🌙 🌞 🌝 🌎 ⛄ ⚡ 🔥 💧 🌊",60],["🌋 🗻 🎈 🎁 🎀 🎵 🔔 💡",100]]],
+["tl","🎒 どうぐ",[["📚 📖 🎒 🎓 📏 📐 🔬 🔭",30],["🎨 🎹 🎸 🎺 🎻 🥁 🎤 🎧",50],["📷 🎥 ⏰ 🔑 🧸 🧭 🔦 📺",80]]]];
+const FR=[["ふつう",0,"border:6px solid #cfd6df"],["ぎんいろ",60,"border:6px solid #aab4c0"],["きんいろ",120,"border:6px solid #d4a83a;box-shadow:0 0 14px #f4d47b"],["にじいろ",200,"border:6px solid transparent;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#f55,#fc3,#4c8,#38f,#a5f) border-box"],["ほのお",260,"border:6px solid #f26a21;box-shadow:0 0 16px #ffb347"],["ダイヤ",400,"border:6px solid #7fd8ff;box-shadow:0 0 16px #bdf0ff"],["ももいろ",80,"border:6px solid #ff9ec4"],["あおぞら",100,"border:6px solid #5fb4ff"],["もりのみどり",100,"border:6px solid #3fa65a"],["むらさき",120,"border:6px solid #9a6cf0"],["クリスタル",300,"border:6px solid #b6f0ff;box-shadow:0 0 18px #7fe3ff"],["エメラルド",350,"border:6px solid #2fcf8a;box-shadow:0 0 16px #6fe8b8"],["ルビー",350,"border:6px solid #e0305a;box-shadow:0 0 16px #ff8aa8"],["くろいかがやき",450,"border:6px solid #222;box-shadow:0 0 0 2px #d4a83a,0 0 14px #d4a83a"]];
+const BG=[["しろ",0,"background:#fffdf7"],["そら",60,"background:linear-gradient(135deg,#d6ecff,#fff)"],["さくら",100,"background:linear-gradient(135deg,#ffd6e6,#fff6fa)"],["くさはら",100,"background:linear-gradient(135deg,#d6f5dd,#fbfffb)"],["ゆうやけ",200,"background:linear-gradient(135deg,#ffd9a8,#ffc4da)"],["うちゅう",300,"background:linear-gradient(135deg,#3a3f86,#8a62c8)"],["レモン",100,"background:linear-gradient(135deg,#fff6b0,#fffdf0)"],["ミント",100,"background:linear-gradient(135deg,#c6f5e4,#f5fffb)"],["ラベンダー",120,"background:linear-gradient(135deg,#e5d9ff,#faf7ff)"],["ひまわり",150,"background:linear-gradient(135deg,#ffe066,#ffb347)"],["こおり",200,"background:linear-gradient(135deg,#cdeeff,#eaf8ff 50%,#b4e0ff)"],["オーロラ",250,"background:linear-gradient(135deg,#7fffd4,#7fb2ff,#d49bff)"],["にじいろ",300,"background:linear-gradient(135deg,#ffd6d6,#fff3c4,#d6f5d6,#d6e8ff,#ead6ff)"],["よぞら",300,"background:radial-gradient(#ffffff55 1px,transparent 1.5px) 0 0/18px 18px,linear-gradient(135deg,#0f1b4d,#2b3a8a)"],["ゴールド",450,"background:linear-gradient(135deg,#f6dc7a,#fff3c0 45%,#d4a83a)"]];
+const PT=[["なし",0,""],["ドット",50,"background-image:radial-gradient(#0003 2px,transparent 2.5px);background-size:14px 14px"],["しましま",60,"background-image:repeating-linear-gradient(45deg,#00000014 0 8px,transparent 8px 16px)"],["チェック",80,"background-image:linear-gradient(#0000001a 1px,transparent 1px),linear-gradient(90deg,#0000001a 1px,transparent 1px);background-size:16px 16px"],["なみ",100,"background-image:repeating-radial-gradient(circle at 0 100%,transparent 0 10px,#0000001a 10px 12px)"],["ほしがら",150,"background-image:url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2734%27 height=%2734%27><text y=%2724%27 font-size=%2720%27>⭐</text></svg>')"],["ハート",150,"background-image:url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2734%27 height=%2734%27><text y=%2724%27 font-size=%2720%27>💗</text></svg>')"],["ねこあし",200,"background-image:url('data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 width=%2736%27 height=%2736%27><text y=%2726%27 font-size=%2720%27>🐾</text></svg>')"]];
+const SG=[["⭐ 🌟 ✨ 💖 🎀 🎈 🎉 🍀",20],["🌸 🌈 🔥 ⚡ 💯 🎵 🎶 🔔",40],["🏅 🥇 🏆 🎁 🎯 🚀 🛸 🎓",80],["👑 💎 🧮 📚 🎊",120]];
+const CG=[["🐣 🐥 🐰 🐱 🐶 🐻 🐼 🐸",30],["🦊 🐧 🦉 🐬 🐢 🐝 🐞 🦋",60],["🐙 🦄 🐲 🦖 🤖 👻 👽 🐳",120]];
+const TL=[["がんばりや",30],["けいさんだいすき",30],["にこにこ",40],["ちょうせんしゃ",50],["はやうちめいじん",60],["きょうもぜっこうちょう",80],["ミスなしマスター",100],["九九のたつじん",120],["ひらめきてんさい",150],["すーぱーすたー",150],["けいさんはかせ",200],["でんせつのけいさんおう",300]];
+const IT={a:[],f:FR.map(([n,p,s],i)=>({id:"f"+i,n,p,s})),b:BG.map(([n,p,s],i)=>({id:"b"+i,n,p,s})),p:PT.map(([n,p,s],i)=>({id:"p"+i,n,p,s})),s:[{id:"s0",n:"なし",p:0}],c:[{id:"c0",n:"なし",p:0}],t:[{id:"t0",n:"なし",p:0}].concat(TL.map(([n,p],i)=>({id:"t"+(i+1),n,p})))},GI={f:IT.f,b:IT.b,p:IT.p,s:IT.s,c:IT.c,t:IT.t};
+SG.forEach(([s,p])=>s.split(" ").forEach(n=>IT.s.push({id:"s"+n,n,p})));CG.forEach(([s,p])=>s.split(" ").forEach(n=>IT.c.push({id:"c"+n,n,p})));
 AVG.forEach(([k,t,sg])=>{GI[k]=[];sg.forEach(([s,p])=>s.split(" ").forEach(n=>{const o={id:"a"+n,n,p};GI[k].push(o);IT.a.push(o)}))});
-const TABS=AVG.map(g=>[g[0],g[1],"a"]).concat([["f","🖼️ わく","f"],["b","🎨 はいけい","b"]]);
+const TABS=AVG.map(g=>[g[0],g[1],"a"]).concat([["f","🖼️ わく","f"],["b","🎨 はいけい","b"],["p","🔷 もよう","p"],["s","⭐ シール","s"],["c","🐣 おとも","c"],["t","💬 ひとこと","t"]]);
 const tyOf=()=>TABS.find(t=>t[0]===tb)[2];
-const ALLI=[].concat(IT.a,IT.f,IT.b);
+const ALLI=[].concat(IT.a,IT.f,IT.b,IT.p,IT.s,IT.c,IT.t);
 function blank(){return{attempts:0,correct:0,totalTime:0,bestCorrect:0,bestAcc:0,bestAvg:Infinity,runs:0,top:0,history:[],weak:{}}}
 function norm(v){const b=blank();if(!v||typeof v!=="object")return b;["attempts","correct","totalTime","bestCorrect","bestAcc","runs"].forEach(k=>b[k]=Number(v[k])||0);b.top=Math.min(19,Number(v.top)||0);b.bestAvg=Number.isFinite(Number(v.bestAvg))&&v.bestAvg!==null?Number(v.bestAvg):Infinity;b.history=Array.isArray(v.history)?v.history.filter(h=>h&&Number.isFinite(Number(h.correct))&&Number.isFinite(Number(h.acc))&&Number.isFinite(Number(h.avg))).map(h=>({correct:+h.correct,acc:+h.acc,avg:+h.avg})).slice(-8):[];b.weak=v.weak&&typeof v.weak==="object"?v.weak:{};return b}
 function dayStr(off){const d=new Date(Date.now()+(off||0)*864e5);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function load(){let x={};try{x=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
- const d={name:typeof x.name==="string"?x.name:"",coins:Number.isFinite(Number(x.coins))&&x.coins!==undefined?Number(x.coins):Math.min(300,Math.floor((Number(x.xp)||0)/10)),streak:Number(x.streak)||0,lastDay:typeof x.lastDay==="string"?x.lastDay:"",since:x.since||dayStr(),no:x.no||String(Math.floor(1e7+Math.random()*9e7)),owned:Array.isArray(x.owned)?x.owned:[],hint:!!x.hint,sound:x.sound!==false,eq:Object.assign({a:"a😀",f:"f0",b:"b0"},x.eq||{}),add:norm(x.add),sub:norm(x.sub)};
+ const d={name:typeof x.name==="string"?x.name:"",coins:Number.isFinite(Number(x.coins))&&x.coins!==undefined?Number(x.coins):Math.min(300,Math.floor((Number(x.xp)||0)/10)),streak:Number(x.streak)||0,lastDay:typeof x.lastDay==="string"?x.lastDay:"",since:x.since||dayStr(),no:x.no||String(Math.floor(1e7+Math.random()*9e7)),owned:Array.isArray(x.owned)?x.owned:[],hint:!!x.hint,sound:x.sound!==false,eq:Object.assign({a:"a😀",f:"f0",b:"b0",p:"p0",s:"s0",c:"c0",t:"t0"},x.eq||{}),add:norm(x.add),sub:norm(x.sub),mul:norm(x.mul)};
  ALLI.forEach(i=>{if(i.p===0&&!d.owned.includes(i.id))d.owned.push(i.id)});
- ["a","f","b"].forEach(t=>{if(!IT[t].some(i=>i.id===d.eq[t]&&d.owned.includes(i.id)))d.eq[t]=IT[t][0].id});
+ ["a","f","b","p","s","c","t"].forEach(t=>{if(!IT[t].some(i=>i.id===d.eq[t]&&d.owned.includes(i.id)))d.eq[t]=IT[t][0].id});
  return d}
 let data=load(),game=null,tr=null,tb="fa",lastKind="mix";
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
@@ -143,12 +150,12 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 const SC=["home","game","result","train","shop","road"];
 function show(id){SC.forEach(x=>$(x).classList.toggle("hidden",x!==id));window.scrollTo(0,0)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function makeDeck(m){const a=[];if(m==="add"){for(let x=1;x<=10;x++)for(let y=1;y<=10;y++)a.push({m,x,y,k:x+"_"+y,ans:x+y})}else{for(let x=10;x<=19;x++)for(let y=1;y<=10;y++)a.push({m,x,y,k:x+"_"+y,ans:x-y})}return shuffle(a)}
-const dg=a=>a>=10?2:1,sym=m=>m==="add"?"＋":"−";
+function makeDeck(m){const a=[];if(m==="mul"){for(let x=1;x<=9;x++)for(let y=1;y<=9;y++)a.push({m,x,y,k:x+"_"+y,ans:x*y})}else if(m==="add"){for(let x=1;x<=10;x++)for(let y=1;y<=10;y++)a.push({m,x,y,k:x+"_"+y,ans:x+y})}else{for(let x=10;x<=19;x++)for(let y=1;y<=10;y++)a.push({m,x,y,k:x+"_"+y,ans:x-y})}return shuffle(a)}
+const dg=a=>a>=10?2:1,sym=m=>m==="add"?"＋":m==="mul"?"×":"−";
 /* レベル判定：正かい数 × 正かく率 */
 function pScore(h){return Math.min(100,h.correct/60*100)*Math.pow(h.acc/100,2)}
 function info(d){let sc=0;if(d.history.length){const s=d.history.slice(-3).map(pScore).sort((a,b)=>a-b);sc=s[Math.floor(s.length/2)]}return{sc,lv:Math.min(19,Math.max(d.top||0,Math.floor(sc/5)))}}
-const ovLv=()=>Math.max(info(data.add).lv,info(data.sub).lv);
+const ovLv=()=>Math.max(info(data.add).lv,info(data.sub).lv,info(data.mul).lv);
 function stars(n){return "★".repeat(n)+"☆".repeat(5-n)}
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function spS(c,a){return clamp(Math.round((Math.min(1,c/45)*.55+clamp((4-a)/3,0,1)*.45)*5),0,5)}
@@ -157,33 +164,33 @@ function meter(i){if(i.lv>=19)return'<div class="mt"><span style="width:100%"></
  const p=clamp((i.sc-i.lv*5)/5*100,0,100);
  return`<div class="mt"><span style="width:${p}%"></span></div><div class="mn">つぎのレベルまで あと ${Math.max(1,Math.ceil((i.lv+1)*5-i.sc))} ポイント（めやす：ミスなしで100秒に${(i.lv+1)*3}もん）</div>`}
 function licHTML(){
- const ia=info(data.add),is=info(data.sub),top=ia.lv>=is.lv?ia:is,o=top.lv,t=TIERS[tierOf(o)];
- const av=IT.a.find(i=>i.id===data.eq.a),fr=IT.f.find(i=>i.id===data.eq.f),bg=IT.b.find(i=>i.id===data.eq.b);
- const A=data.add,S=data.sub;
- const sp=Math.max(spS(A.bestCorrect,A.bestAvg),spS(S.bestCorrect,S.bestAvg)),ac=Math.max(acS(A.bestAcc),acS(S.bestAcc)),fo=Math.max(foS(A.bestCorrect,A.bestAcc),foS(S.bestCorrect,S.bestAcc));
+ const ia=info(data.add),is=info(data.sub),im=info(data.mul),top=[ia,is,im].reduce((a,b)=>b.lv>a.lv?b:a),o=top.lv,t=TIERS[tierOf(o)];
+ const av=IT.a.find(i=>i.id===data.eq.a),fr=IT.f.find(i=>i.id===data.eq.f),bg=IT.b.find(i=>i.id===data.eq.b),pt=IT.p.find(i=>i.id===data.eq.p),sk=IT.s.find(i=>i.id===data.eq.s),cm=IT.c.find(i=>i.id===data.eq.c),ti=IT.t.find(i=>i.id===data.eq.t);
+ const A=data.add,S=data.sub,M=data.mul;
+ const sp=Math.max(spS(A.bestCorrect,A.bestAvg),spS(S.bestCorrect,S.bestAvg),spS(M.bestCorrect,M.bestAvg)),ac=Math.max(acS(A.bestAcc),acS(S.bestAcc),acS(M.bestAcc)),fo=Math.max(foS(A.bestCorrect,A.bestAcc),foS(S.bestCorrect,S.bestAcc),foS(M.bestCorrect,M.bestAcc));
  const no=data.no.replace(/(\d{4})(\d{4})/,"$1 $2");
- return`<div class="lic" style="${bg.s}"><div class="lh" style="background:linear-gradient(90deg,${t[1]})"><b>けいさんめんきょしょう</b><span>${t[0]}</span></div>
-<div class="lb"><div class="ph" style="${fr.s}">${av.n}</div><div class="li"><div class="ln">${esc(data.name||"なまえ")}</div><div class="lv">レベル ${o+1}　${LEVELS[o]}</div><div class="rk">＋ ${LEVELS[ia.lv]}　／　− ${LEVELS[is.lv]}</div></div></div>
+ return`<div class="lic" style="${bg.s}"><div class="pl" style="${pt.s}"></div><div class="lh" style="background:linear-gradient(90deg,${t[1]})"><b>けいさんめんきょしょう</b><span>${t[0]}</span></div>
+<div class="lb"><div class="ph" style="${fr.s}">${av.n}${cm.n==="なし"?"":`<span class="cm">${cm.n}</span>`}</div><div class="li"><div class="ln">${esc(data.name||"なまえ")}</div>${ti.n==="なし"?"":`<div class="tt">${esc(ti.n)}</div>`}<div class="lv">レベル ${o+1}　${LEVELS[o]}</div><div class="rk">＋ ${LEVELS[ia.lv]}　− ${LEVELS[is.lv]}　× ${LEVELS[im.lv]}</div></div></div>
 <div class="ls"><div>⚡ はやさ<b>${stars(sp)}</b></div><div>🎯 正確さ<b>${stars(ac)}</b></div><div>💪 集中力<b>${stars(fo)}</b></div></div>
 <div class="lm">${meter(top)}</div>
-<div class="lf"><span>第 ${no} 号</span><span>こうふ ${data.since}</span><span>ゆうこうきげん：ずっと</span></div></div>`}
+<div class="lf"><span>第 ${no} 号</span><span>こうふ ${data.since}</span><span>ゆうこうきげん：ずっと</span></div>${sk.n==="なし"?"":`<div class="sk">${sk.n}</div>`}</div>`}
 function renderHome(){
  $("homeLic").innerHTML=licHTML();$("name").value=data.name;$("coinHome").textContent=data.coins;$("streak").textContent=data.streak;
- ["add","sub"].forEach(m=>{const i=info(data[m]);$(m+"Lv").textContent="Lv."+(i.lv+1)+" "+LEVELS[i.lv];$(m+"Best").textContent=data[m].runs?"ベスト "+data[m].bestCorrect+"もん":"まだチャレンジしていません"})}
+ ["add","sub","mul"].forEach(m=>{const i=info(data[m]);$(m+"Lv").textContent="Lv."+(i.lv+1)+" "+LEVELS[i.lv];$(m+"Best").textContent=data[m].runs?"ベスト "+data[m].bestCorrect+"もん":"まだチャレンジしていません"})}
 function home(){stopAll();show("home");renderHome()}
 function flash(type,msg,ms){const el=document.createElement("div");el.className="flash "+type;el.innerHTML='<span style="animation-duration:'+(ms||650)+'ms">'+esc(msg)+"</span>";document.body.appendChild(el);setTimeout(()=>el.remove(),ms||650)}
 function stopAll(){if(game){game.active=false;clearInterval(game.timer);game=null}tr=null;const c=$("countdown");if(c)c.remove()}
 function dayBonus(){const t=dayStr();if(data.lastDay===t)return 0;data.streak=data.lastDay===dayStr(-1)?data.streak+1:1;data.lastDay=t;return 10}
 /* 100秒チャレンジ */
 function start(mode){stopAll();game={mode,deck:makeDeck(mode),idx:0,q:null,input:"",cor:0,att:0,tt:0,st:0,qs:0,timer:null,active:false,el:$("ans")};
- show("game");$("mTitle").textContent=mode==="add"?"＋ たしざん":"− ひきざん";$("score").textContent="正かい 0";$("timer").className="timer";$("timer").textContent="100.0秒";$("prob").textContent="";$("hint").innerHTML="";$("ans").innerHTML="&nbsp;";
+ show("game");$("mTitle").textContent={add:"＋ たしざん",sub:"− ひきざん",mul:"× かけざん"}[mode];$("score").textContent="正かい 0";$("timer").className="timer";$("timer").textContent="100.0秒";$("prob").textContent="";$("hint").innerHTML="";$("rd").innerHTML="";$("ans").innerHTML="&nbsp;";
  const o=document.createElement("div");o.className="cd";o.id="countdown";o.innerHTML='<div><div class="m">100びょうで できるだけ多く正かいしよう！</div><div class="n">3</div></div>';document.body.appendChild(o);
  let n=3;const nm=o.querySelector(".n"),iv=setInterval(()=>{if(!game||!o.isConnected){clearInterval(iv);return}n--;if(n>0)nm.textContent=n;else if(n===0)nm.textContent="スタート！";else{clearInterval(iv);o.remove();game.active=true;game.st=performance.now();nextG();game.timer=setInterval(tick,50)}},900)}
-function mark(el,ok,ans,inp){el.innerHTML='<span class="am '+(ok?"o":"x")+'">'+esc(inp)+"</span>"+(ok?"":'<div class="co">こたえ：'+ans+"</div>")}
-function nextG(){const g=game;if(!g||!g.active)return;if(g.idx>=g.deck.length){g.deck=makeDeck(g.mode);g.idx=0}const q=g.deck[g.idx++];g.q=q;g.input="";g.lock=false;g.qs=performance.now();$("prob").textContent=q.x+" "+sym(g.mode)+" "+q.y+" ＝";setHint($("hint"),q);$("ans").innerHTML="&nbsp;"}
+function mark(el,ok,ans,inp,q){el.innerHTML='<span class="am '+(ok?"o":"x")+'">'+esc(inp)+"</span>"+(ok?"":'<div class="co">こたえ：'+ans+"</div>")+(q&&q.m==="mul"?'<div class="co">'+kuku(q.x,q.y)+"　"+yomi(ans)+"</div>":"")}
+function nextG(){const g=game;if(!g||!g.active)return;if(g.idx>=g.deck.length){g.deck=makeDeck(g.mode);g.idx=0}const q=g.deck[g.idx++];g.q=q;g.input="";g.lock=false;g.qs=performance.now();$("prob").textContent=q.x+" "+sym(g.mode)+" "+q.y+" ＝";setHint($("hint"),q);setRd($("rd"),q);$("ans").innerHTML="&nbsp;"}
 function tick(){const g=game;if(!g||!g.active)return;const l=Math.max(0,100-(performance.now()-g.st)/1000);$("timer").textContent=l.toFixed(1)+"秒";if(l<=10)$("timer").classList.add("w");if(l<=0)finishG()}
 function judgeG(){const g=game,q=g.q,d=data[g.mode],el=(performance.now()-g.qs)/1000,ok=Number(g.input)===q.ans;g.att++;g.tt+=el;d.attempts++;d.totalTime+=el;
- if(ok){g.cor++;d.correct++;}else{d.weak[q.k]=(d.weak[q.k]||0)+1}g.lock=true;mark(g.el,ok,q.ans,g.input);snd(ok);
+ if(ok){g.cor++;d.correct++;}else{d.weak[q.k]=(d.weak[q.k]||0)+1}g.lock=true;mark(g.el,ok,q.ans,g.input,ok?null:q);snd(ok);
  $("score").textContent="正かい "+g.cor;save();setTimeout(()=>{if(game===g)nextG()},ok?300:900)}
 function finishG(){const g=game;if(!g||!g.active)return;g.active=false;clearInterval(g.timer);
  const d=data[g.mode],acc=g.att?g.cor/g.att*100:0,avg=g.att?g.tt/g.att:0,before=ovLv(),old={c:d.bestCorrect,a:d.bestAcc,v:d.bestAvg};
@@ -198,21 +205,21 @@ function finishG(){const g=game;if(!g||!g.active)return;g.active=false;clearInte
  $("rMeter").innerHTML=meter(info(d));g.mode&&(lastKind=g.mode);show("result")}
 /* とっくん */
 function startT(kind){let list=[];lastKind=kind;
- if(kind==="weak"){["add","sub"].forEach(m=>Object.entries(data[m].weak).forEach(([k,c])=>{const[x,y]=k.split("_").map(Number);list.push({m,x,y,k,c,ans:m==="add"?x+y:x-y})}));list.sort((a,b)=>b.c-a.c);list=shuffle(list.slice(0,15));if(!list.length){alert("まだにがてな計算はないよ！ まず100秒チャレンジをしてみよう");return}}
- else if(kind==="mix")list=shuffle(makeDeck("add").slice(0,10).concat(makeDeck("sub").slice(0,10)));else list=makeDeck(kind).slice(0,20);
+ if(kind==="weak"){["add","sub","mul"].forEach(m=>Object.entries(data[m].weak).forEach(([k,c])=>{const[x,y]=k.split("_").map(Number);list.push({m,x,y,k,c,ans:m==="add"?x+y:m==="mul"?x*y:x-y})}));list.sort((a,b)=>b.c-a.c);list=shuffle(list.slice(0,15));if(!list.length){alert("まだにがてな計算はないよ！ まず100秒チャレンジをしてみよう");return}}
+ else if(kind==="mix")list=shuffle(makeDeck("add").slice(0,7).concat(makeDeck("sub").slice(0,7),makeDeck("mul").slice(0,6)));else if(kind[0]==="o"){const d=+kind.slice(1);for(let x=d||1;x<=(d||9);x++)for(let y=1;y<=9;y++)list.push({m:"mul",x,y,k:x+"_"+y,ans:x*y})}else list=makeDeck(kind).slice(0,20);
  stopAll();tr={list,i:0,input:"",cor:0,tt:0,active:false,kind,el:$("tans"),q:null,t0:0};show("train");$("tMenu").classList.add("hidden");$("tEnd").classList.add("hidden");$("tPlay").classList.remove("hidden");nextT()}
-function nextT(){if(!tr)return;if(tr.i>=tr.list.length)return endT();const q=tr.list[tr.i];tr.q=q;tr.input="";tr.active=true;tr.t0=performance.now();$("tProg").textContent=(tr.i+1)+" / "+tr.list.length;$("tprob").textContent=q.x+" "+sym(q.m)+" "+q.y+" ＝";setHint($("thint"),q);$("tans").innerHTML="&nbsp;"}
+function nextT(){if(!tr)return;if(tr.i>=tr.list.length)return endT();const q=tr.list[tr.i];tr.q=q;tr.input="";tr.active=true;tr.t0=performance.now();$("tProg").textContent=(tr.i+1)+" / "+tr.list.length;$("tprob").textContent=q.x+" "+sym(q.m)+" "+q.y+" ＝";setHint($("thint"),q);setRd($("trd"),q);$("tans").innerHTML="&nbsp;"}
 function judgeT(){const t=tr,q=t.q,ok=Number(t.input)===q.ans,d=data[q.m];t.tt+=(performance.now()-t.t0)/1000;t.active=false;
  if(ok){t.cor++;if(d.weak[q.k]){d.weak[q.k]--;if(d.weak[q.k]<=0)delete d.weak[q.k]}}else{d.weak[q.k]=(d.weak[q.k]||0)+1}
- mark(t.el,ok,q.ans,t.input);snd(ok);save();setTimeout(()=>{if(tr!==t)return;t.i++;nextT()},ok?600:1600)}
-function endT(){const t=tr,n=t.list.length,avg=t.tt/n,perfect=t.cor===n&&avg<3,reward=t.cor*3+(perfect?15:0);t.active=false;data.coins+=reward+dayBonus();save();
+ mark(t.el,ok,q.ans,t.input,q);snd(ok);save();setTimeout(()=>{if(tr!==t)return;t.i++;nextT()},ok?600:1600)}
+function endT(){const t=tr,n=t.list.length,avg=t.tt/n,perfect=t.kind[0]!=="o"&&t.cor===n&&avg<3,reward=t.kind[0]==="o"?t.cor:t.cor*3+(perfect?15:0);t.active=false;data.coins+=reward+dayBonus();save();
  $("tPlay").classList.add("hidden");$("tEnd").classList.remove("hidden");$("tRes").innerHTML="正かい "+t.cor+" / "+n+"　へいきん "+avg.toFixed(1)+"秒<br>🪙 +"+reward+" コイン"+(perfect?"（ぜんぶ正かい＆はやい！ボーナス込み）":"")}
-function renderTrain(){const c=new Set([...Object.keys(data.add.weak).map(k=>"a"+k),...Object.keys(data.sub.weak).map(k=>"s"+k)]).size;$("weakInfo").textContent=c?"にがて "+c+"こ":"まだないよ"}
+function renderTrain(){const c=new Set([...Object.keys(data.add.weak).map(k=>"a"+k),...Object.keys(data.sub.weak).map(k=>"s"+k),...Object.keys(data.mul.weak).map(k=>"m"+k)]).size;$("weakInfo").textContent=c?"にがて "+c+"こ":"まだないよ"}
 /* ショップ */
 function renderShop(){$("coinShop").textContent=data.coins;$("shopLic").innerHTML=licHTML();$("tabs").innerHTML=TABS.map(t=>'<button class="tab'+(t[0]===tb?" on":"")+'" data-t="'+t[0]+'">'+t[1]+"</button>").join("");
  $("items").innerHTML=GI[tb].map(it=>{const ty=tyOf(),own=data.owned.includes(it.id),eq=data.eq[ty]===it.id;
-  const pv=ty==="a"?`<div class="pv">${it.n}</div>`:`<div class="pv"><i style="${it.s}${ty==="b"?";border:2px solid #ccd":""}"></i></div>`;
-  return`<div class="item${eq?" eq":""}">${pv}<div class="in">${ty==="a"?"":esc(it.n)}</div><button class="btn ${own?"s":"p"}" data-id="${it.id}" ${!own&&data.coins<it.p?"disabled":""}>${eq?"つかっている":own?"つかう":"🪙"+it.p+" でかう"}</button></div>`}).join("")}
+  const pv=ty==="t"?`<div class="pv" style="font-size:14px;font-weight:900">${esc(it.n)}</div>`:"asc".includes(ty)?`<div class="pv">${it.n}</div>`:`<div class="pv"><i style="${ty==="p"?"background-color:#fff;":""}${it.s||""}${ty==="b"||ty==="p"?";border:2px solid #ccd":""}"></i></div>`;
+  return`<div class="item${eq?" eq":""}">${pv}<div class="in">${"asct".includes(ty)?"":esc(it.n)}</div><button class="btn ${own?"s":"p"}" data-id="${it.id}" ${!own&&data.coins<it.p?"disabled":""}>${eq?"つかっている":own?"つかう":"🪙"+it.p+" でかう"}</button></div>`}).join("")}
 function renderRoad(){const o=ovLv();$("roadList").innerHTML=LEVELS.map((n,i)=>{const t=tierOf(i),h=(i===0||tierOf(i-1)!==t)?`<div class="rh" style="background:linear-gradient(90deg,${TIERS[t][1]})">${TIERS[t][0]}めんきょ（${TIERS[t][2]}）</div>`:"";
  return h+`<div class="rl${i===o?" now":""}${i<o?" done":""}"><b>${i<o?"✅":i===o?"⭐":"🔒"}</b><span>レベル${i+1}　${esc(n)}</span><em>${i?"ミスなしで100秒に"+i*3+"もん":"スタート！"}</em></div>`}).join("")}
 /* イベント */
@@ -221,21 +228,28 @@ function key(k){const s=game&&game.active?game:tr&&tr.active?tr:null;if(!s||!s.q
  if(k==="c")s.input="";else if(k==="b")s.input=s.input.slice(0,-1);else{if(s.input.length>=dg(s.q.ans))return;s.input+=k}
  s.el.textContent=s.input||"\u00a0";if(k!=="c"&&k!=="b"&&s.input.length>=dg(s.q.ans))s===game?judgeG():judgeT()}
 document.addEventListener("keydown",e=>{if(/^[0-9]$/.test(e.key))key(e.key);else if(e.key==="Backspace")key("b");else if(e.key==="Escape")key("c")});
-$("addStart").onclick=()=>start("add");$("subStart").onclick=()=>start("sub");
+$("addStart").onclick=()=>start("add");$("subStart").onclick=()=>start("sub");$("mulStart").onclick=()=>start("mul");document.querySelectorAll(".dan [data-o]").forEach(b=>b.onclick=()=>startT("o"+b.dataset.o));
 $("goTrain").onclick=()=>{stopAll();show("train");$("tMenu").classList.remove("hidden");$("tPlay").classList.add("hidden");$("tEnd").classList.add("hidden");renderTrain()};
 $("goShop").onclick=()=>{show("shop");renderShop()};$("goRoad").onclick=()=>{show("road");renderRoad()};
 ["gHome","rHome","tHome","sHome","rdHome"].forEach(i=>$(i).onclick=home);
-$("rAgain").onclick=()=>start(game&&game.mode==="sub"?"sub":"add");
+$("rAgain").onclick=()=>start(game?game.mode:"add");
 document.querySelectorAll("#tMenu [data-k]").forEach(b=>b.onclick=()=>startT(b.dataset.k));
 $("tAgain").onclick=()=>startT(lastKind);$("tMenuBtn").onclick=$("goTrain").onclick;
 $("name").addEventListener("input",()=>{data.name=$("name").value.trim();save()});
 $("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b){tb=b.dataset.t;renderShop()}});
+/* 九九のよみ */
+const KF=[["いんいちが","いんにが","いんさんが","いんしが","いんごが","いんろくが","いんしちが","いんはちが","いんくが"],["にいちが","ににんが","にさんが","にしが","にご","にろく","にしち","にはち","にく"],["さんいちが","さんにが","さざんが","さんし","さんご","さぶろく","さんしち","さんぱ","さんく"],["しいちが","しにが","しさん","しし","しご","しろく","ししち","しは","しく"],["ごいちが","ごに","ごさん","ごし","ごご","ごろく","ごしち","ごは","ごっく"],["ろくいちが","ろくに","ろくさん","ろくし","ろくご","ろくろく","ろくしち","ろくは","ろっく"],["しちいちが","しちに","しちさん","しちし","しちご","しちろく","しちしち","しちは","しちく"],["はちいちが","はちに","はちさん","はちし","はちご","はちろく","はちしち","はっぱ","はっく"],["くいちが","くに","くさん","くし","くご","くろく","くしち","くは","くく"]];
+const O1=["","いち","に","さん","し","ご","ろく","しち","はち","く"],TN=["","","に","さん","し","ご","ろく","しち","はち"];
+function kuku(x,y){return KF[x-1][y-1]}
+function yomi(n){if(n<10)return O1[n];const t=Math.floor(n/10),o=n%10;return(t>1?TN[t]:"")+"じゅう"+O1[o]}
+function setRd(el,q){el.textContent=q&&q.m==="mul"?kuku(q.x,q.y):""}
 /* ヒント・おと */
 function hintOf(q){const x=q.x,y=q.y;let g,t;
+ if(q.m==="mul"){return{y:x,rows:[["b",y]],t:'<b>'+x+'</b> × '+y+' <small>（'+x+'こずつ、'+y+'こぶん）</small>'}}
  if(q.m==="add"){if(x===10||x+y<=10){g=[["b",x],["r",y]];t='<b>'+x+'</b> ＋ <i>'+y+'</i>'}else{const a=10-x,b=y-a;g=[["b",x],["r",a],["r",b]];t='<b>'+x+'</b> ＋ <i>'+a+'</i> ＋ <i>'+b+'</i> <small>（10をつくる）</small>'}}
  else{const r=x-10;if(x===10||y<=r){g=[["b",x-y],["r",y]];t='<b>'+x+'</b> − <i>'+y+'</i> <small>（赤い●をとる）</small>'}else{const b=y-r;g=[["b",x-y],["r",r],["r",b]];t='<b>'+x+'</b> − <i>'+r+'</i> − <i>'+b+'</i> <small>（10からひく）</small>'}}
  return{g,t}}
-function setHint(el,q){if(!data.hint||!q){el.innerHTML="";return}const h=hintOf(q),gs=h.g.filter(a=>a[1]>0),n=gs.reduce((s,a)=>s+a[1],0);
+function setHint(el,q){if(!data.hint||!q){el.innerHTML="";return}const h=hintOf(q);if(h.rows){const s="min(18px,calc((min(100vw,980px) - "+(70+h.y*2)+"px)/"+h.y+"))";el.innerHTML='<div class="ht">'+h.t+'</div><div style="--s:'+s+'">'+h.rows.map(r=>'<div class="blk">'+('<div class="hrow">'+('<span class="d '+r[0]+'"></span>').repeat(h.y)+'</div>').repeat(r[1])+'</div>').join("")+'</div>';return}const gs=h.g.filter(a=>a[1]>0),n=gs.reduce((s,a)=>s+a[1],0);
  const s='min(24px,calc((min(100vw,980px) - '+(70+gs.length*8+n*2)+'px)/'+n+'))';
  el.innerHTML='<div class="ht">'+h.t+'</div><div class="hrow" style="--s:'+s+'">'+gs.map(a=>'<div class="hg">'+('<span class="d '+a[0]+'"></span>').repeat(a[1])+'</div>').join("")+'</div>'}
 function refreshHint(){if(game&&game.active&&game.q)setHint($("hint"),game.q);if(tr&&tr.q)setHint($("thint"),tr.q)}
