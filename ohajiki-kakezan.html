@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>おはじきでかけざん</title>
+<style>
+:root{--bg:#fff4d6;--card:#fff;--ink:#4a3b2a;--pri:#ff7aa2;--soft:#ffe9c7;--ring:#fff8ea;--chip:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2b2238;--card:#3c3152;--ink:#fff1dc;--soft:#4d4068;--ring:#5a4a78;--chip:#3c3152;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#2b2238;--card:#3c3152;--ink:#fff1dc;--soft:#4d4068;--ring:#5a4a78;--chip:#3c3152;color-scheme:dark}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;font-weight:700;-webkit-user-select:none;user-select:none}
+#app{max-width:480px;margin:0 auto;padding:10px 14px 30px;text-align:center}
+h1{font-size:34px;margin:6px 0 0;color:var(--pri);line-height:1.2;text-shadow:2px 2px 0 #fff8}
+.sub{background:#ffd93d;color:#5a4300;display:inline-block;border-radius:20px;padding:4px 14px;margin:8px 0;font-size:15px}
+.top{display:flex;gap:8px;justify-content:center;align-items:center;margin:4px 0 8px;flex-wrap:wrap}
+.chip{background:var(--chip);border-radius:20px;padding:5px 12px;font-size:15px;box-shadow:0 2px 0 #0002}
+.back{border:0;background:var(--chip);color:var(--ink);border-radius:50%;width:38px;height:38px;font-size:18px;box-shadow:0 2px 0 #0002;font-weight:700}
+.card{background:var(--card);border-radius:20px;padding:12px;margin:10px 0;box-shadow:0 3px 0 #0002}
+.big{font-size:44px}
+.bar{height:12px;background:var(--soft);border-radius:8px;overflow:hidden;margin:6px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff7aa2,#ffd93d)}
+.btn{display:block;width:100%;border:0;border-radius:22px;padding:14px;margin:10px 0;font-size:19px;font-weight:700;font-family:inherit;color:#fff;background:#ff7aa2;box-shadow:0 5px 0 #d4507a;cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #d4507a}
+.b2{background:#38b6ff;box-shadow:0 5px 0 #1f86c7}.b3{background:#7ed957;box-shadow:0 5px 0 #4fa32b;color:#234}
+.ask{background:var(--card);border-radius:18px;padding:10px;box-shadow:0 3px 0 #0002;font-size:17px}
+.ask small{display:block;font-size:13px;opacity:.8;margin-top:4px}
+.eq{font-size:40px;color:var(--pri);letter-spacing:2px}
+.board{background:linear-gradient(#e0a060,#c98440);border:5px solid #a8662a;border-radius:18px;padding:12px;margin:10px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;justify-items:center}
+.ring{width:72px;height:72px;border-radius:50%;background:var(--ring);border:3px dashed #c98440;display:grid;grid-template-columns:repeat(3,1fr);align-content:center;justify-items:center;font-size:19px;line-height:1.15;overflow:hidden;padding:4px;box-sizing:border-box}
+.ring .o{cursor:pointer}
+.ring.big2{width:92px;height:92px;border:3px solid #fff8;background:#fff2;font-size:22px}
+.b2board{grid-template-columns:repeat(3,1fr)}
+.boxwrap{display:flex;align-items:center;justify-content:center;gap:12px;font-size:13px}
+.obox{width:96px;height:80px;background:#4cc3ff;border:4px solid #1f86c7;border-radius:16px;font-size:34px;display:flex;align-items:center;justify-content:center;touch-action:none;cursor:grab;box-shadow:0 4px 0 #1f86c7}
+.ghost{position:fixed;font-size:38px;pointer-events:none;transform:translate(-50%,-50%);z-index:50}
+.msg{min-height:24px;font-size:15px;color:#e0457b;margin:6px 0}
+.shake{animation:sh .4s}@keyframes sh{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.eqb{font-size:34px;margin:8px 0}
+.bx{display:inline-block;min-width:54px;border:3px dashed var(--pri);border-radius:12px;padding:2px 6px;margin:0 3px;background:var(--card)}
+.bx.f{border-style:solid;background:#fff3a8;color:#5a4300}
+.cur{outline:4px solid #ffd93d}
+.inp{font-size:32px;background:var(--card);border-radius:14px;min-height:46px;margin:8px 0;padding:2px;box-shadow:inset 0 2px 0 #0002}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pad button{font-size:24px;padding:10px 0;border:0;border-radius:14px;background:var(--card);color:var(--ink);font-family:inherit;font-weight:700;box-shadow:0 3px 0 #0003}
+.pad .ok{background:#ff7aa2;color:#fff}
+.ov{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:60;padding:20px}
+.pop{background:var(--card);border-radius:26px;padding:20px;max-width:340px;width:100%;box-shadow:0 6px 0 #0003;animation:pp .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pp{from{transform:scale(.3)}}
+.pop h2{margin:0;font-size:30px;color:var(--pri)}
+.pop .big{animation:bo 1s infinite}@keyframes bo{50%{transform:translateY(-10px)}}
+.cf{position:fixed;top:-40px;font-size:28px;z-index:70;pointer-events:none;animation:fl 2.2s linear forwards}
+@keyframes fl{to{transform:translateY(110vh) rotate(540deg)}}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.it{background:var(--card);border-radius:18px;padding:10px;box-shadow:0 3px 0 #0002;font-size:14px}
+.it .big{font-size:40px}
+.it button{border:0;border-radius:14px;padding:6px 12px;font-family:inherit;font-weight:700;background:#7ed957;color:#234;margin-top:4px}
+.it button[disabled]{background:#bbb;color:#666}
+.stars{font-size:46px}
+.tools{display:flex;gap:8px;margin:8px 0}.tools button{flex:1;border:0;border-radius:14px;padding:10px 4px;font-family:inherit;font-weight:700;font-size:15px;background:var(--card);color:var(--ink);box-shadow:0 3px 0 #0003}.tools .on{background:#ffd93d;color:#5a4300;outline:3px solid #ff7aa2}
+.desk{position:relative;height:340px;border-radius:18px;border:5px solid #a8662a;background:linear-gradient(#e6a965,#cf8d49);touch-action:none;overflow:hidden}
+.desk svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.desk .o{position:absolute;transform:translate(-50%,-50%);font-size:28px;line-height:1;cursor:pointer}
+.r2{display:grid;gap:2px;padding:10px 12px;font-size:28px;line-height:1.15;border-radius:30px;background:#fff6;border:3px solid #fff;justify-items:center;align-content:center}
+.b2board{grid-template-columns:repeat(2,1fr);gap:14px;padding:16px}
+</style></head><body><div id="app"></div>
+<script>
+const app=document.getElementById('app');
+let S={pts:0,ok:0,pieces:0,plays:0,bc:0,best:{a:0,b:0},own:[0],cur:0};
+try{Object.assign(S,JSON.parse(localStorage.getItem('okk1')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('okk1',JSON.stringify(S))}catch(e){}};
+const ITEMS=[['🔵','あおいおはじき',0],['🌸','さくら',30],['⭐','おほしさま',60],['🍀','よつばクローバー',100],['🍓','いちご',150],['🐥','ひよこ',220],['🍩','ドーナツ',320],['🦄','ユニコーン',500],['💎','ダイヤ',800],['🌈','にじ',1200]];
+const RANKS=[[0,'おはじき みならい','🔰'],[5,'おはじき はじめ','🌱'],[15,'おはじき じょうず','🌼'],[30,'かけざん ちゅうい','🐣'],[50,'かけざん はかせ','🎓'],[80,'おはじき めいじん','🏅'],[120,'かけざん めいじん','🥇'],[170,'かけざん ひーろー','🦸'],[230,'かけざん キング','👑'],[300,'おはじき でんせつ','🐉']];
+const PRAISE=['せいかい！','すごーい！','てんさい！','やったね！','かんぺき！','かけざん めいじん！'];
+const E=()=>ITEMS[S.cur][0],rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const rk=()=>{let r=0;RANKS.forEach((x,i)=>{if(S.ok>=x[0])r=i});return r};
+let ac;function beep(f=600,d=.12){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+const jingle=()=>[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110));
+function confetti(){const em=['🎉','⭐','✨','🌸','💖',E()];for(let i=0;i<34;i++){const s=document.createElement('div');s.className='cf';s.textContent=em[i%em.length];s.style.left=rnd(0,95)+'%';s.style.animationDelay=(Math.random()*.6)+'s';document.body.appendChild(s);setTimeout(()=>s.remove(),3000)}}
+
+function home(){const r=rk(),n=RANKS[r+1],p=n?Math.round((S.ok-RANKS[r][0])/(n[0]-RANKS[r][0])*100):100;
+app.innerHTML=`<div class="top"><div class="chip">🪙 ${S.pts}</div><div class="chip">${E()} ${S.pieces}こ ならべた</div></div>
+<h1>${E()}おはじきで<br>かけざん${E()}</h1><div class="sub">1つ分 × いくつ分 ＝ ぜんぶの数</div>
+<div class="card"><div class="big">${RANKS[r][2]}</div>${RANKS[r][1]}
+<div class="bar"><i style="width:${p}%"></i></div><small>${n?`つぎの ランクまで あと ${n[0]-S.ok}もん`:'さいこうランク！'}</small></div>
+<button class="btn" onclick="start('a')">🎨 おはじきで ばめんを つくろう</button>
+<button class="btn b2" onclick="start('b')">✏️ おはじきを しきに しよう</button>
+<button class="btn b3" onclick="shop()">🛍️ おはじきショップ</button>
+<div class="card">🏆 きろく<br>つくろう ${S.best.a}てん ／ しきに ${S.best.b}てん<br>さいこう れんぞく ${S.bc}もん🔥 ／ あそんだ ${S.plays}かい</div>`}
+
+let G;
+function start(m){G={m,q:0,n:5,sc:0,miss:0,combo:0,mc:0};nextQ()}
+function nextQ(){if(G.q>=G.n)return result();G.q++;const lv=Math.min(3,Math.floor(rk()/3));
+G.A=rnd(2,[5,6,8,9][lv]);G.B=rnd(2,[4,5,6,7][lv]);G.tries=0;G.m=='a'?mA():mB()}
+const hdr=()=>`<div class="top"><button class="back" onclick="home()">←</button><div class="chip">${G.q}/${G.n}もんめ</div><div class="chip">🔥${G.combo}</div><div class="chip">⭐${G.sc}</div></div>`;
+
+function mA(){const{A,B}=G;G.items=[];G.loops=[];G.tool='put';
+app.innerHTML=hdr()+`<div class="ask"><div class="eq">${A} × ${B}</div>${A}こ の ${B}つ分 を つくろう<small>①つくえを タップして おはじきを おく　②⭕で まとまりを かこむ</small></div>
+<div class="tools"><button id="t1" class="on" onclick="tool('put')">${E()} おく</button><button id="t2" onclick="tool('circle')">⭕ かこむ</button><button onclick="G.loops=[];drawL()">↩ まるを けす</button></div>
+<div class="desk" id="desk"><svg id="svg"></svg></div>
+<div class="msg" id="msg">つくえを タップして おはじきを おこう。おはじきを もういちど タップすると きえるよ</div><button class="btn" onclick="checkA()">できた！</button>`;
+const d=document.getElementById('desk');let cur=null;
+d.onpointerdown=e=>{e.preventDefault();const r=d.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+if(G.tool=='put'){
+if(e.target.classList&&e.target.classList.contains('o')){G.items.splice(+e.target.dataset.i,1);drawO();beep(300,.06);return}
+if(G.items.some(p=>Math.hypot(p.x-x,p.y-y)<26)||G.items.length>=80)return;
+G.items.push({x,y});drawO();beep(500+Math.min(G.items.length,20)*20,.07)}
+else{cur=[[x,y]];try{d.setPointerCapture(e.pointerId)}catch(_){}}};
+d.onpointermove=e=>{if(!cur)return;const r=d.getBoundingClientRect();cur.push([e.clientX-r.left,e.clientY-r.top]);drawL(cur)};
+d.onpointerup=d.onpointercancel=()=>{if(cur&&cur.length>8){G.loops.push(cur);beep(660,.1)}cur=null;drawL()}}
+function tool(t){G.tool=t;document.getElementById('t1').classList.toggle('on',t=='put');document.getElementById('t2').classList.toggle('on',t=='circle');document.getElementById('msg').textContent=t=='put'?'タップで おはじきを おくよ':'ゆびで おはじきの まとまりを ぐるっと かこもう！'}
+function drawO(){const d=document.getElementById('desk');d.querySelectorAll('.o').forEach(n=>n.remove());G.items.forEach((p,i)=>{const s=document.createElement('span');s.className='o';s.dataset.i=i;s.textContent=E();s.style.left=p.x+'px';s.style.top=p.y+'px';d.appendChild(s)})}
+const COL=['#ff4d88','#2d9cff','#35b53a','#ff9f1a','#a455e8','#00b8a9','#e6b800','#8a5a3c'];
+function drawL(c){const pt=l=>l.map(p=>p[0].toFixed(0)+','+p[1].toFixed(0)).join(' ');document.getElementById('svg').innerHTML=G.loops.map((l,i)=>`<polygon points="${pt(l)}" fill="${COL[i%8]}33" stroke="${COL[i%8]}" stroke-width="4" stroke-linejoin="round"/>`).join('')+(c?`<polyline points="${pt(c)}" fill="none" stroke="#ff4d88" stroke-width="4"/>`:'')}
+const inside=(p,l)=>{let c=false;for(let i=0,j=l.length-1;i<l.length;j=i++){const a=l[i],b=l[j];if((a[1]>p.y)!=(b[1]>p.y)&&p.x<(b[0]-a[0])*(p.y-a[1])/(b[1]-a[1])+a[0])c=!c}return c};
+function wrong(m){G.tries++;G.combo=0;const el=document.getElementById('msg');el.textContent=m;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');beep(180,.25)}
+function checkA(){const{A,B}=G,it=G.items,cnt=it.map(p=>G.loops.filter(l=>inside(p,l)).length);
+if(!it.length)return wrong('まず おはじきを おいてみよう！');
+if(!G.loops.length)return wrong('⭕で おはじきを かこんで まとまりを つくろう！');
+if(cnt.some(c=>c==0))return wrong('まるで かこんでいない おはじきが あるよ');
+if(cnt.some(c=>c>1))return wrong('2つの まるに はいっている おはじきが あるよ');
+if(G.loops.length!=B)return wrong(`${B}つ分 だよ。まとまりは ${B}つ に なっているかな？`);
+if(G.loops.some(l=>it.filter(p=>inside(p,l)).length!=A))return wrong(`1つ分は ${A}こ だよ。どの まるも ${A}こずつ かな？`);
+win()}
+
+function mB(){const{A,B}=G,c=A<4?A:A==4?2:3;G.st=0;G.inp='';
+const rings=Array.from({length:B},()=>`<div class="r2" style="grid-template-columns:repeat(${c},auto);transform:rotate(${rnd(-3,3)}deg)">${E().repeat(A)}</div>`).join('');
+app.innerHTML=hdr()+`<div class="ask">おはじきの ばめんを かけざんの しきに しよう</div>
+<div class="board b2board">${rings}</div>
+<div class="eqb"><span class="bx" id="e0">▢</span>×<span class="bx" id="e1">▢</span>＝<span class="bx" id="e2">▢</span></div>
+<div class="ask" id="q"></div><div class="inp" id="inp"></div><div class="msg" id="msg"></div>
+<div class="pad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="key('${n}')">${n}</button>`).join('')}<button onclick="key('x')">⌫</button><button onclick="key('0')">0</button><button class="ok" onclick="okB()">こたえる</button></div>`;stepQ()}
+const QS=['1つ分は いくつ？','いくつ分 ある？','ぜんぶの かずは？'];
+function stepQ(){document.getElementById('q').textContent=QS[G.st];document.getElementById('e'+G.st).classList.add('cur');G.inp='';document.getElementById('inp').textContent=''}
+function key(k){if(k=='x')G.inp=G.inp.slice(0,-1);else if(G.inp.length<2)G.inp+=k;document.getElementById('inp').textContent=G.inp;beep(440,.05)}
+function okB(){if(!G.inp)return;const{A,B}=G,ex=[A,B,A*B][G.st];
+if(+G.inp!=ex)return wrong([`1つの まとまりに おはじきは いくつ あるかな？ かぞえてみよう`,`まとまりが いくつ あるかな？ かぞえてみよう`,`${A}この まとまりが ${B}つ分 だよ。ぜんぶで いくつかな？`][G.st]);
+const b=document.getElementById('e'+G.st);b.textContent=ex;b.classList.remove('cur');b.classList.add('f');beep(600+G.st*100,.12);document.getElementById('msg').textContent='';
+if(++G.st==3){document.getElementById('inp').textContent='';return setTimeout(win,500)}stepQ()}
+
+function win(){const{A,B}=G,r0=rk();G.combo++;G.mc=Math.max(G.mc,G.combo);
+const p=(G.tries?5:10)+Math.min(G.combo,10)*2;if(G.tries)G.miss++;G.sc+=p;S.ok++;S.pieces+=A*B;S.pts+=p;S.bc=Math.max(S.bc,G.mc);save();
+const up=rk()>r0,o=document.createElement('div');o.className='ov';
+o.innerHTML=`<div class="pop"><div class="big">${up?RANKS[rk()][2]:'🎉'}</div><h2>${PRAISE[rnd(0,5)]}</h2>
+<div class="eq">${A} × ${B} ＝ ${A*B}</div><div>${A}こ の ${B}つ分 で ぜんぶ ${A*B}こ！</div>
+<div class="card" style="margin:10px 0">${(`<span>${E()}</span>`).repeat(Math.min(A*B,63))}</div>
+<div>+${p}ポイント🪙 ${G.combo>1?`／ ${G.combo}もん れんぞく🔥`:''}</div>${up?`<div style="color:#e0457b">ランクアップ！ ${RANKS[rk()][1]}</div>`:''}
+<button class="btn" id="nx">${G.q>=G.n?'けっかを みる':'つぎへ'}</button></div>`;
+document.body.appendChild(o);jingle();confetti();o.querySelector('#nx').onclick=()=>{o.remove();nextQ()}}
+
+function result(){const bonus=G.miss==0?20:0,st=G.miss==0?3:G.miss<=2?2:1,sc=G.sc+bonus,rec=sc>S.best[G.m];
+S.pts+=bonus;S.plays++;if(rec)S.best[G.m]=sc;save();jingle();confetti();
+app.innerHTML=`<h1>🎊 クリア！ 🎊</h1><div class="stars">${'⭐'.repeat(st)}${'☆'.repeat(3-st)}</div>
+<div class="card"><div class="eq">${sc}てん</div>${bonus?'ノーミス ボーナス +20🪙<br>':''}${rec?'<b style="color:#e0457b">🎉 しんきろく！ 🎉</b><br>':`ベスト ${S.best[G.m]}てん<br>`}
+さいこう ${G.mc}もん れんぞく🔥<br>いまの ポイント 🪙${S.pts}</div>
+<button class="btn" onclick="start('${G.m}')">🔁 もういちど！</button>
+<button class="btn b3" onclick="shop()">🛍️ ショップへ</button><button class="btn b2" onclick="home()">🏠 ホームへ</button>`}
+
+function shop(){app.innerHTML=`<div class="top"><button class="back" onclick="home()">←</button><div class="chip">🪙 ${S.pts}</div></div><h1 style="font-size:26px">おはじきショップ</h1>
+<div class="grid">${ITEMS.map((x,i)=>{const own=S.own.includes(i);return`<div class="it"><div class="big">${x[0]}</div>${x[1]}<br>${own?'':'🪙'+x[2]}<br>
+<button ${own&&S.cur==i?'disabled':''} onclick="buy(${i})">${own?(S.cur==i?'つかってる':'つかう'):'かう'}</button></div>`}).join('')}</div>`}
+function buy(i){if(!S.own.includes(i)){if(S.pts<ITEMS[i][2]){beep(180,.25);return alert('ポイントが たりないよ。もっと あそんで ためよう！')}S.pts-=ITEMS[i][2];S.own.push(i);jingle();confetti()}S.cur=i;save();shop()}
+home();
+</script></body></html>
