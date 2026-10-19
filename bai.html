@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ばいマスター</title>
+<style>
+:root{--bg:#fffaf0;--fg:#333;--card:#fff;--ac:#2fa36b;--pk:#f9d9d3;--bd:#e07f6f;--ye:#ffe58a;--bad:#d9534f;--line:#ddd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e2420;--fg:#eee;--card:#2b332e;--pk:#5a3b37;--ye:#7a6a22;--line:#455;}}
+:root[data-theme="dark"]{--bg:#1e2420;--fg:#eee;--card:#2b332e;--pk:#5a3b37;--ye:#7a6a22;--line:#455}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif}
+.w{max-width:520px;margin:0 auto;padding:10px}
+h1{font-size:22px;margin:4px 0;color:var(--ac)}
+.top{display:flex;justify-content:space-between;align-items:center}
+.tabs{display:flex;gap:6px;margin:8px 0}
+.tabs button{flex:1;padding:8px 2px;font-size:14px;border:2px solid var(--ac);border-radius:10px;background:var(--card);color:var(--fg);font-family:inherit}
+.tabs button.on{background:var(--ac);color:#fff}
+.card{background:var(--card);border-radius:14px;padding:12px;border:2px solid var(--line);margin-bottom:10px}
+.q{font-size:18px;line-height:1.6;margin:4px 0}
+.hl{background:var(--ye);padding:0 4px;border-radius:4px;font-weight:bold}
+svg{width:100%;height:auto;display:block}
+.ch{display:block;width:100%;padding:12px;margin:8px 0;font-size:20px;border-radius:12px;border:2px solid var(--ac);background:var(--card);color:var(--fg);font-family:inherit}
+.btn{padding:12px 18px;font-size:18px;border-radius:12px;border:0;background:var(--ac);color:#fff;font-family:inherit}
+.btn.g{background:#888}
+.row{display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap}
+.eq{font-size:26px;display:flex;gap:6px;align-items:center;justify-content:center;margin:10px 0}
+.box{min-width:56px;height:52px;border:3px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--card);color:var(--fg);font-size:26px;font-family:inherit}
+.box.act{background:var(--ye)}.box.ng{border-color:var(--bad);background:#fdd;color:#900}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.pad button{padding:12px 0;font-size:20px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--fg);font-family:inherit}
+.msg{font-size:18px;text-align:center;min-height:28px;margin:6px 0;font-weight:bold}
+.ok{color:var(--ac)}.no{color:var(--bad)}
+.note{font-size:16px;border:2px solid var(--ac);border-radius:12px;padding:8px;margin-top:8px;line-height:1.6}
+@keyframes pop{0%{transform:scale(.2);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.shake{animation:shake .4s}
+.seg{animation:pop .35s both}
+#cv{position:fixed;inset:0;pointer-events:none;z-index:50}
+.mas{font-size:44px;display:inline-block;animation:bob 1.6s infinite}
+.hd{display:flex;align-items:center;gap:8px}
+.mas.react{animation:pop .5s}
+.mas img{height:56px;width:auto;display:block}
+.bub{background:var(--card);border:2px solid var(--ac);border-radius:12px;padding:6px 10px;font-size:15px;flex:1}
+#cmb{font-size:15px;color:#e07f6f;font-weight:bold;min-height:20px}
+.box.gv{background:var(--ye);border-style:dashed}
+</style></head><body><div class="w">
+<div class="top"><h1>ばいマスター</h1><div id="st">⭐ 0</div></div><div class="hd"><span class="mas" id="mas"><img id="mi" src="https://mrs-shrimp.github.io/2math/ebizarashi.png" alt="" onerror="imgFail()"></span><div class="bub" id="bub">いっしょに がんばろう！</div></div><div id="cmb"></div><canvas id="cv"></canvas>
+<div class="tabs" id="tabs"></div>
+<div id="main"></div>
+</div>
+<script>
+var MODES=["まなぶ","ばいをしろう","しきにしよう","ずをつくろう"];
+var mode=0,q=null,done=0,locked=false,stars=0,learnK=1;
+try{stars=+localStorage.getItem("bai_stars")||0}catch(e){}
+function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuf(a){return a.sort(function(){return Math.random()-.5})}
+var combo=0,miss=false,perf=0,animFrom=99;
+function rank(){return stars<10?"🥚たまご":stars<30?"🐣ひよこ":stars<60?"🐔にわとり":stars<100?"🦅たか":"👑ばいマスター"}
+function setSt(){document.getElementById("st").textContent="⭐ "+stars+" "+rank()}
+var imgOk=true;
+function imgFail(){imgOk=false;document.getElementById("mas").textContent="🐻"}
+function say(t,e){document.getElementById("bub").textContent=t;var m=document.getElementById("mas");if(imgOk){m.classList.remove("react");void m.offsetWidth;m.classList.add("react")}else{m.textContent=e;setTimeout(function(){if(!imgOk)m.textContent="🐻"},1800)}}
+function snd(a){try{var C=window.AC=window.AC||new(window.AudioContext||window.webkitAudioContext)();a.forEach(function(f,i){var o=C.createOscillator(),g=C.createGain(),t=C.currentTime+i*.1;o.frequency.value=f;o.type="triangle";g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g);g.connect(C.destination);o.start(t);o.stop(t+.25)})}catch(e){}}
+function burst(big){var c=document.getElementById("cv");c.width=innerWidth;c.height=innerHeight;var x=c.getContext("2d"),P=[],cols=["#f66","#fc3","#4c8","#59f","#e7a"];for(var i=0;i<(big?160:70);i++)P.push({x:c.width/2,y:c.height*.4,vx:(Math.random()-.5)*14,vy:-Math.random()*14-3,r:4+Math.random()*5,c:cols[i%5],a:1});(function f(){x.clearRect(0,0,c.width,c.height);var n=0;P.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vy+=.45;p.a-=.012;if(p.a>0){n++;x.globalAlpha=p.a;x.fillStyle=p.c;x.fillRect(p.x,p.y,p.r,p.r)}});if(n)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})()}
+function good(){var r0=rank();stars++;if(!miss){combo++;perf++}else combo=0;try{localStorage.setItem("bai_stars",stars)}catch(e){}setSt();var L=["やったね！","すごい！","いいね！","さすが！"],t=L[rnd(0,3)];if(combo>=3)t="🔥 "+combo+"れんぞく！ てんさい！";document.getElementById("cmb").textContent=combo>=2?"🔥 "+combo+" れんぞく！":"";say(t,"🥳");burst(combo>=3||rank()!==r0);snd([523,659,784,1047])}
+function bad(){miss=true;combo=0;document.getElementById("cmb").textContent="";var e=document.querySelector(".card");e.classList.remove("shake");void e.offsetWidth;e.classList.add("shake");say("だいじょうぶ！ もういちど やってみよう","🤔");snd([220,196])}
+function figOld(u,n,unit,cnt){
+  var h='<svg viewBox="0 0 340 110">';
+  if(unit==="L"){
+    var w=Math.min(60,320/n),g=(340-w*n)/(n+1);
+    for(var i=0;i<n;i++){var x=g+i*(w+g);
+      h+='<rect x="'+(x+w*.35)+'" y="8" width="'+w*.3+'" height="12" rx="3" fill="#2fa36b"/>';
+      h+='<rect x="'+x+'" y="20" width="'+w+'" height="70" rx="12" fill="#9fd86b" stroke="#2fa36b" stroke-width="2"/>';
+      h+='<text x="'+(x+w/2)+'" y="62" font-size="18" text-anchor="middle" fill="#234">'+u+'L</text>';
+      if(cnt)h+='<text x="'+(x+w/2)+'" y="106" font-size="14" text-anchor="middle" fill="currentColor">'+(i+1)+'</text>'}
+  }else{
+    var W=300,sw=W/n;
+    for(var i=0;i<n;i++){var x=20+i*sw;
+      h+='<path d="M'+(x+3)+' 26 Q'+(x+sw/2)+' 8 '+(x+sw-3)+' 26" fill="none" stroke="currentColor" stroke-dasharray="3 3"/>';
+      h+='<text x="'+(x+sw/2)+'" y="18" font-size="14" text-anchor="middle" fill="currentColor">'+u+'cm</text>';
+      h+='<rect x="'+x+'" y="32" width="'+sw+'" height="50" fill="#f9d9d3" stroke="#c0594a" stroke-width="2"/>';
+      if(cnt)h+='<text x="'+(x+sw/2)+'" y="104" font-size="14" text-anchor="middle" fill="currentColor">'+(i+1)+'つぶん</text>'}
+  }
+  return h+'</svg>'}
+function fig(u,n,unit,cnt,tot){
+  var o=cnt?20:0,H=tot?140+o:110,h='<svg viewBox="0 0 340 '+H+'">',x1,x2,x,i;
+  var cl=function(i){return i>=animFrom?' class="seg" style="animation-delay:'+((i-animFrom)*.08)+'s;transform-box:fill-box;transform-origin:center"':''};
+  if(unit==="L"){var w=Math.min(60,320/n),g=(340-w*n)/(n+1);x1=g;x2=340-g;
+    for(i=0;i<n;i++){x=g+i*(w+g);h+='<g'+cl(i)+'><rect x="'+(x+w*.35)+'" y="8" width="'+w*.3+'" height="12" rx="3" fill="#2fa36b"/><rect x="'+x+'" y="20" width="'+w+'" height="70" rx="12" fill="#9fd86b" stroke="#2fa36b" stroke-width="2"/><text x="'+(x+w/2)+'" y="62" font-size="18" text-anchor="middle" fill="#234">'+u+'L</text>'+(cnt?'<text x="'+(x+w/2)+'" y="106" font-size="14" text-anchor="middle" fill="currentColor">'+(i+1)+'</text>':'')+'</g>'}
+  }else{var sw=300/n;x1=20;x2=320;
+    for(i=0;i<n;i++){x=20+i*sw;h+='<g'+cl(i)+'><path d="M'+(x+3)+' 26 Q'+(x+sw/2)+' 8 '+(x+sw-3)+' 26" fill="none" stroke="currentColor" stroke-dasharray="3 3"/><text x="'+(x+sw/2)+'" y="18" font-size="14" text-anchor="middle" fill="currentColor">'+u+'cm</text><rect x="'+x+'" y="32" width="'+sw+'" height="50" fill="#f9d9d3" stroke="#c0594a" stroke-width="2"/>'+(cnt?'<text x="'+(x+sw/2)+'" y="104" font-size="14" text-anchor="middle" fill="currentColor">'+(i+1)+'つぶん</text>':'')+'</g>'}}
+  if(tot)h+='<path d="M'+x1+' '+(96+o)+' v8 H'+x2+' v-8" fill="none" stroke="#2fa36b" stroke-width="3"/><text x="170" y="'+(128+o)+'" font-size="20" font-weight="bold" text-anchor="middle" fill="currentColor">ぜんぶで '+(u*n)+unit+'</text>';
+  return h+'</svg>'}
+function gen(){
+  var L=Math.random()<.3,unit=L?"L":"cm";
+  return {unit:unit,u:L?rnd(2,4):rnd(2,9),n:L?rnd(2,5):rnd(2,6)}}
+function tabs(){
+  var t=document.getElementById("tabs");t.innerHTML="";
+  MODES.forEach(function(m,i){var b=document.createElement("button");b.textContent=m;b.className=i===mode?"on":"";
+    b.onclick=function(){mode=i;done=0;start()};t.appendChild(b)})}
+function start(){tabs();locked=false;miss=false;if(done===0)perf=0;animFrom=0;if(mode===0)learn();else{q=gen();[0,m1,m2,m3][mode]()}animFrom=99}
+function learn(){
+  var m=document.getElementById("main"),k=learnK,u=5;
+  var t=k===1?'<span class="hl">5cmの 1つぶん</span> は 5cm です。<br>1ばい は、1つぶん の ことです。':
+   '<span class="hl">5cmの '+k+'つぶん</span> の ことを、<br><span class="hl">5cmの '+k+'ばい</span> と いいます。<br>ながさは 5×'+k+' ＝ '+(5*k)+'（cm）';
+  m.innerHTML='<div class="card"><div class="q">「ふやす」を おして みよう！</div>'+fig(u,k,"cm",true,true)+
+   '<div class="q" style="margin-top:8px">'+t+'</div><div class="row"><button class="btn g" id="d">へらす</button><button class="btn" id="a">ふやす</button></div></div>'+
+   '<div class="card"><div class="q">かさも おなじ！</div>'+fig(2,4,"L",true,true)+
+   '<div class="q">2Lの 4つぶん ＝ 2Lの 4ばい<br>しき 2×4＝8 　<span class="hl">8L</span></div></div>'+
+   '<div class="note">なんばいかの ながさを もとめる ときも、<b>かけざん</b>が つかえるんだね。<br><b>1つぶんの大きさ × いくつぶん（ばい）＝ぜんぶ</b></div>'+
+   '<div class="row" style="margin-top:10px"><button class="btn" id="go">れんしゅうへ ▶</button></div>';
+  document.getElementById("a").onclick=function(){if(learnK<6)learnK++;learn()};
+  document.getElementById("d").onclick=function(){if(learnK>1)learnK--;learn()};
+  document.getElementById("go").onclick=function(){mode=1;done=0;start()}}
+function next(){done++;if(done>=10){burst(true);snd([523,659,784,1047,1319]);document.getElementById("main").innerHTML='<div class="card"><div class="q" style="text-align:center;font-size:24px">🎉 10もん クリア！<br>いっぱつせいかい '+perf+'もん<br>⭐ '+stars+'</div><div class="row"><button class="btn" id="r">もういちど</button></div></div>';document.getElementById("r").onclick=function(){done=0;start()};return}
+  start()}
+function head(txt){return '<div class="card"><div class="q">'+txt+'</div><div style="text-align:right;font-size:14px">'+(done+1)+' / 10</div>'+fig(q.u,q.n,q.unit,false,true)}
+function nbtn(){return '<div class="row"><button class="btn" id="nx" style="display:none">つぎへ ▶</button></div></div>'}
+function m1(){
+  var u=q.u,n=q.n,x=q.unit,c=u+x+"の "+n+"ばい";
+  var opts=[c,(u*n)+x+"の "+n+"ばい",n+x+"の "+u+"ばい",u+x+"の "+(n+1)+"ばい"];
+  var seen={},o=[];opts.forEach(function(s){if(!seen[s]){seen[s]=1;o.push(s)}});o=shuf(o.slice(0,4));
+  var m=document.getElementById("main");
+  m.innerHTML=head('1つぶんは <span class="hl">'+u+x+'</span>。<br>この ずを ことばで いうと？')+o.map(function(s){return '<button class="ch">'+s+'</button>'}).join("")+'<div class="msg" id="ms"></div>'+nbtn();
+  var bs=m.querySelectorAll(".ch");
+  bs.forEach(function(b){b.onclick=function(){if(locked)return;
+    if(b.textContent===c){locked=true;good();b.style.background="#bdf0cf";msg('せいかい！ '+u+x+'の '+n+'つぶん は '+u+x+'の '+n+'ばい',1);document.getElementById("nx").style.display="";document.getElementById("nx").onclick=next}
+    else{b.style.background="#fdd";msg('ちがうよ。1つぶんの大きさと、いくつぶんかを みてみよう',0);bad()}}})}
+function msg(t,ok){var e=document.getElementById("ms");e.textContent=t;e.className="msg "+(ok?"ok":"no")}
+var vals,act,ans;
+function m2(){
+  vals=["","",String(q.u*q.n)];act=0;ans=[q.u,q.n,q.u*q.n];draw2()}
+function draw2(bad){
+  var m=document.getElementById("main"),x=q.unit;
+  var bx=function(i){return '<div class="box'+(i===act?' act':'')+(bad&&bad[i]?' ng':'')+(i===2?' gv':'')+'" data-i="'+i+'">'+vals[i]+'</div>'};
+  m.innerHTML=head('ずを みて、しきに あらわそう。<br>（1つぶん × いくつぶん ＝ ぜんぶ）')+
+   '<div class="eq">'+bx(0)+'×'+bx(1)+'＝'+bx(2)+'<span style="font-size:18px">'+x+'</span></div>'+
+   '<div class="pad">'+[1,2,3,4,5,6,7,8,9,0].map(function(d){return '<button data-d="'+d+'">'+d+'</button>'}).join("")+'</div>'+
+   '<div class="row" style="margin-top:8px"><button class="btn g" id="bk">けす</button><button class="btn" id="ok">けってい</button></div><div class="msg" id="ms"></div>'+nbtn();
+  m.querySelectorAll(".box").forEach(function(b){b.onclick=function(){if(!locked&&b.dataset.i!=="2"){act=+b.dataset.i;draw2()}}});
+  m.querySelectorAll(".pad button").forEach(function(b){b.onclick=function(){if(locked)return;
+    vals[act]=(vals[act]+b.dataset.d).slice(0,2);
+    if(vals[act].length>=String(ans[act]).length&&act<1)act++;draw2()}});
+  document.getElementById("bk").onclick=function(){if(locked)return;vals[act]="";draw2()};
+  document.getElementById("ok").onclick=function(){if(locked)return;
+    var b=vals.map(function(v,i){return +v!==ans[i]});
+    if(!b[0]&&!b[1]&&!b[2]){locked=true;good();draw2();msg(q.u+'×'+q.n+'＝'+q.u*q.n+'（'+x+'）　'+q.u+x+'の '+q.n+'ばい！',1);document.getElementById("nx").style.display="";document.getElementById("nx").onclick=next;
+      document.querySelectorAll(".pad button,#ok,#bk").forEach(function(e){e.disabled=true})}
+    else{draw2(b);msg('おしい！ 1つぶんは '+q.u+x+'。いくつぶんか かぞえてみよう',0);bad()}}}
+var cur;
+function m3(){cur=0;draw3()}
+function draw3(){
+  var m=document.getElementById("main"),u=q.u,n=q.n,x=q.unit;
+  m.innerHTML='<div class="card"><div class="q"><span class="hl">'+u+x+'の '+n+'ばい</span> を つくろう！<br><span style="font-size:14px">（'+(done+1)+' / 10）</span></div>'+
+   (cur>0?fig(u,cur,x,true,true):'<div style="height:110px;text-align:center;padding-top:40px;opacity:.6">まだ ありません</div>')+
+   '<div class="q" style="text-align:center">いま '+u+x+'の '+cur+'つぶん</div>'+
+   '<div class="row"><button class="btn g" id="mi">−へらす</button><button class="btn" id="pl">＋'+u+x+'ふやす</button></div>'+
+   '<div class="row" style="margin-top:8px"><button class="btn" id="ck" style="background:#e07f6f">できた！</button></div><div class="msg" id="ms"></div>'+nbtn();
+  document.getElementById("pl").onclick=function(){if(!locked&&cur<7){cur++;animFrom=cur-1;draw3();animFrom=99}};
+  document.getElementById("mi").onclick=function(){if(!locked&&cur>0){cur--;draw3()}};
+  document.getElementById("ck").onclick=function(){if(locked)return;
+    if(cur===n){locked=true;good();msg(u+x+'の '+n+'つぶん ＝ '+u+x+'の '+n+'ばい。しきは '+u+'×'+n+'＝'+u*n,1);document.getElementById("nx").style.display="";document.getElementById("nx").onclick=next}
+    else{msg(cur<n?'まだ たりないよ':'おおすぎるよ。'+n+'ばいは '+n+'つぶんだね',0);bad()}}}
+setSt();
+start();
+(function(){var im=document.getElementById("mi");if(im&&im.complete&&!im.naturalWidth)imgFail()})();
+</script></body></html>
