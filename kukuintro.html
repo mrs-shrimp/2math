@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>九九の導入｜1つ分といくつ分</title>
+<style>
+:root{
+  --ink:#24354b; --muted:#61748a; --cream:#fffaf0; --paper:#ffffff;
+  --blue:#dff3ff; --blue-deep:#2779a8; --orange:#ffb45c; --orange-deep:#b85b18;
+  --green:#287c62; --line:#dce6ed; --shadow:0 8px 24px rgba(35,64,86,.10);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;font-family:"Yu Gothic UI","Meiryo",sans-serif;color:var(--ink);background:linear-gradient(135deg,#f1faff 0%,#fff9ed 100%)}
+button{font:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:4px solid #f0a33b;outline-offset:3px}
+.app{min-height:100vh;display:flex;flex-direction:column;padding:clamp(10px,2vw,24px);gap:clamp(8px,1.4vh,16px);max-width:1800px;margin:auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:48px;height:48px;border-radius:15px;background:#ffe2b9;display:grid;place-items:center;font-size:27px;box-shadow:inset 0 -4px 0 #f6c486}
+.brand h1{font-size:clamp(20px,2.1vw,32px);margin:0;letter-spacing:.02em}
+.brand p{margin:3px 0 0;color:var(--muted);font-size:clamp(12px,1vw,15px)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}
+.utility{border:1px solid #d7e3eb;background:white;border-radius:12px;padding:10px 14px;font-weight:700;color:var(--ink);box-shadow:0 2px 5px #183b5510}
+.utility:hover{background:#f4faff}
+.screen{flex:1;display:flex;flex-direction:column;gap:clamp(10px,1.5vh,16px);min-height:0}
+.panel{background:rgba(255,255,255,.94);border:1px solid #e0eaf0;border-radius:22px;box-shadow:var(--shadow)}
+.menu-screen{justify-content:center;align-items:center;padding:clamp(20px,5vw,64px)}
+.menu-inner{width:min(100%,1000px);text-align:center}
+.eyebrow{color:var(--green);font-weight:800;letter-spacing:.12em;font-size:clamp(12px,1.2vw,16px)}
+.menu-inner h2{font-size:clamp(27px,4vw,48px);margin:10px 0}
+.menu-inner .sub{color:var(--muted);font-size:clamp(15px,1.6vw,20px);margin:0 0 28px}
+.tables{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.4vw,18px)}
+.table-btn{border:2px solid #e3edf3;border-radius:18px;background:#fff;padding:clamp(16px,2.4vw,28px) 8px;font-size:clamp(22px,2.5vw,34px);font-weight:900;color:var(--ink);box-shadow:0 4px 0 #e2eaf0;transition:transform .12s,box-shadow .12s,border-color .12s}
+.table-btn:hover{transform:translateY(-2px);border-color:#8dc9e8;box-shadow:0 6px 0 #d4e7f1}
+.table-btn span{display:block;font-size:clamp(12px,1.2vw,16px);color:var(--muted);font-weight:600;margin-top:5px}
+.lesson-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:clamp(12px,1.7vw,20px) clamp(14px,2vw,24px)}
+.lesson-title{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.lesson-title h2{font-size:clamp(24px,3vw,42px);margin:0}
+.lesson-title .status{font-size:clamp(17px,2vw,26px);font-weight:800;color:var(--blue-deep);background:#e7f6ff;border-radius:12px;padding:7px 14px}
+.progress{font-size:clamp(13px,1.3vw,17px);font-weight:800;color:var(--muted)}
+.visual-panel{flex:1;min-height:210px;padding:clamp(10px,1.5vw,18px);display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.visual-label{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 6px}
+.visual-label strong{font-size:clamp(15px,1.6vw,21px)}
+.visual-label span{color:var(--muted);font-size:clamp(12px,1.1vw,15px)}
+.groups{flex:1;display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:clamp(3px,1vw,14px);align-items:stretch;min-height:0}
+.group{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(3px,.7vh,8px);min-width:0;border:2px solid #d8eaf4;border-radius:14px;background:linear-gradient(180deg,#f5fbff,#edf8ff);padding:clamp(4px,.7vw,10px) 2px;animation:popIn .24s ease-out both}
+.group::after{content:"";position:absolute;inset:5px;border:1px dashed #b8d9eb;border-radius:9px;pointer-events:none}
+.group-num{font-size:clamp(10px,1.05vw,15px);font-weight:900;color:#376781;position:relative;z-index:1}
+.cookie{width:min(100%,clamp(18px,4.3vh,48px));aspect-ratio:1;display:block;position:relative;z-index:1;filter:drop-shadow(0 2px 1px #6c45252a)}
+.group-count{font-size:clamp(10px,1vw,14px);font-weight:800;color:#537286;position:relative;z-index:1}
+.empty-note{grid-column:1/-1;align-self:center;text-align:center;color:#8aa0af;font-size:clamp(17px,2vw,24px);font-weight:700}
+.bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:clamp(10px,1.5vw,18px);align-items:stretch}
+.equation-panel{padding:clamp(12px,1.8vw,22px);display:flex;flex-direction:column;justify-content:center;gap:8px}
+.eq-caption{font-size:clamp(13px,1.2vw,16px);color:var(--muted);font-weight:700;text-align:center}
+.equation{display:flex;justify-content:center;align-items:center;gap:clamp(6px,1.7vw,22px);font-size:clamp(31px,5vw,68px);font-weight:900;line-height:1.15;white-space:nowrap}
+.eq-slot{min-width:clamp(52px,7vw,92px);height:clamp(55px,7vw,88px);border:3px solid #d7e6ef;border-radius:15px;background:#f8fcff;color:var(--blue-deep);display:grid;place-items:center;padding:0 8px;transition:transform .18s,border-color .18s,background .18s}
+.eq-slot.revealed{background:#fff3dc;border-color:#f4c16e;color:#8c4a12;animation:reveal .28s ease-out}
+.eq-symbol{color:#8aa0af}
+.eq-hint{text-align:center;font-size:clamp(11px,1vw,14px);color:#8294a3}
+.actions{display:flex;flex-direction:column;gap:10px;min-width:clamp(170px,20vw,250px)}
+.primary{border:0;border-radius:16px;background:linear-gradient(180deg,#ffbf6d,#ffa847);color:#60330d;font-size:clamp(17px,1.8vw,24px);font-weight:900;padding:16px 20px;box-shadow:0 5px 0 #e28a31;min-height:66px}
+.primary:hover{filter:brightness(1.03);transform:translateY(-1px)}
+.primary:disabled{background:#e4e9ed;color:#8c9aa4;box-shadow:0 4px 0 #ccd5db;cursor:not-allowed;transform:none}
+.secondary{border:2px solid #dce7ed;background:white;color:var(--ink);border-radius:14px;padding:11px 14px;font-weight:800;font-size:clamp(13px,1.2vw,16px)}
+.secondary:disabled{opacity:.45;cursor:not-allowed}
+.toast{min-height:1.2em;text-align:center;color:var(--green);font-size:clamp(12px,1vw,14px);font-weight:700}
+@keyframes popIn{from{opacity:0;transform:translateX(10px) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes reveal{0%{transform:scale(.88);opacity:.55}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+@media (max-width:700px){
+ .app{padding:8px;gap:8px}.brand-mark{width:38px;height:38px;font-size:22px}.toolbar{width:100%}.utility{flex:1;padding:8px}
+ .tables{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.table-btn{padding:15px 4px}
+ .lesson-header{padding:12px}.visual-panel{padding:7px;min-height:180px}.groups{gap:2px}
+ .group{border-radius:8px;padding:3px 0}.group::after{inset:2px;border-radius:5px}.group-num,.group-count{font-size:9px}
+ .bottom{grid-template-columns:1fr}.actions{display:grid;grid-template-columns:1fr 1fr;min-width:0}.primary{grid-column:1/-1;min-height:54px;padding:10px}
+ .equation{gap:5px}.eq-slot{min-width:0;width:22vw;max-width:80px;height:58px;border-width:2px}.eq-caption{font-size:12px}
+}
+@media (max-height:650px) and (min-width:701px){
+ .app{padding:10px;gap:8px}.brand-mark{width:38px;height:38px}.lesson-header{padding:8px 16px}.visual-panel{padding:8px;min-height:170px}.group{gap:2px;padding:3px 1px}.cookie{width:min(100%,26px)}.bottom{gap:8px}.equation-panel{padding:8px}.eq-slot{height:52px}.primary{min-height:52px;padding:9px 14px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* 掲示用：学習内容を大きく、教師用操作を下部にまとめる */
+.app{max-width:none;min-height:100vh;padding:clamp(8px,1.3vw,18px);gap:clamp(5px,.8vh,10px)}
+.topbar{display:none}
+.teacher-controls{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;padding-top:2px}
+.teacher-controls .utility{font-size:12px;padding:6px 10px;border-radius:8px;box-shadow:none;color:#687888;background:#f8fbfd}
+.lesson-header{padding:clamp(12px,2vh,24px) clamp(14px,2vw,30px)}
+.lesson-title{width:100%;justify-content:center;align-items:center;gap:clamp(12px,2vw,28px)}
+.lesson-title h2{display:none}
+.lesson-title .status{font-size:clamp(30px,4.2vw,64px);font-weight:950;color:#24354b;background:transparent;padding:0;line-height:1.15}
+.progress{font-size:clamp(14px,1.4vw,20px)}
+.visual-panel{flex:1;min-height:260px;padding:clamp(8px,1.2vw,18px);gap:8px}
+.visual-label{justify-content:center;padding:0}
+.visual-label strong{font-size:clamp(20px,2.4vw,36px);font-weight:900}
+.visual-label span{display:none}
+.groups{gap:clamp(5px,1vw,16px);align-items:stretch}
+.group{border:clamp(3px,.35vw,5px) solid #f1a23a;background:#fff5df;border-radius:clamp(8px,1vw,16px);gap:clamp(3px,.65vh,8px);padding:clamp(5px,.7vw,12px) 2px}
+.group::after{border-color:#f4c16f;border-width:2px}
+.group-num{font-size:clamp(12px,1.3vw,20px);color:#9b5a0c;font-weight:900}
+.cookie{width:min(100%,clamp(24px,5.4vh,66px));filter:drop-shadow(0 2px 1px #6c45252a)}
+.group-count{font-size:clamp(12px,1.3vw,19px);color:#9b5a0c;font-weight:900}
+.bottom{grid-template-columns:minmax(0,1fr) minmax(160px,18vw);gap:clamp(8px,1vw,16px)}
+.equation-panel{padding:clamp(8px,1.2vw,18px);gap:clamp(4px,.7vh,9px)}
+.eq-caption{font-size:clamp(16px,1.8vw,25px);color:#4d6173;font-weight:800}
+.equation{gap:clamp(6px,1.4vw,20px);font-size:clamp(52px,7.5vw,108px);font-weight:950;line-height:1}
+.eq-slot{min-width:clamp(74px,10vw,150px);height:clamp(74px,10vw,140px);border:4px solid #d7e6ef;border-radius:20px;background:#f5fbff;font-size:inherit;font-weight:950;padding:0 10px}
+.eq-slot[data-slot="0"]{color:#247db4;border-color:#9bd3f1;background:#eaf8ff}
+.eq-slot[data-slot="1"]{color:#a65c08;border-color:#f1a23a;background:#fff5df}
+.eq-slot[data-slot="2"]{color:#217a5b;border-color:#8ed0b5;background:#eafff5}
+.eq-slot.revealed{animation:reveal .28s ease-out}
+.eq-hint{font-size:clamp(12px,1.2vw,17px)}
+.actions{min-width:0;gap:8px;justify-content:center}
+.primary{font-size:clamp(17px,1.8vw,25px);min-height:68px;padding:12px 14px}
+.secondary{font-size:clamp(12px,1.15vw,16px);padding:9px 10px}
+.toast{font-size:clamp(11px,1vw,14px)}
+@media (max-width:850px){
+ .bottom{grid-template-columns:1fr}
+ .actions{display:grid;grid-template-columns:1fr 1fr}
+ .primary{grid-column:1/-1}
+}
+@media (max-width:600px){
+ .lesson-title .status{font-size:clamp(26px,6vw,36px)}
+ .visual-label strong{font-size:clamp(17px,4vw,22px)}
+ .groups{gap:2px}
+ .group{border-width:2px;border-radius:6px}
+ .group::after{inset:2px;border-width:1px}
+ .group-num,.group-count{font-size:8px}
+ .cookie{width:min(100%,clamp(15px,3.8vh,24px))}
+ .equation{font-size:clamp(38px,10vw,58px);gap:4px}
+ .eq-slot{width:22vw;min-width:0;max-width:85px;height:58px;border-width:2px;border-radius:10px}
+ .teacher-controls{gap:4px}
+ .teacher-controls .utility{font-size:10px;padding:5px 7px}
+}
+@media (max-height:700px) and (min-width:851px){
+ .lesson-header{padding:6px 14px}
+ .lesson-title .status{font-size:clamp(28px,3.2vw,48px)}
+ .visual-panel{min-height:190px;padding:6px}
+ .cookie{width:min(100%,clamp(18px,3.6vh,34px))}
+ .equation-panel{padding:6px}
+ .eq-slot{height:58px;min-width:80px}
+ .primary{min-height:48px;padding:8px}
+}
+
+
+/* 「〇こずつ〇つぶん、ぜんぶで？こ」を式の色・大きさと対応させる */
+.lesson-title .status{
+  display:flex;
+  justify-content:center;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:.08em .18em;
+  font-size:clamp(27px,3.8vw,58px);
+  line-height:1.2;
+  font-weight:900;
+  color:#24354b;
+}
+.status-one{color:#247db4;font-size:1.22em;font-weight:950}
+.status-groups{color:#a65c08;font-size:1.22em;font-weight:950}
+.status-total{color:#217a5b;font-size:1.22em;font-weight:950}
+
+
+/* 九九唱え練習画面 */
+.practice-launch{margin-top:24px;border:0;border-radius:16px;background:#287c62;color:#fff;padding:16px 28px;font-size:clamp(18px,2vw,25px);font-weight:900;box-shadow:0 4px 0 #1b604b}
+.practice-screen{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.practice-top,.practice-settings{padding:clamp(10px,1.4vw,18px)}
+.practice-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.practice-topline h2{font-size:clamp(20px,2.2vw,32px);margin:0}
+.mode-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.mode-tab{border:2px solid #dce7ed;background:#fff;border-radius:12px;padding:12px 8px;font-weight:900;font-size:clamp(13px,1.3vw,18px);color:var(--ink)}
+.mode-tab.active{background:#e7f6ff;border-color:#7fc4e8;color:#17658d}
+.practice-settings{display:flex;align-items:center;gap:clamp(8px,1.3vw,18px);flex-wrap:wrap}
+.practice-settings label{display:flex;align-items:center;gap:7px;font-size:clamp(12px,1.1vw,15px);font-weight:800;color:#52677a}
+.practice-settings select{border:1px solid #cbdbe5;background:#fff;border-radius:8px;padding:8px;font:inherit;color:var(--ink)}
+.practice-settings input{width:18px;height:18px;accent-color:#287c62}
+.practice-card{flex:1;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:clamp(14px,2vw,28px);gap:clamp(8px,1.5vh,18px)}
+.practice-meta{width:100%;display:flex;justify-content:space-between;color:#60768a;font-size:clamp(13px,1.3vw,18px);font-weight:800}
+.practice-equation{display:flex;align-items:center;justify-content:center;gap:clamp(10px,2vw,30px);font-size:clamp(58px,9vw,126px);font-weight:950;line-height:1.05;white-space:nowrap}
+.practice-equation span:nth-child(1){color:#247db4}
+.practice-equation span:nth-child(3){color:#a65c08}
+.practice-equation span:nth-child(5){color:#217a5b}
+.practice-symbol{color:#8a9aaa}
+.practice-reading{font-size:clamp(28px,4.3vw,60px);font-weight:900;color:#34485b;min-height:1.3em;line-height:1.25;overflow-wrap:anywhere}
+.practice-hidden-note{font-size:clamp(17px,2vw,25px);font-weight:800;color:#8c9aa4}
+.practice-feedback{min-height:1.2em;color:#287c62;font-weight:800;font-size:clamp(12px,1.1vw,15px)}
+.practice-controls{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.practice-controls button{min-width:clamp(100px,12vw,170px)}
+.practice-controls .primary{min-height:54px}
+.practice-controls .secondary{min-height:48px}
+@media(max-width:750px){
+ .mode-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .practice-equation{font-size:clamp(46px,11vw,70px);gap:8px}
+ .practice-reading{font-size:clamp(24px,6vw,36px)}
+ .practice-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .practice-controls button{min-width:0;width:100%}
+ .practice-controls #practiceNext{grid-column:auto}
+}
+
+
+.practice-reading{display:grid;grid-template-columns:1fr 1fr auto 1fr;align-items:start;justify-items:center;gap:clamp(10px,2vw,28px);width:min(100%,1100px);min-height:1.3em}
+.reading-part{font-size:inherit;font-weight:900;white-space:normal;overflow-wrap:anywhere}
+#readingA{color:#247db4}
+#readingB{color:#a65c08}
+#readingGa{color:#555} #readingAnswer{color:#217a5b}
+.practice-card.checked-answer .practice-equation,
+.practice-card.checked-answer .practice-reading{color:#c62828!important}
+.practice-card.checked-answer .practice-equation span,
+.practice-card.checked-answer .practice-reading .reading-part{color:#c62828!important}
+.practice-card.checked-answer .practice-equation{outline:5px solid #e53935;border-radius:18px;padding:10px 18px}
+.practice-card.checked-answer .practice-reading{outline:4px solid #e53935;border-radius:14px;padding:8px 14px}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar" aria-hidden="true"></header>
+
+  <main id="menuScreen" class="screen panel menu-screen">
+    <div class="menu-inner">
+      <div class="eyebrow">どの段を しらべる？</div>
+      <h2>「1つ分」をふやしてみよう</h2>
+      <p class="sub">段をえらぶと、おかしが たてに ならぶよ。</p>
+      <div class="tables" id="tablesMenu" aria-label="九九の段を選ぶ"></div>
+      <button class="practice-launch" id="practiceLaunch" type="button">九九を となえる れんしゅう</button>
+    </div>
+  </main>
+
+  <main id="lessonScreen" class="screen" hidden>
+    <section class="panel lesson-header">
+      <div class="lesson-title"><h2 id="lessonHeading">5のだん</h2><div class="status" id="statusText"><span class="status-one">5</span>こずつ <span class="status-groups">1</span>つぶん　ぜんぶで <span class="status-total">？</span>こ</div></div>
+      <div class="progress" id="progressText">1 / 9 つぶん</div>
+    </section>
+    <section class="panel visual-panel" aria-label="おかしの図">
+      <div class="visual-label"><strong>たての1れつが「1つ分」</strong><span id="totalText">おかしは 5こ</span></div>
+      <div class="groups" id="groups" aria-live="polite"></div>
+    </section>
+    <section class="bottom">
+      <div class="panel equation-panel">
+        <div class="eq-caption">？を おして、式を かんがえよう</div>
+        <div class="equation" aria-label="かけ算の式">
+          <button class="eq-slot" data-slot="0" type="button" aria-label="1つ分の数を表示">？</button>
+          <span class="eq-symbol" aria-hidden="true">×</span>
+          <button class="eq-slot" data-slot="1" type="button" aria-label="いくつ分かを表示">？</button>
+          <span class="eq-symbol" aria-hidden="true">＝</span>
+          <button class="eq-slot" data-slot="2" type="button" aria-label="ぜんぶの数を表示">？</button>
+        </div>
+        <div class="eq-hint">数字は 1つずつ ひょうじできます。</div>
+      </div>
+      <div class="actions">
+        <button class="primary" id="addBtn" type="button">＋ 1つぶん ふやす</button>
+        <button class="secondary" id="hideBtn" type="button">数字を かくす</button>
+        <button class="secondary" id="equationResetBtn" type="button">式を はじめにもどす</button>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </div>
+    </section>
+  </main>
+
+  <main id="practiceScreen" class="practice-screen" hidden>
+    <section class="practice-top panel">
+      <div class="practice-topline">
+        <h2>九九を となえる れんしゅう</h2>
+        <button class="utility" id="practiceBackMenu" type="button">もとの画面へ</button>
+      </div>
+      <div class="mode-tabs" role="group" aria-label="練習モード">
+        <button class="mode-tab active" data-mode="model" type="button">1 お手本</button>
+        <button class="mode-tab" data-mode="hide" type="button">2 答えをかくす</button>
+        <button class="mode-tab" data-mode="sequence" type="button">3 ぎゃくじゅん</button>
+        <button class="mode-tab" data-mode="reverse" type="button">4 ランダム</button>
+      </div>
+    </section>
+    <section class="practice-settings panel" id="practiceSettings">
+      <label>段 <select id="practiceTable"></select></label>
+      <label id="orderLabel">出題順
+        <select id="practiceOrder">
+          <option value="reverse">逆順（9から1）</option>
+          <option value="random-table">ランダム（選んだ段）</option>
+          <option value="random-all">ランダム（全81問）</option>
+        </select>
+      </label>
+      <label class="check-label" id="initialAnswerLabel"><input id="initialAnswer" type="checkbox"> 答えを最初から表示</label>
+      <label class="check-label" id="initialReadingLabel"><input id="initialReading" type="checkbox"> 読み方を最初から表示</label>
+      <label id="autoLabel" class="check-label"><input id="autoMode" type="checkbox"> 自動で次へ</label>
+      <label id="intervalLabel">間隔
+        <select id="autoInterval">
+          <option value="0.5">0.5秒</option><option value="0.8">0.8秒</option><option value="1">1秒</option><option value="1.5">1.5秒</option><option value="2">2秒</option><option value="3">3秒</option><option value="5" selected>5秒</option><option value="8">8秒</option><option value="10">10秒</option><option value="15">15秒</option>
+        </select>
+      </label>
+    </section>
+    <section class="practice-card panel">
+      <div class="practice-meta"><span id="practiceModeName">お手本</span><span id="practiceProgress">1 / 9</span></div>
+      <div class="practice-equation" aria-label="問題の式">
+        <span id="practiceA">5</span><span class="practice-symbol">×</span><span id="practiceB">1</span><span class="practice-symbol">＝</span><span id="practiceAnswer">5</span>
+      </div>
+      <div id="practiceReading" class="practice-reading" aria-label="九九の読み方">
+        <span class="reading-part" id="readingA">ご</span>
+        <span class="reading-part" id="readingB">いち</span>
+        <span class="reading-part" id="readingGa">が</span>
+        <span class="reading-part" id="readingAnswer">ご</span>
+      </div>
+      <div class="practice-hidden-note" id="practiceHiddenNote" hidden>こたえを かんがえて、声に出してみよう</div>
+      <div class="practice-feedback" id="practiceFeedback" role="status" aria-live="polite"></div>
+    </section>
+    <section class="practice-controls">
+      <button class="secondary" id="practiceRestart" type="button">最初から</button>
+      <button class="secondary" id="practicePrev" type="button">前へ</button>
+      <button class="primary" id="practiceRevealAnswer" type="button">答えをみる</button>
+      <button class="secondary" id="practiceRevealReading" type="button">読み方をみる</button>
+      <button class="primary" id="practiceNext" type="button">次へ</button>
+      <button class="secondary" id="practiceAutoToggle" type="button" hidden>自動進行を開始</button>
+    </section>
+  </main>
+
+  <footer class="teacher-controls" aria-label="教師用操作">
+    <button class="utility" id="menuBtn" type="button">段をえらぶ</button>
+    <button class="utility" id="backBtn" type="button">1つもどる</button>
+    <button class="utility" id="resetBtn" type="button">この段をリセット</button>
+    <button class="utility" id="fullBtn" type="button">全画面</button>
+  </footer>
+</div>
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const menuScreen = $("menuScreen"), lessonScreen = $("lessonScreen");
+  const menu = $("tablesMenu"), groups = $("groups");
+  const slots = Array.from(document.querySelectorAll(".eq-slot"));
+  let table = 5, count = 1, revealed = [false, false, false], inLesson = false;
+
+  function cookieSVG(seed) {
+    const spots = [[28,27],[48,20],[62,35],[37,48],[55,57],[22,60],[69,52]];
+    const visible = spots.slice(0, 4 + (seed % 4));
+    return `<svg class="cookie" viewBox="0 0 88 88" role="img" aria-label="クッキー1こ" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="44" cy="45" r="34" fill="#e9a64d" stroke="#b96f2a" stroke-width="3"/>
+      <circle cx="44" cy="43" r="29" fill="#f4c875"/>
+      <path d="M19 31 Q25 18 38 16 M53 17 Q66 22 73 35 M18 54 Q22 67 36 73" fill="none" stroke="#ffe4a2" stroke-width="3" stroke-linecap="round"/>
+      ${visible.map(([x,y],i)=>`<ellipse cx="${x}" cy="${y}" rx="4.5" ry="5.5" transform="rotate(${(i*23)%60-30} ${x} ${y})" fill="#754326"/>`).join("")}
+    </svg>`;
+  }
+  function buildMenu() {
+    menu.innerHTML = "";
+    for (let n = 1; n <= 9; n++) {
+      const b = document.createElement("button");
+      b.className = "table-btn"; b.type = "button";
+      b.innerHTML = `${n}のだん<span>${n}こずつ</span>`;
+      b.addEventListener("click", () => startTable(n));
+      menu.appendChild(b);
+    }
+  }
+  function startTable(n) {
+    table = n; count = 1; revealed = [false,false,false]; inLesson = true;
+    menuScreen.hidden = true; lessonScreen.hidden = false;
+    $("lessonHeading").textContent = `${table}のだん`;
+    render();
+  }
+  function renderGroups() {
+    groups.innerHTML = "";
+    for (let c = 1; c <= count; c++) {
+      const group = document.createElement("div");
+      group.className = "group";
+      group.style.animationDelay = `${Math.min(c-1,8)*22}ms`;
+      group.setAttribute("aria-label", `${c}つ分目、${table}こ`);
+      const num = document.createElement("div");
+      num.className = "group-num"; num.textContent = `${c}つ分`;
+      group.appendChild(num);
+      for (let r = 0; r < table; r++) {
+        const wrap = document.createElement("div");
+        wrap.innerHTML = cookieSVG(c * 11 + r);
+        group.appendChild(wrap.firstElementChild);
+      }
+      const countLabel = document.createElement("div");
+      countLabel.className = "group-count"; countLabel.textContent = `${table}こ`;
+      group.appendChild(countLabel);
+      groups.appendChild(group);
+    }
+  }
+  function renderEquation() {
+    const values = [table, count, table * count];
+    slots.forEach((slot, i) => {
+      slot.textContent = revealed[i] ? String(values[i]) : "？";
+      slot.classList.toggle("revealed", revealed[i]);
+      slot.setAttribute("aria-label", ["1つ分の数","いくつ分","ぜんぶの数"][i] + (revealed[i] ? `：${values[i]}` : "を表示"));
+    });
+    // 式の「＝」の右側を表示したら、上部の「ぜんぶで？」にも同じ数を表示する。
+    const statusTotal = document.querySelector(".status-total");
+    if (statusTotal) statusTotal.textContent = revealed[2] ? String(values[2]) : "？";
+  }
+  function render() {
+    $("statusText").innerHTML = `<span class="status-one">${table}</span>こずつ <span class="status-groups">${count}</span>つぶん　ぜんぶで <span class="status-total">？</span>こ`;
+    $("progressText").textContent = `${count} / 9 つぶん`;
+    $("totalText").textContent = `おかしは ${table * count}こ`;
+    $("addBtn").disabled = count >= 9;
+    $("backBtn").disabled = count <= 1;
+    $("toast").textContent = count >= 9 ? "9つ分まで ふやしたよ。" : "";
+    renderGroups(); renderEquation();
+  }
+  function resetEquation() { revealed = [false,false,false]; renderEquation(); $("toast").textContent = "式を かくしました。"; }
+  slots.forEach((slot, i) => slot.addEventListener("click", () => {
+    if (!inLesson) return;
+    revealed[i] = !revealed[i];
+    renderEquation();
+    $("toast").textContent = revealed[i] ? "数字を ひょうじしました。" : "数字を かくしました。";
+  }));
+  $("addBtn").addEventListener("click", () => {
+    if (count >= 9) return;
+    count++; revealed = [false,false,false]; render();
+    $("toast").textContent = `${table}こずつの列が ふえました。`;
+  });
+  $("backBtn").addEventListener("click", () => {
+    if (count <= 1 || !inLesson) return;
+    count--; revealed = [false,false,false]; render();
+  });
+  $("resetBtn").addEventListener("click", () => {
+    if (!inLesson) { startTable(table); return; }
+    count = 1; revealed = [false,false,false]; render();
+    $("toast").textContent = "1つ分に もどしました。";
+  });
+  $("equationResetBtn").addEventListener("click", resetEquation);
+  $("hideBtn").addEventListener("click", resetEquation);
+  $("menuBtn").addEventListener("click", () => {
+    inLesson = false; lessonScreen.hidden = true; menuScreen.hidden = false;
+  });
+  $("fullBtn").addEventListener("click", async () => {
+    try {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+      else await document.exitFullscreen();
+    } catch (e) { $("toast").textContent = "全画面表示はブラウザのメニューから設定してください。"; }
+  });
+const KU_KU_DATA = [
+  {a:1, b:1, answer:1, reading:"いんいち が いち"},
+  {a:1, b:2, answer:2, reading:"いん に が に"},
+  {a:1, b:3, answer:3, reading:"いん さん が さん"},
+  {a:1, b:4, answer:4, reading:"いん し が し"},
+  {a:1, b:5, answer:5, reading:"いん ご が ご"},
+  {a:1, b:6, answer:6, reading:"いん ろく が ろく"},
+  {a:1, b:7, answer:7, reading:"いん しち が しち"},
+  {a:1, b:8, answer:8, reading:"いん はち が はち"},
+  {a:1, b:9, answer:9, reading:"いん く が く"},
+  {a:2, b:1, answer:2, reading:"に いち が に"},
+  {a:2, b:2, answer:4, reading:"に にん が し"},
+  {a:2, b:3, answer:6, reading:"に さん が ろく"},
+  {a:2, b:4, answer:8, reading:"に し が はち"},
+  {a:2, b:5, answer:10, reading:"に ご じゅう"},
+  {a:2, b:6, answer:12, reading:"に ろく じゅう に"},
+  {a:2, b:7, answer:14, reading:"に しち じゅう し"},
+  {a:2, b:8, answer:16, reading:"に はち じゅう ろく"},
+  {a:2, b:9, answer:18, reading:"に く じゅう はち"},
+  {a:3, b:1, answer:3, reading:"さん いち が さん"},
+  {a:3, b:2, answer:6, reading:"さん に が ろく"},
+  {a:3, b:3, answer:9, reading:"さざん が きゅう"},
+  {a:3, b:4, answer:12, reading:"さん し じゅう に"},
+  {a:3, b:5, answer:15, reading:"さん ご じゅう ご"},
+  {a:3, b:6, answer:18, reading:"さぶろく じゅう はち"},
+  {a:3, b:7, answer:21, reading:"さん しち に じゅう いち"},
+  {a:3, b:8, answer:24, reading:"さん ぱ に じゅう し"},
+  {a:3, b:9, answer:27, reading:"さん く にじゅうしち"},
+  {a:4, b:1, answer:4, reading:"しいち が し"},
+  {a:4, b:2, answer:8, reading:"し に が はち"},
+  {a:4, b:3, answer:12, reading:"し さん じゅう に"},
+  {a:4, b:4, answer:16, reading:"し し じゅう ろく"},
+  {a:4, b:5, answer:20, reading:"し ご に じゅう"},
+  {a:4, b:6, answer:24, reading:"し ろく に じゅう し"},
+  {a:4, b:7, answer:28, reading:"し しち に じゅう はち"},
+  {a:4, b:8, answer:32, reading:"し は さん じゅう に"},
+  {a:4, b:9, answer:36, reading:"し く さん じゅう ろく"},
+  {a:5, b:1, answer:5, reading:"ご いち が ご"},
+  {a:5, b:2, answer:10, reading:"ご に じゅう"},
+  {a:5, b:3, answer:15, reading:"ご さん じゅう ご"},
+  {a:5, b:4, answer:20, reading:"ご し に じゅう"},
+  {a:5, b:5, answer:25, reading:"ご ご に じゅう ご"},
+  {a:5, b:6, answer:30, reading:"ご ろく さん じゅう"},
+  {a:5, b:7, answer:35, reading:"ご しち さん じゅう ご"},
+  {a:5, b:8, answer:40, reading:"ご は し じゅう"},
+  {a:5, b:9, answer:45, reading:"ごっくし じゅう ご"},
+  {a:6, b:1, answer:6, reading:"ろくいち が ろく"},
+  {a:6, b:2, answer:12, reading:"ろく に じゅう に"},
+  {a:6, b:3, answer:18, reading:"ろく さん じゅう はち"},
+  {a:6, b:4, answer:24, reading:"ろく し に じゅう し"},
+  {a:6, b:5, answer:30, reading:"ろく ご さん じゅう"},
+  {a:6, b:6, answer:36, reading:"ろく ろく さん じゅう ろく"},
+  {a:6, b:7, answer:42, reading:"ろく しち し じゅう に"},
+  {a:6, b:8, answer:48, reading:"ろく は し じゅう はち"},
+  {a:6, b:9, answer:54, reading:"ろっく ご じゅう し"},
+  {a:7, b:1, answer:7, reading:"しちいち が しち"},
+  {a:7, b:2, answer:14, reading:"しち に じゅう し"},
+  {a:7, b:3, answer:21, reading:"しち さん に じゅう いち"},
+  {a:7, b:4, answer:28, reading:"しち し に じゅう はち"},
+  {a:7, b:5, answer:35, reading:"しち ご さん じゅう ご"},
+  {a:7, b:6, answer:42, reading:"しち ろく し じゅう に"},
+  {a:7, b:7, answer:49, reading:"しち しち し じゅう く"},
+  {a:7, b:8, answer:56, reading:"しち は ご じゅう ろく"},
+  {a:7, b:9, answer:63, reading:"しち く ろく じゅう さん"},
+  {a:8, b:1, answer:8, reading:"はちいち が はち"},
+  {a:8, b:2, answer:16, reading:"はち に じゅう ろく"},
+  {a:8, b:3, answer:24, reading:"はち さん に じゅう し"},
+  {a:8, b:4, answer:32, reading:"はち し さん じゅう に"},
+  {a:8, b:5, answer:40, reading:"はち ご し じゅう"},
+  {a:8, b:6, answer:48, reading:"はち ろく し じゅう はち"},
+  {a:8, b:7, answer:56, reading:"はち しち ご じゅう ろく"},
+  {a:8, b:8, answer:64, reading:"はっぱ ろく じゅう し"},
+  {a:8, b:9, answer:72, reading:"はっ く しち じゅう に"},
+  {a:9, b:1, answer:9, reading:"く いち が く"},
+  {a:9, b:2, answer:18, reading:"く に じゅう はち"},
+  {a:9, b:3, answer:27, reading:"く さん にじゅうしち"},
+  {a:9, b:4, answer:36, reading:"く し さん じゅう ろく"},
+  {a:9, b:5, answer:45, reading:"く ご し じゅう ご"},
+  {a:9, b:6, answer:54, reading:"く ろく ご じゅう し"},
+  {a:9, b:7, answer:63, reading:"く しち ろく じゅう さん"},
+  {a:9, b:8, answer:72, reading:"く は しち じゅう に"},
+  {a:9, b:9, answer:81, reading:"く く はち じゅう いち"}
+];
+const READING_ALIGNMENT = {
+  "1-1": ["いん", "いち", "が", "いち"],
+  "1-2": ["いん", "に", "が", "に"],
+  "1-3": ["いん", "さん", "が", "さん"],
+  "1-4": ["いん", "し", "が", "し"],
+  "1-5": ["いん", "ご", "が", "ご"],
+  "1-6": ["いん", "ろく", "が", "ろく"],
+  "1-7": ["いん", "しち", "が", "しち"],
+  "1-8": ["いん", "は", "が", "はち"],
+  "1-9": ["いん", "く", "が", "く"],
+  "2-1": ["に", "いち", "が", "に"],
+  "2-2": ["に", "に", "が", "し"],
+  "2-3": ["に", "さん", "が", "ろく"],
+  "2-4": ["に", "し", "が", "はち"],
+  "2-5": ["に", "ご", "が", "じゅう"],
+  "2-6": ["に", "ろく", "が", "じゅうに"],
+  "2-7": ["に", "しち", "が", "じゅうし"],
+  "2-8": ["に", "は", "が", "じゅうろく"],
+  "2-9": ["に", "く", "が", "じゅうはち"],
+  "3-1": ["さん", "いち", "が", "さん"],
+  "3-2": ["さん", "に", "が", "ろく"],
+  "3-3": ["さん", "さん", "が", "く"],
+  "3-4": ["さん", "し", "が", "じゅうに"],
+  "3-5": ["さん", "ご", "が", "じゅうご"],
+  "3-6": ["さん", "ろく", "が", "じゅうはち"],
+  "3-7": ["さん", "しち", "が", "にじゅういち"],
+  "3-8": ["さん", "は", "が", "にじゅうし"],
+  "3-9": ["さん", "く", "が", "にじゅうしち"],
+  "4-1": ["し", "いち", "が", "し"],
+  "4-2": ["し", "に", "が", "はち"],
+  "4-3": ["し", "さん", "が", "じゅうに"],
+  "4-4": ["し", "し", "が", "じゅうろく"],
+  "4-5": ["し", "ご", "が", "にじゅう"],
+  "4-6": ["し", "ろく", "が", "にじゅうし"],
+  "4-7": ["し", "しち", "が", "にじゅうはち"],
+  "4-8": ["し", "は", "が", "さんじゅうに"],
+  "4-9": ["し", "く", "が", "さんじゅうろく"],
+  "5-1": ["ご", "いち", "が", "ご"],
+  "5-2": ["ご", "に", "が", "じゅう"],
+  "5-3": ["ご", "さん", "が", "じゅうご"],
+  "5-4": ["ご", "し", "が", "にじゅう"],
+  "5-5": ["ご", "ご", "が", "にじゅうご"],
+  "5-6": ["ご", "ろく", "が", "さんじゅう"],
+  "5-7": ["ご", "しち", "が", "さんじゅうご"],
+  "5-8": ["ご", "は", "が", "しじゅう"],
+  "5-9": ["ご", "く", "が", "しじゅうご"],
+  "6-1": ["ろく", "いち", "が", "ろく"],
+  "6-2": ["ろく", "に", "が", "じゅうに"],
+  "6-3": ["ろく", "さん", "が", "じゅうはち"],
+  "6-4": ["ろく", "し", "が", "にじゅうし"],
+  "6-5": ["ろく", "ご", "が", "さんじゅう"],
+  "6-6": ["ろく", "ろく", "が", "さんじゅうろく"],
+  "6-7": ["ろく", "しち", "が", "しじゅうに"],
+  "6-8": ["ろく", "は", "が", "しじゅうはち"],
+  "6-9": ["ろく", "く", "が", "ごじゅうし"],
+  "7-1": ["しち", "いち", "が", "しち"],
+  "7-2": ["しち", "に", "が", "じゅうし"],
+  "7-3": ["しち", "さん", "が", "にじゅういち"],
+  "7-4": ["しち", "し", "が", "にじゅうはち"],
+  "7-5": ["しち", "ご", "が", "さんじゅうご"],
+  "7-6": ["しち", "ろく", "が", "しじゅうに"],
+  "7-7": ["しち", "しち", "が", "しじゅうく"],
+  "7-8": ["しち", "は", "が", "ごじゅうろく"],
+  "7-9": ["しち", "く", "が", "ろくじゅうさん"],
+  "8-1": ["はち", "いち", "が", "はち"],
+  "8-2": ["はち", "に", "が", "じゅうろく"],
+  "8-3": ["はち", "さん", "が", "にじゅうし"],
+  "8-4": ["はち", "し", "が", "さんじゅうに"],
+  "8-5": ["はち", "ご", "が", "しじゅう"],
+  "8-6": ["はち", "ろく", "が", "しじゅうはち"],
+  "8-7": ["はち", "しち", "が", "ごじゅうろく"],
+  "8-8": ["はち", "は", "が", "ろくじゅうし"],
+  "8-9": ["はち", "く", "が", "しちじゅうに"],
+  "9-1": ["く", "いち", "が", "く"],
+  "9-2": ["く", "に", "が", "じゅうはち"],
+  "9-3": ["く", "さん", "が", "にじゅうしち"],
+  "9-4": ["く", "し", "が", "さんじゅうろく"],
+  "9-5": ["く", "ご", "が", "しじゅうご"],
+  "9-6": ["く", "ろく", "が", "ごじゅうし"],
+  "9-7": ["く", "しち", "が", "ろくじゅうさん"],
+  "9-8": ["く", "は", "が", "しちじゅうに"],
+  "9-9": ["く", "く", "が", "はちじゅういち"]
+};
+
+  // 4つの練習モードは、上記の固定81件データだけを参照する。
+  const practiceScreen = $("practiceScreen");
+  const originalMenuScreen = $("menuScreen");
+  const originalLessonScreen = $("lessonScreen");
+  let practiceMode = "model";
+  let practiceList = [];
+  let practiceIndex = 0;
+  let showPracticeAnswer = true;
+  let showPracticeReading = true;
+  let autoTimer = null;
+  let autoPaused = false;
+
+  function shuffleNoAdjacent(items) {
+    const out = items.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    // Best-effort swap to avoid identical adjacent equations.
+    for (let i = 1; i < out.length; i++) {
+      if (out[i].a === out[i-1].a && out[i].b === out[i-1].b) {
+        const j = out.findIndex((item, k) => k > i && !(item.a === out[i-1].a && item.b === out[i-1].b));
+        if (j >= 0) [out[i], out[j]] = [out[j], out[i]];
+      }
+    }
+    return out;
+  }
+  function selectedTable() { return Number($("practiceTable").value || 5); }
+  function stopAuto() {
+    if (autoTimer !== null) { clearInterval(autoTimer); autoTimer = null; }
+    autoPaused = false;
+    $("practiceAutoToggle").textContent = "自動進行を開始";
+  }
+  function updateModeSettings() {
+    const reverse = practiceMode === "sequence";
+    const sequence = practiceMode === "reverse";
+    $("orderLabel").hidden = true;
+    $("autoLabel").hidden = true;
+    $("intervalLabel").hidden = true;
+    $("initialAnswerLabel").hidden = true;
+    $("initialReadingLabel").hidden = true;
+    $("practiceAutoToggle").hidden = true;
+    $("practiceRevealAnswer").hidden = false;
+    $("practiceRevealReading").hidden = false;
+    $("practiceNext").textContent = "次へ";
+    $("practiceModeName").textContent = ({
+      model:"1 お手本", hide:"2 答えをかくして唱える",
+      sequence:"3 ぎゃくじゅん", reverse:"4 ランダム"
+    })[practiceMode];
+  }
+  function makePracticeList() {
+    const table = selectedTable();
+    if (practiceMode === "sequence") {
+      practiceList = KU_KU_DATA.filter(q => q.a === table).slice().reverse();
+    } else if (practiceMode === "reverse") {
+      const order = $("practiceOrder").value;
+      if (order === "random-all") practiceList = shuffleNoAdjacent(KU_KU_DATA);
+      else if (order === "random-table") practiceList = shuffleNoAdjacent(KU_KU_DATA.filter(q => q.a === table));
+      else practiceList = shuffleNoAdjacent(KU_KU_DATA.filter(q => q.a === table));
+    } else {
+      practiceList = KU_KU_DATA.filter(q => q.a === table);
+    }
+    practiceIndex = 0;
+  }
+  function currentQuestion() { return practiceList[practiceIndex] || KU_KU_DATA[0]; }
+  function renderPractice(resetVisibility=true) {
+    const q = currentQuestion();
+    const sequenceDefaults = practiceMode === "sequence";
+    if (resetVisibility) {
+      showPracticeAnswer = practiceMode === "model" || (sequenceDefaults && $("initialAnswer").checked);
+      showPracticeReading = practiceMode === "model" || practiceMode === "hide" || (sequenceDefaults && $("initialReading").checked);
+    }
+    $("practiceA").textContent = q.a;
+    $("practiceB").textContent = q.b;
+    $("practiceAnswer").textContent = showPracticeAnswer ? q.answer : "？";
+    $("practiceAnswer").style.visibility = showPracticeAnswer ? "visible" : "visible";
+    const alignedReading = READING_ALIGNMENT[`${q.a}-${q.b}`] || [q.reading, "", "が", ""];
+    $("readingA").textContent = alignedReading[0];
+    $("readingB").textContent = alignedReading[1];
+    $("readingGa").textContent = (q.a * q.b < 10) ? alignedReading[2] : "";
+    $("readingAnswer").textContent = showPracticeAnswer ? alignedReading[3] : "？";
+    $("practiceReading").hidden = !showPracticeReading;
+    $("practiceHiddenNote").hidden = showPracticeAnswer || practiceMode === "model";
+    $("practiceProgress").textContent = `${practiceIndex + 1} / ${practiceList.length}`;
+    $("practicePrev").disabled = practiceIndex <= 0;
+    $("practiceNext").disabled = practiceIndex >= practiceList.length - 1;
+    $("practiceRevealAnswer").textContent = showPracticeAnswer ? "答えをかくす" : "こたえをみる";
+    $("practiceRevealReading").textContent = showPracticeReading ? "読み方をかくす" : "読み方をみる";
+    $("practiceFeedback").textContent = "";
+  }
+  function startPracticeMode(mode, rebuild=true) {
+    stopAuto();
+    clearReviewTimer();
+    practiceMode = mode;
+    document.querySelectorAll(".mode-tab").forEach(btn => btn.classList.toggle("active", btn.dataset.mode === mode));
+    updateModeSettings();
+    if (rebuild) makePracticeList();
+    renderPractice();
+  }
+  let reviewTimer = null;
+  function clearReviewTimer() {
+    if (reviewTimer !== null) { clearTimeout(reviewTimer); reviewTimer = null; }
+    document.querySelector(".practice-card").classList.remove("checked-answer");
+  }
+  function stepPractice(delta) {
+    stopAuto();
+    clearReviewTimer();
+    const next = Math.max(0, Math.min(practiceList.length - 1, practiceIndex + delta));
+    if (next === practiceIndex) return;
+    
+    practiceIndex = next;
+    renderPractice(false);
+  }
+  function revealPracticeAnswer() {
+    showPracticeAnswer = !showPracticeAnswer;
+    const q = currentQuestion();
+    $("practiceAnswer").textContent = showPracticeAnswer ? q.answer : "？";
+    const aligned = READING_ALIGNMENT[`${q.a}-${q.b}`];
+    $("readingAnswer").textContent = showPracticeAnswer ? aligned[2] : "？";
+    $("practiceHiddenNote").hidden = showPracticeAnswer || practiceMode === "model";
+    $("practiceRevealAnswer").textContent = showPracticeAnswer ? "答えをかくす" : "こたえをみる";
+    $("practiceFeedback").textContent = showPracticeAnswer ? "答えを表示しました。" : "答えをかくしました。";
+  }
+  function revealPracticeReading() {
+    showPracticeReading = !showPracticeReading;
+    const parts = READING_ALIGNMENT[`${currentQuestion().a}-${currentQuestion().b}`];
+    $("readingA").textContent = parts[0];
+    $("readingB").textContent = parts[1];
+    $("readingGa").textContent = (current.a * current.b < 10) ? parts[2] : "";
+    $("readingAnswer").textContent = showPracticeAnswer ? parts[3] : "？";
+    $("practiceReading").hidden = !showPracticeReading;
+    $("practiceRevealReading").textContent = showPracticeReading ? "読み方をかくす" : "読み方をみる";
+  }
+  function restartPractice() {
+    stopAuto();
+    clearReviewTimer();
+    makePracticeList();
+    renderPractice();
+  }
+  function toggleAuto() {
+    if (autoTimer !== null) { stopAuto(); $("practiceFeedback").textContent = "自動進行を停止しました。"; return; }
+    if (practiceIndex >= practiceList.length - 1) { restartPractice(); }
+    const ms = Number($("autoInterval").value) * 1000;
+    $("practiceAutoToggle").textContent = "自動進行を停止";
+    autoTimer = setInterval(() => {
+      if (practiceIndex >= practiceList.length - 1) {
+        stopAuto();
+        $("practiceFeedback").textContent = "最後の問題です。";
+        return;
+      }
+      practiceIndex++;
+      renderPractice();
+      $("practiceAutoToggle").textContent = "自動進行を停止";
+    }, ms);
+  }
+  function openPractice() {
+    originalMenuScreen.hidden = true;
+    originalLessonScreen.hidden = true;
+    practiceScreen.hidden = false;
+    document.querySelector(".teacher-controls").hidden = true;
+    startPracticeMode(practiceMode);
+  }
+  function closePractice() {
+    stopAuto();
+    clearReviewTimer();
+    practiceScreen.hidden = true;
+    document.querySelector(".teacher-controls").hidden = false;
+    if (inLesson) { originalLessonScreen.hidden = false; originalMenuScreen.hidden = true; }
+    else { originalLessonScreen.hidden = true; originalMenuScreen.hidden = false; }
+  }
+  for (let n=1; n<=9; n++) {
+    const opt = document.createElement("option");
+    opt.value = String(n); opt.textContent = `${n}の段`;
+    if (n === 5) opt.selected = true;
+    $("practiceTable").appendChild(opt);
+  }
+  $("practiceLaunch").addEventListener("click", openPractice);
+  $("practiceBackMenu").addEventListener("click", closePractice);
+  document.querySelectorAll(".mode-tab").forEach(btn => btn.addEventListener("click", () => startPracticeMode(btn.dataset.mode)));
+  $("practiceTable").addEventListener("change", () => { stopAuto(); makePracticeList(); renderPractice(); });
+  $("practiceOrder").addEventListener("change", () => { stopAuto(); makePracticeList(); renderPractice(); });
+  $("initialAnswer").addEventListener("change", () => { if (practiceMode === "sequence") renderPractice(); });
+  $("initialReading").addEventListener("change", () => { if (practiceMode === "sequence") renderPractice(); });
+  $("practiceRestart").addEventListener("click", restartPractice);
+  $("practicePrev").addEventListener("click", () => stepPractice(-1));
+  $("practiceNext").addEventListener("click", () => stepPractice(1));
+  $("practiceRevealAnswer").addEventListener("click", revealPracticeAnswer);
+  $("practiceRevealReading").addEventListener("click", revealPracticeReading);
+  $("practiceAutoToggle").addEventListener("click", toggleAuto);
+
+  buildMenu();
+  $("backBtn").disabled = true;
+})();
+</script>
+</body>
+</html>
